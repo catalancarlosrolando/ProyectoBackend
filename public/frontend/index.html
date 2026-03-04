@@ -27,6 +27,9 @@
                 <a href="#" class="nav-link" data-section="files">
                     <span class="nav-icon">📁</span> Archivos
                 </a>
+                <a href="#" class="nav-link admin-only" data-section="admin-users" style="display:none;">
+                    <span class="nav-icon">👥</span> Usuarios
+                </a>
                 <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
                     <span class="nav-icon">📊</span> Dashboard
                 </a>
@@ -282,6 +285,172 @@
                 </div>
             </section>
 
+            <!-- ========== ADMIN USERS SECTION ========== -->
+            <section id="sectionAdmin-users" class="section">
+                <div class="section__header">
+                    <h2 class="section__title">Gestión de Usuarios</h2>
+                    <p class="section__subtitle">Administra usuarios, aprueba registros, asigna roles y revisa historial</p>
+                </div>
+
+                <!-- Filtros -->
+                <div class="card">
+                    <div class="card__header">
+                        <h3 class="card__title">🔍 Filtros</h3>
+                        <div class="btn-group">
+                            <button class="btn btn--sm btn--primary" id="btnApplyFilters">Buscar</button>
+                            <button class="btn btn--sm btn--outline" id="btnClearFilters">Limpiar</button>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="filters-grid">
+                            <div class="form-group">
+                                <label for="filterName" class="form-label">Nombre</label>
+                                <input type="text" id="filterName" class="form-input" placeholder="Buscar por nombre...">
+                            </div>
+                            <div class="form-group">
+                                <label for="filterEmail" class="form-label">Email</label>
+                                <input type="text" id="filterEmail" class="form-input" placeholder="Buscar por email...">
+                            </div>
+                            <div class="form-group">
+                                <label for="filterDni" class="form-label">DNI</label>
+                                <input type="text" id="filterDni" class="form-input" placeholder="12345678A">
+                            </div>
+                            <div class="form-group">
+                                <label for="filterStatus" class="form-label">Estado</label>
+                                <select id="filterStatus" class="form-input">
+                                    <option value="">Todos</option>
+                                    <option value="registered">Registrado</option>
+                                    <option value="verified">Verificado</option>
+                                    <option value="approved">Aprobado</option>
+                                    <option value="disabled">Deshabilitado</option>
+                                    <option value="deleted">Eliminado</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="filterRole" class="form-label">Rol</label>
+                                <select id="filterRole" class="form-input">
+                                    <option value="">Todos</option>
+                                    <option value="user">User</option>
+                                    <option value="moderator">Moderator</option>
+                                    <option value="verified">Verified</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="filterPerPage" class="form-label">Por página</label>
+                                <select id="filterPerPage" class="form-input">
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de usuarios -->
+                <div class="card">
+                    <div class="card__header">
+                        <h3 class="card__title">📋 Usuarios</h3>
+                        <button class="btn btn--sm btn--outline" id="btnRefreshUsers">🔄 Actualizar</button>
+                    </div>
+                    <div class="card__body" style="padding:0;">
+                        <div id="usersLoading" class="loading" style="display:none;">
+                            <div class="spinner spinner--sm"></div>
+                            <p>Cargando usuarios...</p>
+                        </div>
+                        <div id="usersEmpty" class="empty-state" style="display:none;">
+                            <p>👥 No se encontraron usuarios con los filtros aplicados</p>
+                        </div>
+                        <div id="usersTableWrapper" style="display:none;">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nombre</th>
+                                            <th>Email</th>
+                                            <th>Estado</th>
+                                            <th>Roles</th>
+                                            <th>Registro</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usersTableBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-bar" id="usersPagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalle de usuario -->
+                <div class="card" id="userDetailCard" style="display:none;">
+                    <div class="card__header">
+                        <h3 class="card__title" id="userDetailTitle">Detalle del Usuario</h3>
+                        <button class="btn btn--sm btn--outline" id="btnCloseDetail">✕ Cerrar</button>
+                    </div>
+                    <div class="card__body">
+                        <div class="user-detail-grid">
+                            <div class="user-detail-info">
+                                <div class="profile-avatar" id="userDetailAvatar">?</div>
+                                <div class="profile-details">
+                                    <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" id="udId">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Nombre</span><span class="detail-value" id="udName">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value" id="udEmail">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">DNI</span><span class="detail-value" id="udDni">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Móvil</span><span class="detail-value" id="udMobile">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Estado</span><span class="detail-value" id="udStatus">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Email verificado</span><span class="detail-value" id="udVerified">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Último acceso</span><span class="detail-value" id="udLastAccess">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Registrado</span><span class="detail-value" id="udCreatedAt">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Motivo rechazo</span><span class="detail-value" id="udRejection">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Roles</span><div class="tags" id="udRoles"><span class="tag tag--muted">-</span></div></div>
+                                    <div class="detail-row"><span class="detail-label">Permisos</span><div class="tags" id="udPermissions"><span class="tag tag--muted">-</span></div></div>
+                                </div>
+                            </div>
+                            <div class="user-detail-actions">
+                                <h4 style="margin-bottom:0.75rem;font-size:0.9rem;">Acciones rápidas</h4>
+                                <div class="action-buttons-stack" id="udActions"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial -->
+                <div class="card" id="userHistoryCard" style="display:none;">
+                    <div class="card__header">
+                        <h3 class="card__title" id="userHistoryTitle">📜 Historial de Cambios</h3>
+                        <button class="btn btn--sm btn--outline" id="btnCloseHistory">✕ Cerrar</button>
+                    </div>
+                    <div class="card__body" style="padding:0;">
+                        <div id="historyLoading" class="loading" style="display:none;">
+                            <div class="spinner spinner--sm"></div>
+                        </div>
+                        <div id="historyEmpty" class="empty-state" style="display:none;">
+                            <p>No hay historial para este usuario</p>
+                        </div>
+                        <div id="historyTableWrapper" style="display:none;">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Acción</th>
+                                            <th>Anterior</th>
+                                            <th>Nuevo</th>
+                                            <th>Motivo</th>
+                                            <th>Admin</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- ========== DASHBOARD SECTION ========== -->
             <section id="sectionDashboard" class="section">
                 <div class="section__header">
@@ -474,6 +643,57 @@
                 </form>
                 <div class="modal__footer-text">
                     <p><a href="#" id="backToLogin" class="link">← Volver al login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: STATUS CHANGE (Reason) ========== -->
+    <div id="statusChangeModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--sm">
+            <div class="modal__header">
+                <h2 class="modal__title" id="statusChangeTitle">Cambiar Estado</h2>
+                <button class="modal__close" data-close-modal="statusChangeModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p id="statusChangeDesc" class="text-muted" style="margin-bottom:1rem;">¿Estás seguro?</p>
+                <div class="form-group">
+                    <label for="statusChangeReason" class="form-label">Motivo (opcional)</label>
+                    <textarea id="statusChangeReason" class="form-input form-textarea" rows="3" maxlength="500" placeholder="Explica el motivo del cambio..."></textarea>
+                    <small class="form-hint">Máximo 500 caracteres</small>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn--primary" id="btnStatusChangeConfirm">Confirmar</button>
+                    <button class="btn btn--outline" data-close-modal="statusChangeModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: ASSIGN/REVOKE ROLE ========== -->
+    <div id="roleModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--sm">
+            <div class="modal__header">
+                <h2 class="modal__title" id="roleModalTitle">Gestión de Rol</h2>
+                <button class="modal__close" data-close-modal="roleModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p id="roleModalDesc" class="text-muted" style="margin-bottom:1rem;"></p>
+                <div class="form-group">
+                    <label for="roleSelect" class="form-label">Rol</label>
+                    <select id="roleSelect" class="form-input">
+                        <option value="">Seleccionar rol...</option>
+                        <option value="user">User</option>
+                        <option value="moderator">Moderator</option>
+                        <option value="verified">Verified</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn--primary" id="btnRoleConfirm">Confirmar</button>
+                    <button class="btn btn--outline" data-close-modal="roleModal">Cancelar</button>
                 </div>
             </div>
         </div>
