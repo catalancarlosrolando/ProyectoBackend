@@ -5,6 +5,11 @@ use App\Http\Controllers\DocumentationController;
 
 Route::get('/', fn() => view('api-client'));
 
+// Ruta para el frontend SPA
+Route::get('/frontend', function () {
+    return file_get_contents(public_path('frontend/index.html'));
+});
+
 // Ruta para previsualizar emails (solo para desarrollo)
 if (app()->environment('local')) {
     Route::get('/email-preview/reset-password', function () {
