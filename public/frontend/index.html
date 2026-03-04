@@ -1,118 +1,377 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Microservicios API - Frontend</title>
+    <title>Difexa - Frontend</title>
     <link rel="stylesheet" href="./frontend/css/styles.css">
 </head>
+
 <body>
-    <div class="container">
-        <header class="header">
-            <h1 class="header__title">Microservicios API</h1>
-            <nav class="header__nav">
-                <span id="userWelcome" class="user-welcome" style="display: none;"></span>
-                <button id="btnLogin" class="btn btn--secondary">Iniciar Sesión</button>
-                <button id="btnLogout" class="btn btn--secondary" style="display: none;">Cerrar Sesión</button>
+    <div class="app">
+        <!-- Header / Navbar -->
+        <header class="navbar">
+            <div class="navbar__brand">
+                <span class="navbar__logo">◆</span>
+                <h1 class="navbar__title">Difexa</h1>
+                <span class="navbar__badge">API v1.0</span>
+            </div>
+            <nav class="navbar__nav" id="mainNav">
+                <a href="#" class="nav-link active" data-section="home">
+                    <span class="nav-icon">🏠</span> Inicio
+                </a>
+                <a href="#" class="nav-link auth-only" data-section="profile" style="display:none;">
+                    <span class="nav-icon">👤</span> Perfil
+                </a>
+                <a href="#" class="nav-link" data-section="files">
+                    <span class="nav-icon">📁</span> Archivos
+                </a>
+                <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
             </nav>
+            <div class="navbar__actions">
+                <span id="userWelcome" class="user-badge" style="display:none;"></span>
+                <button id="btnLogin" class="btn btn--outline">Iniciar Sesión</button>
+                <button id="btnRegister" class="btn btn--primary btn--sm">Registrarse</button>
+                <button id="btnLogout" class="btn btn--ghost" style="display:none;">
+                    Cerrar Sesión
+                </button>
+            </div>
+            <button class="navbar__toggle" id="navToggle">☰</button>
         </header>
 
+        <!-- Toast notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+
+        <!-- Main content -->
         <main class="main">
-            <section class="landing-section">
-                <div class="loading" id="loading">
+
+            <!-- ========== HOME SECTION ========== -->
+            <section id="sectionHome" class="section active">
+                <div class="section__header">
+                    <h2 class="section__title">Estado de la API</h2>
+                    <p class="section__subtitle">Monitorea la conexión con el backend en tiempo real</p>
+                </div>
+
+                <div class="loading" id="homeLoading">
                     <div class="spinner"></div>
-                    <p>Cargando...</p>
+                    <p>Conectando con la API...</p>
                 </div>
 
-                <div class="content" id="content" style="display: none;">
-                    <h2 class="content__title">Estado de la API</h2>
-                    <div class="card">
-                        <p class="card__label">Mensaje:</p>
-                        <p class="card__value" id="apiMessage"></p>
+                <div id="homeContent" style="display:none;">
+                    <div class="stats-grid">
+                        <div class="stat-card stat-card--success">
+                            <div class="stat-card__icon">✅</div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__label">Estado</span>
+                                <span class="stat-card__value" id="apiStatus">Conectado</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon">💬</div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__label">Mensaje</span>
+                                <span class="stat-card__value" id="apiMessage">-</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon">🏷️</div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__label">Versión</span>
+                                <span class="stat-card__value" id="apiVersion">-</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__icon">🕐</div>
+                            <div class="stat-card__info">
+                                <span class="stat-card__label">Timestamp</span>
+                                <span class="stat-card__value" id="apiTimestamp">-</span>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Ping test -->
                     <div class="card">
-                        <p class="card__label">Versión:</p>
-                        <p class="card__value" id="apiVersion"></p>
+                        <div class="card__header">
+                            <h3 class="card__title">Health Check</h3>
+                            <button class="btn btn--sm btn--outline" id="btnPing">🔄 Ping</button>
+                        </div>
+                        <div class="card__body">
+                            <div id="pingResult" class="code-block">
+                                <pre>Haz clic en "Ping" para verificar el estado de la API</pre>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card">
-                        <p class="card__label">Timestamp:</p>
-                        <p class="card__value" id="apiTimestamp"></p>
+
+                    <!-- Quick actions for guests -->
+                    <div id="guestActions" class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">Comenzar</h3>
+                        </div>
+                        <div class="card__body">
+                            <p class="text-muted mb-1">Inicia sesión o crea una cuenta para acceder a todas las
+                                funcionalidades.</p>
+                            <div class="btn-group">
+                                <button class="btn btn--primary" id="btnGuestLogin">Iniciar Sesión</button>
+                                <button class="btn btn--outline" id="btnGuestRegister">Crear Cuenta</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="error" id="error" style="display: none;">
-                    <h3 class="error__title">Error al conectar con la API</h3>
-                    <p class="error__message" id="errorMessage"></p>
-                    <button class="btn btn--primary" onclick="location.reload()">Reintentar</button>
+                <div id="homeError" class="error-state" style="display:none;">
+                    <div class="error-state__icon">⚠️</div>
+                    <h3>Error al conectar con la API</h3>
+                    <p id="homeErrorMessage">No se pudo conectar con el servidor.</p>
+                    <button class="btn btn--primary" id="btnRetry">Reintentar</button>
                 </div>
             </section>
 
-            <!-- Sección para usuarios autenticados -->
-            <section class="protected-section" id="protectedSection" style="display: none;">
-                <div class="card card--highlight">
-                    <h3 class="card__title">Panel de Usuario</h3>
-                    <p class="card__description">Esta sección solo es visible para usuarios autenticados.</p>
-                    <button class="btn btn--primary" id="btnUserAction">Ver Perfil</button>
+            <!-- ========== PROFILE SECTION ========== -->
+            <section id="sectionProfile" class="section">
+                <div class="section__header">
+                    <h2 class="section__title">Mi Perfil</h2>
+                    <p class="section__subtitle">Información de tu cuenta y sesión</p>
+                </div>
+
+                <div class="profile-grid">
+                    <div class="card profile-card">
+                        <div class="card__header">
+                            <h3 class="card__title">Información Personal</h3>
+                            <button class="btn btn--sm btn--outline" id="btnRefreshProfile">🔄 Actualizar</button>
+                        </div>
+                        <div class="card__body">
+                            <div class="profile-avatar" id="profileAvatar">?</div>
+                            <div class="profile-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">ID</span>
+                                    <span class="detail-value" id="profileId">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Nombre</span>
+                                    <span class="detail-value" id="profileName">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Email</span>
+                                    <span class="detail-value" id="profileEmail">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Email Verificado</span>
+                                    <span class="detail-value" id="profileVerified">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">Roles y Permisos</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="detail-row">
+                                <span class="detail-label">Roles</span>
+                                <div class="tags" id="profileRoles">
+                                    <span class="tag tag--muted">Sin roles</span>
+                                </div>
+                            </div>
+                            <div class="detail-row" style="margin-top: 1rem;">
+                                <span class="detail-label">Permisos</span>
+                                <div class="tags" id="profilePermissions">
+                                    <span class="tag tag--muted">Sin permisos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">Sesión Activa</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="detail-row">
+                                <span class="detail-label">Token</span>
+                                <span class="detail-value token-display" id="profileToken">-</span>
+                            </div>
+                            <div class="btn-group" style="margin-top: 1rem;">
+                                <button class="btn btn--danger btn--sm" id="btnProfileLogout">Cerrar Sesión</button>
+                                <button class="btn btn--outline btn--sm" id="btnResendVerification">Reenviar
+                                    Verificación</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- Sección para administradores -->
-            <section class="admin-section" id="adminSection" style="display: none;">
-                <div class="card card--admin">
-                    <h3 class="card__title">Panel de Administrador</h3>
-                    <p class="card__description">Esta sección solo es visible para administradores.</p>
-                    <button class="btn btn--danger" id="btnAdminAction">Ver Dashboard</button>
+            <!-- ========== FILES SECTION ========== -->
+            <section id="sectionFiles" class="section">
+                <div class="section__header">
+                    <h2 class="section__title">Gestión de Archivos</h2>
+                    <p class="section__subtitle">Sube, lista, descarga y elimina archivos del servidor</p>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3 class="card__title">📤 Subir Archivos</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="upload-zone" id="uploadZone">
+                            <div class="upload-zone__icon">📁</div>
+                            <p class="upload-zone__text">Arrastra archivos aquí o haz clic para seleccionar</p>
+                            <p class="upload-zone__hint">Máximo 10 archivos, 10MB por archivo</p>
+                            <input type="file" id="fileInput" multiple style="display:none;">
+                        </div>
+
+                        <div id="selectedFiles" class="selected-files" style="display:none;">
+                            <div class="selected-files__header">
+                                <span id="selectedCount">0 archivos seleccionados</span>
+                                <button class="btn btn--ghost btn--sm" id="btnClearFiles">✕ Limpiar</button>
+                            </div>
+                            <div id="filePreviewList" class="file-preview-list"></div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label class="form-label" for="uploadDescription">Descripción (opcional)</label>
+                            <input type="text" id="uploadDescription" class="form-input"
+                                placeholder="Descripción de los archivos..." maxlength="500">
+                        </div>
+
+                        <button class="btn btn--primary btn--block" id="btnUpload" disabled>
+                            <span id="uploadBtnText">Subir Archivos</span>
+                        </button>
+
+                        <div id="uploadProgress" class="progress-bar" style="display:none;">
+                            <div class="progress-bar__fill" id="uploadProgressFill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3 class="card__title">📋 Archivos en el Servidor</h3>
+                        <button class="btn btn--sm btn--outline" id="btnRefreshFiles">🔄 Actualizar</button>
+                    </div>
+                    <div class="card__body">
+                        <div id="filesLoading" class="loading" style="display:none;">
+                            <div class="spinner spinner--sm"></div>
+                            <p>Cargando archivos...</p>
+                        </div>
+                        <div id="filesEmpty" class="empty-state">
+                            <p>📂 No hay archivos en el servidor</p>
+                        </div>
+                        <div id="filesTable" style="display:none;">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Tamaño</th>
+                                            <th>Última modificación</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="filesTableBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="files-summary">
+                                <span id="filesTotalCount">0 archivos</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
+
+            <!-- ========== DASHBOARD SECTION ========== -->
+            <section id="sectionDashboard" class="section">
+                <div class="section__header">
+                    <h2 class="section__title">Panel de Administración</h2>
+                    <p class="section__subtitle">Vista general del sistema (requiere rol admin)</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card stat-card--primary">
+                        <div class="stat-card__icon">👥</div>
+                        <div class="stat-card__info">
+                            <span class="stat-card__value" id="dashUsers">-</span>
+                            <span class="stat-card__label">Usuarios</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-card--success">
+                        <div class="stat-card__icon">📝</div>
+                        <div class="stat-card__info">
+                            <span class="stat-card__value" id="dashPosts">-</span>
+                            <span class="stat-card__label">Posts</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-card--warning">
+                        <div class="stat-card__icon">💬</div>
+                        <div class="stat-card__info">
+                            <span class="stat-card__value" id="dashComments">-</span>
+                            <span class="stat-card__label">Comentarios</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-card--info">
+                        <div class="stat-card__icon">📊</div>
+                        <div class="stat-card__info">
+                            <span class="stat-card__value" id="dashActive">-</span>
+                            <span class="stat-card__label">Activos hoy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3 class="card__title">Respuesta del Dashboard API</h3>
+                        <button class="btn btn--sm btn--outline" id="btnRefreshDash">🔄 Actualizar</button>
+                    </div>
+                    <div class="card__body">
+                        <div id="dashLoading" class="loading" style="display:none;">
+                            <div class="spinner spinner--sm"></div>
+                        </div>
+                        <div id="dashResponse" class="code-block">
+                            <pre>Haz clic en "Actualizar" para cargar los datos del dashboard</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </main>
 
         <footer class="footer">
-            <p>&copy; 2025 Microservicios API. Todos los derechos reservados.</p>
+            <p>&copy; 2026 Difexa — Microservicios API. Todos los derechos reservados.</p>
+            <div class="footer__links">
+                <a href="/docs" class="footer__link">📚 Documentación</a>
+                <a href="/" class="footer__link">🔧 API Client</a>
+            </div>
         </footer>
     </div>
 
-    <!-- Modal de Login -->
+    <!-- ========== MODAL: LOGIN ========== -->
     <div id="loginModal" class="modal">
+        <div class="modal__overlay"></div>
         <div class="modal__content">
             <div class="modal__header">
                 <h2 class="modal__title">Iniciar Sesión</h2>
-                <button class="modal__close" id="closeLoginModal">&times;</button>
+                <button class="modal__close" data-close-modal="loginModal">&times;</button>
             </div>
             <div class="modal__body">
-                <!-- Área de mensajes de error -->
-                <div class="alert alert--error" id="loginError" style="display: none;">
+                <div class="alert alert--error" id="loginError" style="display:none;">
                     <p id="loginErrorMessage"></p>
                 </div>
-
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="loginEmail" class="form-label">Email</label>
-                        <input
-                            type="email"
-                            id="loginEmail"
-                            class="form-input"
-                            placeholder="tu@email.com"
-                            required
-                        >
+                        <input type="email" id="loginEmail" class="form-input" placeholder="tu@email.com" required>
                     </div>
                     <div class="form-group">
                         <label for="loginPassword" class="form-label">Contraseña</label>
-                        <input
-                            type="password"
-                            id="loginPassword"
-                            class="form-input"
-                            placeholder="••••••••"
-                            required
-                        >
+                        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
                     </div>
-                    <div class="form-group form-group--checkbox">
+                    <div class="form-group form-group--inline">
                         <label class="checkbox-label">
-                            <input
-                                type="checkbox"
-                                id="rememberMe"
-                                class="checkbox-input"
-                            >
-                            <span class="checkbox-text">Recordarme</span>
+                            <input type="checkbox" id="rememberMe" class="checkbox-input">
+                            <span>Recordarme (30 días)</span>
                         </label>
                     </div>
                     <button type="submit" class="btn btn--primary btn--block" id="btnSubmitLogin">
@@ -120,106 +379,119 @@
                     </button>
                 </form>
                 <div class="modal__footer-text">
-                    <p>¿No tienes cuenta? <a href="#" id="showRegisterModal" class="link">Regístrate aquí</a></p>
+                    <p>¿No tienes cuenta? <a href="#" id="switchToRegister" class="link">Regístrate aquí</a></p>
+                    <p style="margin-top:0.5rem;"><a href="#" id="showForgotPassword" class="link">¿Olvidaste tu
+                            contraseña?</a></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Registro -->
+    <!-- ========== MODAL: REGISTER ========== -->
     <div id="registerModal" class="modal">
-        <div class="modal__content">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
             <div class="modal__header">
                 <h2 class="modal__title">Crear Cuenta</h2>
-                <button class="modal__close" id="closeRegisterModal">&times;</button>
+                <button class="modal__close" data-close-modal="registerModal">&times;</button>
             </div>
             <div class="modal__body">
-                <!-- Área de mensajes de error -->
-                <div class="alert alert--error" id="registerError" style="display: none;">
+                <div class="alert alert--error" id="registerError" style="display:none;">
                     <p id="registerErrorMessage"></p>
                 </div>
-
                 <form id="registerForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="registerFirstName" class="form-label">Nombres</label>
-                            <input
-                                type="text"
-                                id="registerFirstName"
-                                class="form-input"
-                                placeholder="Juan"
-                                required
-                            >
+                            <label for="registerFirstName" class="form-label">Nombres *</label>
+                            <input type="text" id="registerFirstName" class="form-input" placeholder="Juan" required>
                         </div>
                         <div class="form-group">
-                            <label for="registerLastName" class="form-label">Apellidos</label>
-                            <input
-                                type="text"
-                                id="registerLastName"
-                                class="form-input"
-                                placeholder="Pérez"
-                                required
-                            >
+                            <label for="registerLastName" class="form-label">Apellidos *</label>
+                            <input type="text" id="registerLastName" class="form-input" placeholder="Pérez" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="registerMobile" class="form-label">Móvil (Opcional)</label>
-                        <input
-                            type="tel"
-                            id="registerMobile"
-                            class="form-input"
-                            placeholder="+56 9 1234 5678"
-                        >
+                        <label for="registerMobile" class="form-label">Móvil</label>
+                        <input type="tel" id="registerMobile" class="form-input" placeholder="+56 9 1234 5678">
                     </div>
                     <div class="form-group">
-                        <label for="registerEmail" class="form-label">Email</label>
-                        <input
-                            type="email"
-                            id="registerEmail"
-                            class="form-input"
-                            placeholder="tu@email.com"
-                            required
-                        >
+                        <label for="registerEmail" class="form-label">Email *</label>
+                        <input type="email" id="registerEmail" class="form-input" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="registerPassword" class="form-label">Contraseña *</label>
+                            <input type="password" id="registerPassword" class="form-input" placeholder="••••••••"
+                                required minlength="8">
+                            <small class="form-hint">Mínimo 8 caracteres</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPasswordConfirm" class="form-label">Confirmar *</label>
+                            <input type="password" id="registerPasswordConfirm" class="form-input"
+                                placeholder="••••••••" required minlength="8">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="registerPassword" class="form-label">Contraseña</label>
-                        <input
-                            type="password"
-                            id="registerPassword"
-                            class="form-input"
-                            placeholder="••••••••"
-                            required
-                            minlength="8"
-                        >
-                        <small class="form-hint">Mínimo 8 caracteres</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPasswordConfirm" class="form-label">Confirmar Contraseña</label>
-                        <input
-                            type="password"
-                            id="registerPasswordConfirm"
-                            class="form-input"
-                            placeholder="••••••••"
-                            required
-                            minlength="8"
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="registerSemanticContext" class="form-label">Contexto Semántico (Opcional)</label>
-                        <textarea
-                            id="registerSemanticContext"
-                            class="form-input form-textarea"
-                            placeholder="Información adicional sobre tu perfil o contexto de uso..."
-                            rows="3"
-                        ></textarea>
+                        <label for="registerSemanticContext" class="form-label">Contexto Semántico</label>
+                        <textarea id="registerSemanticContext" class="form-input form-textarea"
+                            placeholder="Información adicional sobre tu perfil..." rows="2"></textarea>
                         <small class="form-hint">Este campo agrega contexto a la IA</small>
                     </div>
                     <button type="submit" class="btn btn--primary btn--block" id="btnSubmitRegister">
-                        Registrarse
+                        Crear Cuenta
                     </button>
                 </form>
                 <div class="modal__footer-text">
-                    <p>¿Ya tienes cuenta? <a href="#" id="showLoginModal" class="link">Inicia sesión aquí</a></p>
+                    <p>¿Ya tienes cuenta? <a href="#" id="switchToLogin" class="link">Inicia sesión aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: FORGOT PASSWORD ========== -->
+    <div id="forgotModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title">Recuperar Contraseña</h2>
+                <button class="modal__close" data-close-modal="forgotModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="alert alert--error" id="forgotError" style="display:none;">
+                    <p id="forgotErrorMessage"></p>
+                </div>
+                <div class="alert alert--success" id="forgotSuccess" style="display:none;">
+                    <p id="forgotSuccessMessage"></p>
+                </div>
+                <form id="forgotForm">
+                    <div class="form-group">
+                        <label for="forgotEmail" class="form-label">Email de tu cuenta</label>
+                        <input type="email" id="forgotEmail" class="form-input" placeholder="tu@email.com" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--block" id="btnSubmitForgot">
+                        Enviar Enlace de Recuperación
+                    </button>
+                </form>
+                <div class="modal__footer-text">
+                    <p><a href="#" id="backToLogin" class="link">← Volver al login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: CONFIRM ========== -->
+    <div id="confirmModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--sm">
+            <div class="modal__header">
+                <h2 class="modal__title" id="confirmTitle">Confirmar</h2>
+                <button class="modal__close" data-close-modal="confirmModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p id="confirmMessage">¿Estás seguro?</p>
+                <div class="btn-group" style="margin-top: 1.5rem;">
+                    <button class="btn btn--danger" id="btnConfirmYes">Sí, eliminar</button>
+                    <button class="btn btn--outline" data-close-modal="confirmModal">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -227,4 +499,5 @@
 
     <script src="./frontend/js/app.js"></script>
 </body>
+
 </html>

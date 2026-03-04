@@ -1,847 +1,811 @@
 /**
- * Configuración de la aplicación
+ * =============================================
+ * Difexa Frontend Application
+ * =============================================
+ * Cubre todas las funcionalidades del backend:
+ * - Auth: login, register, logout, perfil, forgot/reset password
+ * - Files: upload, list, download, delete
+ * - Dashboard: panel admin con stats
+ * =============================================
  */
-const API_BASE_URL = 'http://localhost:8000/api';
-const TOKEN_KEY = 'auth_token';
-const USER_KEY = 'user_data';
 
-/**
- * Referencias a elementos del DOM
- */
-const elements = {
-    // Elementos principales
-    loading: document.getElementById('loading'),
-    content: document.getElementById('content'),
-    error: document.getElementById('error'),
-    errorMessage: document.getElementById('errorMessage'),
-    apiMessage: document.getElementById('apiMessage'),
-    apiVersion: document.getElementById('apiVersion'),
-    apiTimestamp: document.getElementById('apiTimestamp'),
+// ── Configuración ──
+const API_BASE = '/api';
+const TOKEN_KEY = 'difexa_token';
+const USER_KEY = 'difexa_user';
 
-    // Secciones protegidas
-    protectedSection: document.getElementById('protectedSection'),
-    adminSection: document.getElementById('adminSection'),
-
-    // Navegación
-    userWelcome: document.getElementById('userWelcome'),
-    btnLogin: document.getElementById('btnLogin'),
-    btnLogout: document.getElementById('btnLogout'),
-
-    // Modales
-    loginModal: document.getElementById('loginModal'),
-    registerModal: document.getElementById('registerModal'),
-    closeLoginModal: document.getElementById('closeLoginModal'),
-    closeRegisterModal: document.getElementById('closeRegisterModal'),
-    showRegisterModal: document.getElementById('showRegisterModal'),
-    showLoginModal: document.getElementById('showLoginModal'),
-
-    // Formulario de Login
-    loginForm: document.getElementById('loginForm'),
-    loginEmail: document.getElementById('loginEmail'),
-    loginPassword: document.getElementById('loginPassword'),
-    rememberMe: document.getElementById('rememberMe'),
-    loginError: document.getElementById('loginError'),
-    loginErrorMessage: document.getElementById('loginErrorMessage'),
-    btnSubmitLogin: document.getElementById('btnSubmitLogin'),
-
-    // Formulario de Registro
-    registerForm: document.getElementById('registerForm'),
-    registerFirstName: document.getElementById('registerFirstName'),
-    registerLastName: document.getElementById('registerLastName'),
-    registerMobile: document.getElementById('registerMobile'),
-    registerEmail: document.getElementById('registerEmail'),
-    registerPassword: document.getElementById('registerPassword'),
-    registerPasswordConfirm: document.getElementById('registerPasswordConfirm'),
-    registerSemanticContext: document.getElementById('registerSemanticContext'),
-    registerError: document.getElementById('registerError'),
-    registerErrorMessage: document.getElementById('registerErrorMessage'),
-    btnSubmitRegister: document.getElementById('btnSubmitRegister'),
-
-    // Botones de acción
-    btnUserAction: document.getElementById('btnUserAction'),
-    btnAdminAction: document.getElementById('btnAdminAction'),
-};
-
-/**
- * Estado de la aplicación
- */
-const appState = {
+// ── Estado global ──
+const state = {
     isAuthenticated: false,
     user: null,
     token: null,
-    permissions: [],
     roles: [],
+    permissions: [],
+    selectedFiles: [],
+    confirmCallback: null,
 };
 
-/**
- * Clase para manejar el almacenamiento local
- */
-class StorageManager {
-    static setToken(token) {
-        localStorage.setItem(TOKEN_KEY, token);
-    }
+// ── Storage ──
+const storage = {
+    setToken(t) { localStorage.setItem(TOKEN_KEY, t); },
+    getToken() { return localStorage.getItem(TOKEN_KEY); },
+    setUser(u) { localStorage.setItem(USER_KEY, JSON.stringify(u)); },
+    getUser() { try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch { return null; } },
+    clear() { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); },
+};
 
-    static getToken() {
-        return localStorage.getItem(TOKEN_KEY);
-    }
+// ── API Client ──
+const api = {
+    async request(method, endpoint, { body = null, auth = false, isFormData = false } = {}) {
+        const headers = { 'Accept': 'application/json' };
+        if (auth && state.token) headers['Authorization'] = `Bearer ${state.token}`;
+        if (!isFormData) headers['Content-Type'] = 'application/json';
 
-    static removeToken() {
-        localStorage.removeItem(TOKEN_KEY);
-    }
-
-    static setUser(user) {
-        localStorage.setItem(USER_KEY, JSON.stringify(user));
-    }
-
-    static getUser() {
-        const user = localStorage.getItem(USER_KEY);
-        return user ? JSON.parse(user) : null;
-    }
-
-    static removeUser() {
-        localStorage.removeItem(USER_KEY);
-    }
-
-    static clear() {
-        this.removeToken();
-        this.removeUser();
-    }
-}
-
-/**
- * Clase para manejar las peticiones a la API
- */
-class ApiClient {
-    constructor(baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-
-    /**
-     * Obtener headers con autenticación
-     */
-    getHeaders(includeAuth = false) {
-        const headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        };
-
-        if (includeAuth && appState.token) {
-            headers['Authorization'] = `Bearer ${appState.token}`;
+        const opts = { method, headers };
+        if (body) {
+            opts.body = isFormData ? body : JSON.stringify(body);
         }
 
-        return headers;
-    }
+        const res = await fetch(`${API_BASE}${endpoint}`, opts);
+        const data = await res.json().catch(() => ({}));
 
-    /**
-     * Petición GET
-     */
-    async get(endpoint, authenticated = false) {
-        try {
-            const response = await fetch(`${this.baseUrl}${endpoint}`, {
-                method: 'GET',
-                headers: this.getHeaders(authenticated),
-            });
-
-            return await this.handleResponse(response);
-        } catch (error) {
-            console.error('Error en GET:', error);
-            throw error;
+        if (!res.ok) {
+            const msg = data.errors
+                ? Object.values(data.errors).flat().join(', ')
+                : data.message || `Error HTTP ${res.status}`;
+            throw new Error(msg);
         }
-    }
-
-    /**
-     * Petición POST
-     */
-    async post(endpoint, body, authenticated = false) {
-        try {
-            const response = await fetch(`${this.baseUrl}${endpoint}`, {
-                method: 'POST',
-                headers: this.getHeaders(authenticated),
-                body: JSON.stringify(body),
-            });
-
-            return await this.handleResponse(response);
-        } catch (error) {
-            console.error('Error en POST:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Manejar respuesta de la API
-     */
-    async handleResponse(response) {
-        const data = await response.json();
-
-        if (!response.ok) {
-            // Si hay error de validación, extraer los mensajes
-            if (data.errors) {
-                const errorMessages = Object.values(data.errors).flat().join(', ');
-                throw new Error(errorMessages);
-            }
-            throw new Error(data.message || `HTTP error! status: ${response.status}`);
-        }
-
         return data;
-    }
+    },
+
+    get(ep, auth = false) { return this.request('GET', ep, { auth }); },
+    post(ep, body, auth = false) { return this.request('POST', ep, { body, auth }); },
+    del(ep, auth = false) { return this.request('DELETE', ep, { auth }); },
+    upload(ep, formData) { return this.request('POST', ep, { body: formData, isFormData: true }); },
+};
+
+// ── Toast Notifications ──
+function showToast(message, type = 'info', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+
+    const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+    toast.innerHTML = `
+        <span class="toast__icon">${icons[type] || icons.info}</span>
+        <span class="toast__message">${message}</span>
+        <button class="toast__close" onclick="this.parentElement.remove()">×</button>
+    `;
+
+    container.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('toast--visible'));
+
+    setTimeout(() => {
+        toast.classList.remove('toast--visible');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
 }
 
-/**
- * Instancia del cliente API
- */
-const apiClient = new ApiClient(API_BASE_URL);
-
-/**
- * Clase para manejar la autenticación
- */
-class AuthManager {
-    /**
-     * Iniciar sesión
-     */
-    static async login(email, password) {
-        const data = await apiClient.post('/login', {
-            email,
-            password,
-        });
-
-        // Verificar que la respuesta sea exitosa
-        if (data.status !== 'success') {
-            throw new Error(data.message || 'Error en el login');
-        }
-
-        // Guardar token y usuario
-        StorageManager.setToken(data.data.token);
-        StorageManager.setUser(data.data.user);
-
-        // Actualizar estado de la aplicación
-        appState.isAuthenticated = true;
-        appState.token = data.data.token;
-        appState.user = data.data.user;
-
-        // Obtener permisos y roles de Spatie si existen
-        appState.permissions = data.data.user.permissions || [];
-        appState.roles = data.data.user.roles || [];
-
-        return data;
-    }
-
-    /**
-     * Registrar usuario
-     */
-    static async register(userData) {
-        const data = await apiClient.post('/register', {
-            first_name: userData.firstName,
-            last_name: userData.lastName,
-            mobile: userData.mobile || null,
-            semantic_context: userData.semanticContext || null,
-            email: userData.email,
-            password: userData.password,
-            password_confirmation: userData.passwordConfirmation,
-        });
-
-        // Verificar que la respuesta sea exitosa
-        if (!data.status || data.status !== 'success') {
-            throw new Error(data.message || 'Error en el registro');
-        }
-
-        // Guardar token y usuario
-        StorageManager.setToken(data.data.token);
-        StorageManager.setUser(data.data.user);
-
-        // Actualizar estado de la aplicación
-        appState.isAuthenticated = true;
-        appState.token = data.data.token;
-        appState.user = data.data.user;
-
-        // Obtener permisos y roles de Spatie si existen
-        appState.permissions = data.data.user.permissions || [];
-        appState.roles = data.data.user.roles || [];
-
-        return data;
-    }
-
-    /**
-     * Cerrar sesión
-     */
-    static async logout() {
-        try {
-            await apiClient.post('/logout', {}, true);
-        } catch (error) {
-            console.error('Error al cerrar sesión:', error);
-        } finally {
-            // Limpiar estado local siempre
-            this.clearSession();
-        }
-    }
-
-    /**
-     * Limpiar sesión local
-     */
-    static clearSession() {
-        StorageManager.clear();
-        appState.isAuthenticated = false;
-        appState.token = null;
-        appState.user = null;
-        appState.permissions = [];
-        appState.roles = [];
-    }
-
-    /**
-     * Verificar si hay sesión guardada
-     */
-    static checkStoredSession() {
-        const token = StorageManager.getToken();
-        const user = StorageManager.getUser();
-
-        if (token && user) {
-            appState.isAuthenticated = true;
-            appState.token = token;
-            appState.user = user;
-            appState.permissions = user.permissions || [];
-            appState.roles = user.roles || [];
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Obtener usuario actual del servidor
-     */
-    static async getCurrentUser() {
-        const data = await apiClient.get('/user', true);
-
-        if (!data.success) {
-            throw new Error(data.message || 'Error al obtener usuario');
-        }
-
-        // Actualizar usuario almacenado
-        StorageManager.setUser(data.data);
-        appState.user = data.data;
-        appState.permissions = data.data.permissions || [];
-        appState.roles = data.data.roles || [];
-
-        return data.data;
-    }
-}
-
-/**
- * Clase para manejar permisos
- */
-class PermissionManager {
-    /**
-     * Verificar si el usuario tiene un permiso específico
-     */
-    static hasPermission(permission) {
-        return appState.permissions.includes(permission);
-    }
-
-    /**
-     * Verificar si el usuario tiene un rol específico
-     */
-    static hasRole(role) {
-        return appState.roles.includes(role);
-    }
-
-    /**
-     * Verificar si el usuario es administrador
-     */
-    static isAdmin() {
-        return this.hasRole('admin');
-    }
-
-    /**
-     * Verificar si el usuario tiene alguno de los permisos especificados
-     */
-    static hasAnyPermission(permissions) {
-        return permissions.some(permission => this.hasPermission(permission));
-    }
-}
-
-/**
- * Clase para manejar la interfaz de usuario
- */
-class UIManager {
-    /**
-     * Mostrar el estado de carga
-     */
-    showLoading() {
-        elements.loading.style.display = 'flex';
-        elements.content.style.display = 'none';
-        elements.error.style.display = 'none';
-    }
-
-    /**
-     * Mostrar el contenido principal
-     */
-    showContent() {
-        elements.loading.style.display = 'none';
-        elements.content.style.display = 'block';
-        elements.error.style.display = 'none';
-    }
-
-    /**
-     * Mostrar un mensaje de error
-     */
-    showError(message) {
-        elements.loading.style.display = 'none';
-        elements.content.style.display = 'none';
-        elements.error.style.display = 'block';
-        elements.errorMessage.textContent = message;
-    }
-
-    /**
-     * Actualizar el contenido con los datos de la API
-     */
-    updateContent(data) {
-        elements.apiMessage.textContent = data.message;
-        elements.apiVersion.textContent = data.version;
-        elements.apiTimestamp.textContent = this.formatTimestamp(data.timestamp);
-    }
-
-    /**
-     * Formatea un timestamp para mostrar
-     */
-    formatTimestamp(timestamp) {
-        const date = new Date(timestamp);
-        return date.toLocaleString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-    }
-
-    /**
-     * Actualizar la visibilidad de secciones según autenticación y permisos
-     */
-    updateAuthUI() {
-        if (appState.isAuthenticated) {
-            // Mostrar nombre de usuario
-            elements.userWelcome.textContent = `Hola, ${appState.user.name}`;
-            elements.userWelcome.style.display = 'inline';
-
-            // Botones de navegación
-            elements.btnLogin.style.display = 'none';
-            elements.btnLogout.style.display = 'block';
-
-            // Sección de usuario autenticado
-            elements.protectedSection.style.display = 'block';
-
-            // Sección de administrador (solo si tiene el permiso)
-            if (PermissionManager.hasPermission('acceder-panel-admin')) {
-                elements.adminSection.style.display = 'block';
-            } else {
-                elements.adminSection.style.display = 'none';
-            }
-        } else {
-            // Usuario no autenticado
-            elements.userWelcome.style.display = 'none';
-            elements.btnLogin.style.display = 'block';
-            elements.btnLogout.style.display = 'none';
-            elements.protectedSection.style.display = 'none';
-            elements.adminSection.style.display = 'none';
-        }
-    }
-
-    /**
-     * Mostrar modal
-     */
-    showModal(modal) {
+// ── Modal helpers ──
+function openModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
+}
 
-    /**
-     * Ocultar modal
-     */
-    hideModal(modal) {
+function closeModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
         modal.classList.remove('active');
         document.body.style.overflow = 'auto';
     }
+}
 
-    /**
-     * Mostrar error en formulario
-     */
-    showFormError(errorElement, messageElement, message) {
-        errorElement.style.display = 'block';
-        messageElement.textContent = message;
-    }
+function showConfirm(title, message, callback) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    state.confirmCallback = callback;
+    openModal('confirmModal');
+}
 
-    /**
-     * Ocultar error en formulario
-     */
-    hideFormError(errorElement) {
-        errorElement.style.display = 'none';
-    }
+// ── Navigation ──
+function navigateTo(sectionName) {
+    // Deactivate all sections and nav links
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
 
-    /**
-     * Resetear formulario
-     */
-    resetForm(form) {
-        form.reset();
-    }
+    // Activate target
+    const section = document.getElementById('section' + capitalize(sectionName));
+    const link = document.querySelector(`[data-section="${sectionName}"]`);
+    if (section) section.classList.add('active');
+    if (link) link.classList.add('active');
 
-    /**
-     * Deshabilitar botón de submit
-     */
-    disableSubmitButton(button, text = 'Procesando...') {
-        button.disabled = true;
-        button.dataset.originalText = button.textContent;
-        button.textContent = text;
-    }
+    // Load section data
+    if (sectionName === 'files') loadFiles();
+    if (sectionName === 'profile') loadProfile();
+    if (sectionName === 'dashboard') loadDashboard();
+}
 
-    /**
-     * Habilitar botón de submit
-     */
-    enableSubmitButton(button) {
-        button.disabled = false;
-        button.textContent = button.dataset.originalText || 'Enviar';
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ── Auth UI Update ──
+function updateAuthUI() {
+    const authOnlyEls = document.querySelectorAll('.auth-only');
+    const adminOnlyEls = document.querySelectorAll('.admin-only');
+    const welcome = document.getElementById('userWelcome');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnRegister = document.getElementById('btnRegister');
+    const btnLogout = document.getElementById('btnLogout');
+    const guestActions = document.getElementById('guestActions');
+
+    if (state.isAuthenticated) {
+        welcome.textContent = `👋 ${state.user?.name || 'Usuario'}`;
+        welcome.style.display = 'inline-flex';
+        btnLogin.style.display = 'none';
+        btnRegister.style.display = 'none';
+        btnLogout.style.display = 'inline-flex';
+        if (guestActions) guestActions.style.display = 'none';
+
+        authOnlyEls.forEach(el => el.style.display = '');
+        const isAdmin = state.permissions.includes('acceder-panel-admin');
+        adminOnlyEls.forEach(el => el.style.display = isAdmin ? '' : 'none');
+    } else {
+        welcome.style.display = 'none';
+        btnLogin.style.display = '';
+        btnRegister.style.display = '';
+        btnLogout.style.display = 'none';
+        if (guestActions) guestActions.style.display = '';
+
+        authOnlyEls.forEach(el => el.style.display = 'none');
+        adminOnlyEls.forEach(el => el.style.display = 'none');
     }
 }
 
-/**
- * Instancia del gestor de UI
- */
-const uiManager = new UIManager();
+// ── Auth Functions ──
+function setAuthState(data) {
+    state.isAuthenticated = true;
+    state.token = data.token;
+    state.user = data.user;
+    state.roles = data.user.roles || [];
+    state.permissions = data.user.permissions || [];
+    storage.setToken(data.token);
+    storage.setUser(data.user);
+}
 
-/**
- * Controlador principal de la aplicación
- */
-class AppController {
-    /**
-     * Inicializar la aplicación
-     */
-    async init() {
-        console.log('Inicializando aplicación...');
+function clearAuthState() {
+    state.isAuthenticated = false;
+    state.token = null;
+    state.user = null;
+    state.roles = [];
+    state.permissions = [];
+    storage.clear();
+}
 
-        // Verificar si hay sesión guardada
-        const hasStoredSession = AuthManager.checkStoredSession();
+async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const remember = document.getElementById('rememberMe').checked;
+    const errorEl = document.getElementById('loginError');
+    const errorMsg = document.getElementById('loginErrorMessage');
+    const btn = document.getElementById('btnSubmitLogin');
 
-        if (hasStoredSession) {
-            console.log('Sesión encontrada, verificando con servidor...');
-            try {
-                // Verificar que el token siga siendo válido
-                await AuthManager.getCurrentUser();
-                console.log('Sesión válida');
-            } catch (error) {
-                console.error('Sesión expirada:', error);
-                AuthManager.clearSession();
-            }
-        }
+    errorEl.style.display = 'none';
 
-        // Registrar event listeners
-        this.registerEventListeners();
-
-        // Cargar datos iniciales
-        await this.loadLandingData();
-
-        // Actualizar UI según estado de autenticación
-        uiManager.updateAuthUI();
+    if (!email || !password) {
+        errorEl.style.display = 'block';
+        errorMsg.textContent = 'Completa todos los campos.';
+        return;
     }
 
-    /**
-     * Registrar los event listeners de la aplicación
-     */
-    registerEventListeners() {
-        // Botones de navegación
-        elements.btnLogin.addEventListener('click', () => {
-            uiManager.showModal(elements.loginModal);
-        });
+    btn.disabled = true;
+    btn.textContent = 'Ingresando...';
 
-        elements.btnLogout.addEventListener('click', async () => {
-            await this.handleLogout();
-        });
+    try {
+        const res = await api.post('/login', { email, password, remember });
+        if (res.status !== 'success') throw new Error(res.message || 'Error en login');
 
-        // Cerrar modales
-        elements.closeLoginModal.addEventListener('click', () => {
-            uiManager.hideModal(elements.loginModal);
-            uiManager.hideFormError(elements.loginError);
-        });
-
-        elements.closeRegisterModal.addEventListener('click', () => {
-            uiManager.hideModal(elements.registerModal);
-            uiManager.hideFormError(elements.registerError);
-        });
-
-        // Cerrar modal al hacer clic fuera
-        elements.loginModal.addEventListener('click', (e) => {
-            if (e.target === elements.loginModal) {
-                uiManager.hideModal(elements.loginModal);
-            }
-        });
-
-        elements.registerModal.addEventListener('click', (e) => {
-            if (e.target === elements.registerModal) {
-                uiManager.hideModal(elements.registerModal);
-            }
-        });
-
-        // Alternar entre modales
-        elements.showRegisterModal.addEventListener('click', (e) => {
-            e.preventDefault();
-            uiManager.hideModal(elements.loginModal);
-            uiManager.showModal(elements.registerModal);
-        });
-
-        elements.showLoginModal.addEventListener('click', (e) => {
-            e.preventDefault();
-            uiManager.hideModal(elements.registerModal);
-            uiManager.showModal(elements.loginModal);
-        });
-
-        // Formularios
-        elements.loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleLogin();
-        });
-
-        elements.registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleRegister();
-        });
-
-        // Botones de acción
-        elements.btnUserAction.addEventListener('click', () => {
-            this.handleUserAction();
-        });
-
-        elements.btnAdminAction.addEventListener('click', () => {
-            this.handleAdminAction();
-        });
-    }
-
-    /**
-     * Cargar los datos de landing desde la API
-     */
-    async loadLandingData() {
-        try {
-            uiManager.showLoading();
-            const data = await apiClient.get('/landing');
-
-            if (data.status === 'success') {
-                uiManager.updateContent(data);
-                uiManager.showContent();
-            } else {
-                throw new Error('La respuesta de la API no fue exitosa');
-            }
-        } catch (error) {
-            console.error('Error al cargar datos:', error);
-            uiManager.showError(
-                'No se pudo conectar con la API. Verifica que el servidor esté ejecutándose.'
-            );
-        }
-    }
-
-    /**
-     * Manejar el login
-     */
-    async handleLogin() {
-        const email = elements.loginEmail.value.trim();
-        const password = elements.loginPassword.value;
-        const remember = elements.rememberMe.checked;
-
-        // Ocultar errores previos
-        uiManager.hideFormError(elements.loginError);
-
-        // Validación básica
-        if (!email || !password) {
-            uiManager.showFormError(
-                elements.loginError,
-                elements.loginErrorMessage,
-                'Por favor, completa todos los campos.'
-            );
-            return;
-        }
-
-        try {
-            uiManager.disableSubmitButton(elements.btnSubmitLogin, 'Iniciando sesión...');
-
-            await AuthManager.login(email, password);
-
-            // Cerrar modal y actualizar UI
-            uiManager.hideModal(elements.loginModal);
-            uiManager.resetForm(elements.loginForm);
-            uiManager.updateAuthUI();
-
-            console.log('Login exitoso:', appState.user);
-
-        } catch (error) {
-            console.error('Error en login:', error);
-            uiManager.showFormError(
-                elements.loginError,
-                elements.loginErrorMessage,
-                error.message || 'Error al iniciar sesión. Verifica tus credenciales.'
-            );
-        } finally {
-            uiManager.enableSubmitButton(elements.btnSubmitLogin);
-        }
-    }
-
-    /**
-     * Manejar el registro
-     */
-    async handleRegister() {
-        // Obtener valores del formulario
-        const firstName = elements.registerFirstName.value.trim();
-        const lastName = elements.registerLastName.value.trim();
-        const mobile = elements.registerMobile.value.trim();
-        const email = elements.registerEmail.value.trim();
-        const password = elements.registerPassword.value;
-        const passwordConfirm = elements.registerPasswordConfirm.value;
-        const semanticContext = elements.registerSemanticContext.value.trim();
-
-        // Ocultar errores previos
-        uiManager.hideFormError(elements.registerError);
-
-        // Validación básica de campos requeridos
-        if (!firstName || !lastName || !email || !password || !passwordConfirm) {
-            uiManager.showFormError(
-                elements.registerError,
-                elements.registerErrorMessage,
-                'Por favor, completa todos los campos obligatorios.'
-            );
-            return;
-        }
-
-        // Validar que las contraseñas coincidan
-        if (password !== passwordConfirm) {
-            uiManager.showFormError(
-                elements.registerError,
-                elements.registerErrorMessage,
-                'Las contraseñas no coinciden.'
-            );
-            return;
-        }
-
-        // Validar longitud mínima de contraseña
-        if (password.length < 8) {
-            uiManager.showFormError(
-                elements.registerError,
-                elements.registerErrorMessage,
-                'La contraseña debe tener al menos 8 caracteres.'
-            );
-            return;
-        }
-
-        try {
-            uiManager.disableSubmitButton(elements.btnSubmitRegister, 'Registrando...');
-
-            // Preparar datos del usuario
-            const userData = {
-                firstName,
-                lastName,
-                mobile,
-                email,
-                password,
-                passwordConfirmation: passwordConfirm,
-                semanticContext
-            };
-
-            await AuthManager.register(userData);
-
-            // Cerrar modal y actualizar UI
-            uiManager.hideModal(elements.registerModal);
-            uiManager.resetForm(elements.registerForm);
-            uiManager.updateAuthUI();
-
-            console.log('Registro exitoso:', appState.user);
-            alert(`¡Cuenta creada exitosamente! Bienvenido, ${appState.user.name}!`);
-
-        } catch (error) {
-            console.error('Error en registro:', error);
-            uiManager.showFormError(
-                elements.registerError,
-                elements.registerErrorMessage,
-                error.message || 'Error al crear la cuenta. Intenta nuevamente.'
-            );
-        } finally {
-            uiManager.enableSubmitButton(elements.btnSubmitRegister);
-        }
-    }
-
-    /**
-     * Manejar el logout
-     */
-    async handleLogout() {
-        if (!confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-            return;
-        }
-
-        try {
-            await AuthManager.logout();
-            uiManager.updateAuthUI();
-            console.log('Logout exitoso');
-        } catch (error) {
-            console.error('Error en logout:', error);
-            alert('Error al cerrar sesión');
-        }
-    }
-
-    /**
-     * Manejar acción de usuario
-     */
-    async handleUserAction() {
-        try {
-            // Obtener datos actuales del usuario
-            const data = await apiClient.get('/user', true);
-
-            if (data.success) {
-                const user = data.data;
-                console.log('Perfil de usuario:', user);
-
-                const userInfo = `
-                    === PERFIL DE USUARIO ===
-                    Nombre: ${user.name}
-                    Email: ${user.email}
-                    Roles: ${user.roles?.join(', ') || 'Ninguno'}
-                    Permisos: ${user.permissions?.join(', ') || 'Ninguno'}
-                    Email verificado: ${user.email_verified_at ? 'Sí' : 'No'}
-                `;
-
-                alert(userInfo);
-            }
-        } catch (error) {
-            console.error('Error al obtener perfil:', error);
-            alert('Error al cargar el perfil de usuario');
-        }
-    }
-
-    /**
-     * Manejar acción de administrador
-     */
-    async handleAdminAction() {
-        // Verificar que tenga el permiso necesario
-        if (!PermissionManager.hasPermission('acceder-panel-admin')) {
-            alert('No tienes permisos para acceder al panel de administración');
-            return;
-        }
-
-        // Mostrar información de administrador
-        const adminInfo = `
-            === PANEL DE ADMINISTRADOR ===
-            Usuario: ${appState.user.name}
-            Roles: ${appState.roles.join(', ')}
-            Permisos: ${appState.permissions.join(', ')}
-
-            Este panel permite gestionar:
-            - Usuarios del sistema
-            - Roles y permisos
-            - Configuración general
-
-            (La implementación completa requiere endpoints adicionales en el backend)
-        `;
-
-        alert(adminInfo);
+        setAuthState(res.data);
+        closeModal('loginModal');
+        document.getElementById('loginForm').reset();
+        updateAuthUI();
+        showToast(`¡Bienvenido, ${state.user.name}!`, 'success');
+    } catch (err) {
+        errorEl.style.display = 'block';
+        errorMsg.textContent = err.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Iniciar Sesión';
     }
 }
 
-/**
- * Punto de entrada de la aplicación
- */
-document.addEventListener('DOMContentLoaded', () => {
-    const app = new AppController();
-    app.init();
-});
+async function handleRegister(e) {
+    e.preventDefault();
+    const firstName = document.getElementById('registerFirstName').value.trim();
+    const lastName = document.getElementById('registerLastName').value.trim();
+    const mobile = document.getElementById('registerMobile').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+    const semanticContext = document.getElementById('registerSemanticContext').value.trim();
+    const errorEl = document.getElementById('registerError');
+    const errorMsg = document.getElementById('registerErrorMessage');
+    const btn = document.getElementById('btnSubmitRegister');
+
+    errorEl.style.display = 'none';
+
+    if (!firstName || !lastName || !email || !password || !passwordConfirm) {
+        errorEl.style.display = 'block';
+        errorMsg.textContent = 'Completa todos los campos obligatorios.';
+        return;
+    }
+    if (password !== passwordConfirm) {
+        errorEl.style.display = 'block';
+        errorMsg.textContent = 'Las contraseñas no coinciden.';
+        return;
+    }
+    if (password.length < 8) {
+        errorEl.style.display = 'block';
+        errorMsg.textContent = 'La contraseña debe tener al menos 8 caracteres.';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Registrando...';
+
+    try {
+        const res = await api.post('/register', {
+            first_name: firstName,
+            last_name: lastName,
+            name: `${firstName} ${lastName}`,
+            mobile: mobile || null,
+            semantic_context: semanticContext || null,
+            email,
+            password,
+            password_confirmation: passwordConfirm,
+        });
+
+        if (res.status !== 'success') throw new Error(res.message || 'Error en registro');
+
+        setAuthState(res.data);
+        closeModal('registerModal');
+        document.getElementById('registerForm').reset();
+        updateAuthUI();
+        showToast('¡Cuenta creada exitosamente!', 'success');
+    } catch (err) {
+        errorEl.style.display = 'block';
+        errorMsg.textContent = err.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Crear Cuenta';
+    }
+}
+
+async function handleLogout() {
+    try {
+        await api.post('/logout', {}, true);
+    } catch (e) {
+        console.warn('Error en logout:', e);
+    }
+    clearAuthState();
+    updateAuthUI();
+    navigateTo('home');
+    showToast('Sesión cerrada correctamente.', 'info');
+}
+
+async function handleForgotPassword(e) {
+    e.preventDefault();
+    const email = document.getElementById('forgotEmail').value.trim();
+    const errorEl = document.getElementById('forgotError');
+    const errorMsg = document.getElementById('forgotErrorMessage');
+    const successEl = document.getElementById('forgotSuccess');
+    const successMsg = document.getElementById('forgotSuccessMessage');
+    const btn = document.getElementById('btnSubmitForgot');
+
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    if (!email) {
+        errorEl.style.display = 'block';
+        errorMsg.textContent = 'Ingresa tu email.';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    try {
+        const res = await api.post('/password/forgot', { email });
+        successEl.style.display = 'block';
+        successMsg.textContent = res.message || 'Enlace de recuperación enviado a tu email.';
+    } catch (err) {
+        errorEl.style.display = 'block';
+        errorMsg.textContent = err.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar Enlace de Recuperación';
+    }
+}
+
+async function resendVerification() {
+    try {
+        const res = await api.post('/email/resend', {}, true);
+        showToast(res.message || 'Email de verificación enviado.', 'success');
+    } catch (err) {
+        showToast(err.message || 'No se pudo enviar el email.', 'error');
+    }
+}
+
+// ── Home / Landing ──
+async function loadLanding() {
+    const loading = document.getElementById('homeLoading');
+    const content = document.getElementById('homeContent');
+    const error = document.getElementById('homeError');
+
+    loading.style.display = 'flex';
+    content.style.display = 'none';
+    error.style.display = 'none';
+
+    try {
+        const data = await api.get('/landing');
+        document.getElementById('apiMessage').textContent = data.message || '-';
+        document.getElementById('apiVersion').textContent = data.version || '-';
+        document.getElementById('apiTimestamp').textContent = formatDate(data.timestamp);
+        document.getElementById('apiStatus').textContent = 'Conectado';
+
+        loading.style.display = 'none';
+        content.style.display = 'block';
+    } catch (err) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        document.getElementById('homeErrorMessage').textContent =
+            'No se pudo conectar con la API. Verifica que el servidor esté ejecutándose.';
+    }
+}
+
+async function doPing() {
+    const pre = document.querySelector('#pingResult pre');
+    pre.textContent = 'Enviando ping...';
+
+    try {
+        const start = performance.now();
+        const data = await api.get('/ping');
+        const ms = Math.round(performance.now() - start);
+        pre.textContent = JSON.stringify(data, null, 2) + `\n\n⏱ Tiempo de respuesta: ${ms}ms`;
+    } catch (err) {
+        pre.textContent = `❌ Error: ${err.message}`;
+    }
+}
+
+// ── Profile ──
+async function loadProfile() {
+    if (!state.isAuthenticated) return;
+
+    try {
+        const res = await api.get('/user', true);
+        const user = res.data?.user || res.data;
+
+        // Update state
+        state.user = user;
+        state.roles = user.roles || [];
+        state.permissions = user.permissions || [];
+        storage.setUser(user);
+
+        // Update UI
+        document.getElementById('profileAvatar').textContent = (user.name || '?')[0].toUpperCase();
+        document.getElementById('profileId').textContent = user.id;
+        document.getElementById('profileName').textContent = user.name;
+        document.getElementById('profileEmail').textContent = user.email;
+        document.getElementById('profileVerified').textContent =
+            user.email_verified_at ? '✅ Verificado' : '❌ No verificado';
+
+        // Roles
+        const rolesContainer = document.getElementById('profileRoles');
+        rolesContainer.innerHTML = (user.roles && user.roles.length)
+            ? user.roles.map(r => `<span class="tag tag--primary">${r}</span>`).join('')
+            : '<span class="tag tag--muted">Sin roles</span>';
+
+        // Permissions
+        const permsContainer = document.getElementById('profilePermissions');
+        permsContainer.innerHTML = (user.permissions && user.permissions.length)
+            ? user.permissions.map(p => `<span class="tag tag--info">${p}</span>`).join('')
+            : '<span class="tag tag--muted">Sin permisos</span>';
+
+        // Token (masked)
+        const token = storage.getToken() || '-';
+        document.getElementById('profileToken').textContent =
+            token.length > 20 ? token.substring(0, 10) + '...' + token.substring(token.length - 6) : token;
+
+        updateAuthUI();
+    } catch (err) {
+        showToast('Error al cargar perfil: ' + err.message, 'error');
+        // Token might be expired
+        if (err.message.includes('401') || err.message.includes('Unauthenticated')) {
+            clearAuthState();
+            updateAuthUI();
+            navigateTo('home');
+        }
+    }
+}
+
+// ── Files ──
+function setupFileUpload() {
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+
+    // Click to select
+    uploadZone.addEventListener('click', () => fileInput.click());
+
+    // Drag & drop
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('upload-zone--dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('upload-zone--dragover');
+    });
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('upload-zone--dragover');
+        handleFileSelection(e.dataTransfer.files);
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        handleFileSelection(e.target.files);
+    });
+}
+
+function handleFileSelection(files) {
+    const fileArray = Array.from(files).slice(0, 10);
+    state.selectedFiles = fileArray;
+
+    const selectedEl = document.getElementById('selectedFiles');
+    const countEl = document.getElementById('selectedCount');
+    const listEl = document.getElementById('filePreviewList');
+    const uploadBtn = document.getElementById('btnUpload');
+
+    if (fileArray.length === 0) {
+        selectedEl.style.display = 'none';
+        uploadBtn.disabled = true;
+        return;
+    }
+
+    selectedEl.style.display = 'block';
+    countEl.textContent = `${fileArray.length} archivo(s) seleccionado(s)`;
+    uploadBtn.disabled = false;
+
+    listEl.innerHTML = fileArray.map((f, i) => `
+        <div class="file-preview-item">
+            <span class="file-preview-item__icon">${getFileIcon(f.name)}</span>
+            <span class="file-preview-item__name">${escapeHtml(f.name)}</span>
+            <span class="file-preview-item__size">${formatSize(f.size)}</span>
+            <button class="btn btn--ghost btn--xs" onclick="removeSelectedFile(${i})">✕</button>
+        </div>
+    `).join('');
+}
+
+function removeSelectedFile(index) {
+    state.selectedFiles.splice(index, 1);
+    handleFileSelection(state.selectedFiles);
+    // Reset file input since we modified the array
+    document.getElementById('fileInput').value = '';
+}
+
+function clearSelectedFiles() {
+    state.selectedFiles = [];
+    document.getElementById('selectedFiles').style.display = 'none';
+    document.getElementById('btnUpload').disabled = true;
+    document.getElementById('fileInput').value = '';
+}
+
+async function uploadFiles() {
+    if (state.selectedFiles.length === 0) return;
+
+    const btn = document.getElementById('btnUpload');
+    const btnText = document.getElementById('uploadBtnText');
+    const progress = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('uploadProgressFill');
+
+    btn.disabled = true;
+    btnText.textContent = 'Subiendo...';
+    progress.style.display = 'block';
+    progressFill.style.width = '30%';
+
+    const formData = new FormData();
+    state.selectedFiles.forEach(f => formData.append('files[]', f));
+
+    const desc = document.getElementById('uploadDescription').value.trim();
+    if (desc) formData.append('description', desc);
+
+    try {
+        progressFill.style.width = '60%';
+        const res = await api.upload('/test-files', formData);
+        progressFill.style.width = '100%';
+
+        const count = res.data?.total_files || state.selectedFiles.length;
+        showToast(`${count} archivo(s) subido(s) exitosamente.`, 'success');
+
+        clearSelectedFiles();
+        document.getElementById('uploadDescription').value = '';
+        loadFiles();
+    } catch (err) {
+        showToast('Error al subir archivos: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Subir Archivos';
+        setTimeout(() => {
+            progress.style.display = 'none';
+            progressFill.style.width = '0%';
+        }, 1000);
+    }
+}
+
+async function loadFiles() {
+    const loading = document.getElementById('filesLoading');
+    const empty = document.getElementById('filesEmpty');
+    const table = document.getElementById('filesTable');
+    const tbody = document.getElementById('filesTableBody');
+
+    loading.style.display = 'flex';
+    empty.style.display = 'none';
+    table.style.display = 'none';
+
+    try {
+        const res = await api.get('/test-files');
+        const files = res.data?.files || [];
+
+        loading.style.display = 'none';
+
+        if (files.length === 0) {
+            empty.style.display = 'block';
+            return;
+        }
+
+        table.style.display = 'block';
+        document.getElementById('filesTotalCount').textContent = `${files.length} archivo(s)`;
+
+        tbody.innerHTML = files.map(f => `
+            <tr>
+                <td>
+                    <span class="file-name">
+                        ${getFileIcon(f.name)} ${escapeHtml(f.name)}
+                    </span>
+                </td>
+                <td>${formatSize(f.size)}</td>
+                <td>${formatDate(f.last_modified * 1000)}</td>
+                <td>
+                    <div class="btn-group btn-group--sm">
+                        <a href="${API_BASE}/test-files/download/${encodeURIComponent(f.name)}"
+                           class="btn btn--sm btn--outline" download>
+                            ⬇ Descargar
+                        </a>
+                        <button class="btn btn--sm btn--danger"
+                                onclick="confirmDeleteFile('${escapeHtml(f.name)}')">
+                            🗑 Eliminar
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+    } catch (err) {
+        loading.style.display = 'none';
+        empty.style.display = 'block';
+        empty.querySelector('p').textContent = '❌ Error al cargar archivos: ' + err.message;
+    }
+}
+
+function confirmDeleteFile(filename) {
+    showConfirm(
+        'Eliminar Archivo',
+        `¿Estás seguro de que deseas eliminar "${filename}"?`,
+        () => deleteFile(filename)
+    );
+}
+
+async function deleteFile(filename) {
+    closeModal('confirmModal');
+    try {
+        await api.del(`/test-files/${encodeURIComponent(filename)}`);
+        showToast('Archivo eliminado exitosamente.', 'success');
+        loadFiles();
+    } catch (err) {
+        showToast('Error al eliminar: ' + err.message, 'error');
+    }
+}
+
+// ── Dashboard ──
+async function loadDashboard() {
+    if (!state.isAuthenticated) return;
+
+    const loading = document.getElementById('dashLoading');
+    const responseEl = document.getElementById('dashResponse');
+
+    loading.style.display = 'flex';
+
+    try {
+        const res = await api.get('/admin/dashboard', true);
+        const stats = res.data?.stats;
+
+        if (stats) {
+            document.getElementById('dashUsers').textContent = stats.users ?? '-';
+            document.getElementById('dashPosts').textContent = stats.posts ?? '-';
+            document.getElementById('dashComments').textContent = stats.comments ?? '-';
+            document.getElementById('dashActive').textContent = stats.active ?? '-';
+        }
+
+        responseEl.querySelector('pre').textContent = JSON.stringify(res, null, 2);
+        loading.style.display = 'none';
+    } catch (err) {
+        loading.style.display = 'none';
+        responseEl.querySelector('pre').textContent = `❌ Error: ${err.message}`;
+        showToast('Error al cargar dashboard: ' + err.message, 'error');
+    }
+}
+
+// ── Utility Functions ──
+function formatDate(ts) {
+    if (!ts) return '-';
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return '-';
+    return d.toLocaleString('es-ES', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+}
+
+function formatSize(bytes) {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function getFileIcon(name) {
+    const ext = (name || '').split('.').pop().toLowerCase();
+    const icons = {
+        pdf: '📄', doc: '📝', docx: '📝', txt: '📃',
+        jpg: '🖼️', jpeg: '🖼️', png: '🖼️', gif: '🖼️', svg: '🖼️', webp: '🖼️',
+        mp4: '🎬', avi: '🎬', mov: '🎬', mp3: '🎵', wav: '🎵',
+        zip: '📦', rar: '📦', tar: '📦', gz: '📦',
+        js: '⚡', ts: '⚡', php: '🐘', py: '🐍', json: '📋', csv: '📊', xlsx: '📊',
+    };
+    return icons[ext] || '📎';
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// ── Initialization ──
+async function initApp() {
+    console.log('🚀 Inicializando Difexa Frontend...');
+
+    // Check stored session
+    const token = storage.getToken();
+    const user = storage.getUser();
+    if (token && user) {
+        state.isAuthenticated = true;
+        state.token = token;
+        state.user = user;
+        state.roles = user.roles || [];
+        state.permissions = user.permissions || [];
+
+        // Verify token is still valid
+        try {
+            await loadProfile();
+        } catch {
+            clearAuthState();
+        }
+    }
+
+    // Update UI
+    updateAuthUI();
+
+    // Load landing data
+    await loadLanding();
+
+    // Setup file upload
+    setupFileUpload();
+
+    // ── Event Listeners ──
+    // Navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = link.dataset.section;
+            if (section) navigateTo(section);
+        });
+    });
+
+    // Mobile nav toggle
+    document.getElementById('navToggle').addEventListener('click', () => {
+        document.getElementById('mainNav').classList.toggle('open');
+    });
+
+    // Auth buttons
+    document.getElementById('btnLogin').addEventListener('click', () => openModal('loginModal'));
+    document.getElementById('btnRegister').addEventListener('click', () => openModal('registerModal'));
+    document.getElementById('btnLogout').addEventListener('click', handleLogout);
+    document.getElementById('btnGuestLogin')?.addEventListener('click', () => openModal('loginModal'));
+    document.getElementById('btnGuestRegister')?.addEventListener('click', () => openModal('registerModal'));
+
+    // Forms
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    document.getElementById('registerForm').addEventListener('submit', handleRegister);
+    document.getElementById('forgotForm').addEventListener('submit', handleForgotPassword);
+
+    // Modal switches
+    document.getElementById('switchToRegister').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('loginModal');
+        openModal('registerModal');
+    });
+    document.getElementById('switchToLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('registerModal');
+        openModal('loginModal');
+    });
+    document.getElementById('showForgotPassword').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('loginModal');
+        openModal('forgotModal');
+    });
+    document.getElementById('backToLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('forgotModal');
+        openModal('loginModal');
+    });
+
+    // Close modal buttons
+    document.querySelectorAll('[data-close-modal]').forEach(btn => {
+        btn.addEventListener('click', () => closeModal(btn.dataset.closeModal));
+    });
+
+    // Close modals on overlay click
+    document.querySelectorAll('.modal__overlay').forEach(overlay => {
+        overlay.addEventListener('click', () => {
+            const modal = overlay.closest('.modal');
+            if (modal) modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    });
+
+    // Confirm modal
+    document.getElementById('btnConfirmYes').addEventListener('click', () => {
+        if (state.confirmCallback) {
+            state.confirmCallback();
+            state.confirmCallback = null;
+        }
+    });
+
+    // Ping button
+    document.getElementById('btnPing').addEventListener('click', doPing);
+    document.getElementById('btnRetry')?.addEventListener('click', loadLanding);
+
+    // Profile buttons
+    document.getElementById('btnRefreshProfile')?.addEventListener('click', loadProfile);
+    document.getElementById('btnProfileLogout')?.addEventListener('click', handleLogout);
+    document.getElementById('btnResendVerification')?.addEventListener('click', resendVerification);
+
+    // Files buttons
+    document.getElementById('btnUpload').addEventListener('click', uploadFiles);
+    document.getElementById('btnClearFiles').addEventListener('click', clearSelectedFiles);
+    document.getElementById('btnRefreshFiles').addEventListener('click', loadFiles);
+
+    // Dashboard button
+    document.getElementById('btnRefreshDash')?.addEventListener('click', loadDashboard);
+
+    console.log('✅ Difexa Frontend inicializado');
+}
+
+// Start
+document.addEventListener('DOMContentLoaded', initApp);
