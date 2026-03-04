@@ -5,8 +5,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FileController;
 
 Route::get('/ping', fn() => response()->json([
-    'success' => true,
-    'data' => ['status' => 'ok'],
+    'status' => 'success',
+    'data' => ['ping' => 'ok'],
     'message' => 'API is running correctly'
 ]));
 

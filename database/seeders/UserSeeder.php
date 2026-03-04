@@ -13,12 +13,12 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        if (User::count() > 1) {
+        if (User::count() > 10) {
             return;
         }
 
         $this->createConfigUser('ADMIN', 'admin');
-        $this->createConfigUser('REGISTERED', 'user');
+        $this->createConfigUser('USER', 'user');
 
         User::factory(7)->create()->each(function ($user) {
             $user->assignRole('user');

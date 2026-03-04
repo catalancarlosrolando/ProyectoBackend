@@ -25,7 +25,7 @@ class FileController extends Controller
 
             if ($validator->fails()) {
                 return response()->json([
-                    'success' => false,
+                    'status' => 'error',
                     'message' => 'Error de validación',
                     'errors' => $validator->errors()
                 ], 422);
@@ -55,7 +55,7 @@ class FileController extends Controller
             }
 
             return response()->json([
-                'success' => true,
+                'status' => 'success',
                 'message' => 'Archivos subidos exitosamente',
                 'data' => [
                     'files' => $uploadedFiles,
@@ -67,7 +67,7 @@ class FileController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Error interno del servidor',
                 'error' => app()->environment('local') ? $e->getMessage() : 'Error procesando los archivos'
             ], 500);
@@ -96,7 +96,7 @@ class FileController extends Controller
             }
 
             return response()->json([
-                'success' => true,
+                'status' => 'success',
                 'data' => [
                     'files' => $fileList,
                     'folder' => $folder,
@@ -106,7 +106,7 @@ class FileController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Error listando archivos',
                 'error' => app()->environment('local') ? $e->getMessage() : 'Error accediendo a los archivos'
             ], 500);
@@ -124,7 +124,7 @@ class FileController extends Controller
 
             if (!Storage::disk('public')->exists($path)) {
                 return response()->json([
-                    'success' => false,
+                    'status' => 'error',
                     'message' => 'Archivo no encontrado'
                 ], 404);
             }
@@ -136,7 +136,7 @@ class FileController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Error descargando archivo',
                 'error' => app()->environment('local') ? $e->getMessage() : 'Error accediendo al archivo'
             ], 500);
@@ -154,7 +154,7 @@ class FileController extends Controller
 
             if (!Storage::disk('public')->exists($path)) {
                 return response()->json([
-                    'success' => false,
+                    'status' => 'error',
                     'message' => 'Archivo no encontrado'
                 ], 404);
             }
@@ -162,13 +162,13 @@ class FileController extends Controller
             Storage::disk('public')->delete($path);
 
             return response()->json([
-                'success' => true,
+                'status' => 'success',
                 'message' => 'Archivo eliminado exitosamente'
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Error eliminando archivo',
                 'error' => app()->environment('local') ? $e->getMessage() : 'Error eliminando el archivo'
             ], 500);

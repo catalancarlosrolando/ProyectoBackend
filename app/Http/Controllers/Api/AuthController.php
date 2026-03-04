@@ -28,7 +28,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Validation errors',
                 'errors' => $validator->errors()
             ], 422);
@@ -137,7 +137,7 @@ class AuthController extends Controller
 
         if (!$user) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'User not found',
                 'errors' => null
             ], 404);
@@ -149,7 +149,7 @@ class AuthController extends Controller
 
         if ($expectedHash !== $providedHash) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Invalid verification link',
                 'errors' => null
             ], 400);
@@ -160,7 +160,7 @@ class AuthController extends Controller
 
         if ($user->hasVerifiedEmail()) {
             return response()->json([
-                'success' => true,
+                'status' => 'success',
                 'data' => null,
                 'message' => 'Email already verified'
             ], 200);
@@ -173,7 +173,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'success' => true,
+            'status' => 'success',
             'data' => null,
             'message' => 'Email verified successfully'
         ], 200);
@@ -183,7 +183,7 @@ class AuthController extends Controller
     {
         if ($request->user()->hasVerifiedEmail()) {
             return response()->json([
-                'success' => true,
+                'status' => 'success',
                 'data' => null,
                 'message' => 'Email already verified'
             ], 200);
@@ -196,14 +196,14 @@ class AuthController extends Controller
 
         if ($sent) {
             return response()->json([
-                'success' => true,
+                'status' => 'success',
                 'data' => null,
                 'message' => 'Verification email sent'
             ], 200);
         }
 
         return response()->json([
-            'success' => false,
+            'status' => 'error',
             'data' => null,
             'message' => 'No se pudo enviar el email de verificación. El servidor de correo no está disponible.'
         ], 503);
@@ -245,7 +245,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Validation errors',
                 'errors' => $validator->errors()
             ], 422);

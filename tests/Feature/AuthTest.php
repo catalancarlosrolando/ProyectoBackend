@@ -13,8 +13,8 @@ describe('Authentication', function () {
         ]);
 
         $response->assertStatus(201);
-        expect($response->json())->toHaveKeys(['success', 'data', 'message']);
-        expect($response->json('success'))->toBe(true);
+        expect($response->json())->toHaveKeys(['status', 'data', 'message']);
+        expect($response->json('status'))->toBe('success');
         expect($response->json('data'))->toHaveKey('user');
 
         // Verificar que el usuario fue creado en la base de datos
@@ -36,8 +36,8 @@ describe('Authentication', function () {
         ]);
 
         $response->assertStatus(200);
-        expect($response->json())->toHaveKeys(['success', 'data', 'message']);
-        expect($response->json('success'))->toBe(true);
+        expect($response->json())->toHaveKeys(['status', 'data', 'message']);
+        expect($response->json('status'))->toBe('success');
         expect($response->json('data'))->toHaveKey('token');
     });
 
@@ -53,7 +53,7 @@ describe('Authentication', function () {
         ]);
 
         $response->assertStatus(401);
-        expect($response->json('success'))->toBe(false);
+        expect($response->json('status'))->toBe('error');
     });
 
     it('valida campos requeridos en registro', function () {
