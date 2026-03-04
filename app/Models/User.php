@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserStatus;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -26,6 +27,10 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'mobile',
         'semantic_context',
         'password',
+        'status',
+        'dni',
+        'last_access_at',
+        'rejection_reason',
     ];
 
     protected $hidden = [
@@ -37,7 +42,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_access_at' => 'datetime',
             'password' => 'hashed',
+            'status' => UserStatus::class,
         ];
     }
 
@@ -46,11 +53,10 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         return "User: {$this->name}, Email: {$this->email}";
     }
 
+    // ── Relaciones ──
+
     /**
      * Relación 1:N con Posts.
-     * Un usuario puede crear muchos posts.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function posts(): HasMany
     {
@@ -59,9 +65,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     /**
      * Relación N:M con Channels.
-     * Un usuario puede pertenecer a muchos canales, y un canal puede tener muchos usuarios.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function channels(): BelongsToMany
     {
@@ -71,10 +74,43 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     }
 
     /**
+     * Historial de cambios de estado del usuario.
+     */
+    public function statusHistories(): HasMany
+    {
+        return $this->hasMany(UserStatusHistory::class)->orderByDesc('created_at');
+    }
+
+    // ── Helpers de estado ──
+
+    /**
+     * Verifica si el usuario tiene un estado específico.
+     */
+    public function hasStatus(UserStatus $status): bool
+    {
+        return $this->status === $status;
+    }
+
+    /**
+     * Verifica si el usuario está activo (aprobado y no deshabilitado).
+     */
+    public function isActive(): bool
+    {
+        return $this->status === UserStatus::APPROVED;
+    }
+
+    /**
+     * Verifica si el usuario está deshabilitado.
+     */
+    public function isDisabled(): bool
+    {
+        return $this->status === UserStatus::DISABLED;
+    }
+
+    // ── Notificaciones ──
+
+    /**
      * Send the password reset notification.
-     *
-     * @param  string  $token
-     * @return void
      */
     public function sendPasswordResetNotification($token)
     {
@@ -83,8 +119,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     /**
      * Send the email verification notification.
-     *
-     * @return void
      */
     public function sendEmailVerificationNotification()
     {

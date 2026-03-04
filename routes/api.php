@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\UserAdminController;
 
 Route::get('/ping', fn() => response()->json([
     'status' => 'success',
@@ -69,6 +70,19 @@ Route::middleware('auth:sanctum')->group(function () {
                 ]
             ]
         ]);
+    });
+
+    // ── Gestión de usuarios (Admin) ──
+    Route::prefix('admin/users')->middleware('permission:gestionar-usuarios')->group(function () {
+        Route::get('/', [UserAdminController::class, 'index']);
+        Route::get('/{user}', [UserAdminController::class, 'show']);
+        Route::post('/{user}/approve', [UserAdminController::class, 'approve']);
+        Route::post('/{user}/reject', [UserAdminController::class, 'reject']);
+        Route::post('/{user}/enable', [UserAdminController::class, 'enable']);
+        Route::post('/{user}/disable', [UserAdminController::class, 'disable']);
+        Route::post('/{user}/assign-role', [UserAdminController::class, 'assignRole']);
+        Route::post('/{user}/revoke-role', [UserAdminController::class, 'revokeRole']);
+        Route::get('/{user}/history', [UserAdminController::class, 'history']);
     });
 });
 
