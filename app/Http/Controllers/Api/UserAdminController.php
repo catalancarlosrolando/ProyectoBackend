@@ -34,6 +34,11 @@ class UserAdminController extends Controller
     {
         $query = User::query()->with('roles');
 
+        // Excluir usuarios con rol admin del listado
+        $query->whereDoesntHave('roles', function ($q) {
+            $q->where('name', 'admin');
+        });
+
         // ── Filtros ──
 
         // Filtro por rol

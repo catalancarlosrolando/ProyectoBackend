@@ -34,8 +34,11 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'first_name' => $firstName,
             'last_name' => $lastName,
+            'dni' => fake()->numerify('########'),
             'mobile' => fake()->phoneNumber(),
             'semantic_context' => fake()->sentence(),
+            'last_access_at' => fake()->dateTimeThisYear(),
+            'created_at' => fake()->dateTimeThisYear(),
         ];
     }
 

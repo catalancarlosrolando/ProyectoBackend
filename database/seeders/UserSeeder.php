@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
         $this->createConfigUser('ADMIN', 'admin');
         $this->createConfigUser('USER', 'user');
 
-        User::factory(7)->create()->each(function ($user) {
+        User::factory(60)->create()->each(function ($user) {
             $user->assignRole('user');
         });
 

@@ -289,7 +289,8 @@
             <section id="sectionAdmin-users" class="section">
                 <div class="section__header">
                     <h2 class="section__title">Gestión de Usuarios</h2>
-                    <p class="section__subtitle">Administra usuarios, aprueba registros, asigna roles y revisa historial</p>
+                    <p class="section__subtitle">Administra usuarios, aprueba registros, asigna roles y revisa historial
+                    </p>
                 </div>
 
                 <!-- Filtros -->
@@ -305,11 +306,13 @@
                         <div class="filters-grid">
                             <div class="form-group">
                                 <label for="filterName" class="form-label">Nombre</label>
-                                <input type="text" id="filterName" class="form-input" placeholder="Buscar por nombre...">
+                                <input type="text" id="filterName" class="form-input"
+                                    placeholder="Buscar por nombre...">
                             </div>
                             <div class="form-group">
                                 <label for="filterEmail" class="form-label">Email</label>
-                                <input type="text" id="filterEmail" class="form-input" placeholder="Buscar por email...">
+                                <input type="text" id="filterEmail" class="form-input"
+                                    placeholder="Buscar por email...">
                             </div>
                             <div class="form-group">
                                 <label for="filterDni" class="form-label">DNI</label>
@@ -343,6 +346,22 @@
                                     <option value="50">50</option>
                                     <option value="100">100</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="filterRegisteredFrom" class="form-label">Registro desde</label>
+                                <input type="date" id="filterRegisteredFrom" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="filterRegisteredTo" class="form-label">Registro hasta</label>
+                                <input type="date" id="filterRegisteredTo" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="filterLastAccessFrom" class="form-label">Último acceso desde</label>
+                                <input type="date" id="filterLastAccessFrom" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="filterLastAccessTo" class="form-label">Último acceso hasta</label>
+                                <input type="date" id="filterLastAccessTo" class="form-input">
                             </div>
                         </div>
                     </div>
@@ -395,18 +414,32 @@
                             <div class="user-detail-info">
                                 <div class="profile-avatar" id="userDetailAvatar">?</div>
                                 <div class="profile-details">
-                                    <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" id="udId">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Nombre</span><span class="detail-value" id="udName">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value" id="udEmail">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">DNI</span><span class="detail-value" id="udDni">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Móvil</span><span class="detail-value" id="udMobile">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Estado</span><span class="detail-value" id="udStatus">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Email verificado</span><span class="detail-value" id="udVerified">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Último acceso</span><span class="detail-value" id="udLastAccess">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Registrado</span><span class="detail-value" id="udCreatedAt">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Motivo rechazo</span><span class="detail-value" id="udRejection">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Roles</span><div class="tags" id="udRoles"><span class="tag tag--muted">-</span></div></div>
-                                    <div class="detail-row"><span class="detail-label">Permisos</span><div class="tags" id="udPermissions"><span class="tag tag--muted">-</span></div></div>
+                                    <div class="detail-row"><span class="detail-label">ID</span><span
+                                            class="detail-value" id="udId">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Nombre</span><span
+                                            class="detail-value" id="udName">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Email</span><span
+                                            class="detail-value" id="udEmail">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">DNI</span><span
+                                            class="detail-value" id="udDni">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Móvil</span><span
+                                            class="detail-value" id="udMobile">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Estado</span><span
+                                            class="detail-value" id="udStatus">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Email verificado</span><span
+                                            class="detail-value" id="udVerified">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Último acceso</span><span
+                                            class="detail-value" id="udLastAccess">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Registrado</span><span
+                                            class="detail-value" id="udCreatedAt">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Motivo rechazo</span><span
+                                            class="detail-value" id="udRejection">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Roles</span>
+                                        <div class="tags" id="udRoles"><span class="tag tag--muted">-</span></div>
+                                    </div>
+                                    <div class="detail-row"><span class="detail-label">Permisos</span>
+                                        <div class="tags" id="udPermissions"><span class="tag tag--muted">-</span></div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="user-detail-actions">
@@ -660,7 +693,8 @@
                 <p id="statusChangeDesc" class="text-muted" style="margin-bottom:1rem;">¿Estás seguro?</p>
                 <div class="form-group">
                     <label for="statusChangeReason" class="form-label">Motivo (opcional)</label>
-                    <textarea id="statusChangeReason" class="form-input form-textarea" rows="3" maxlength="500" placeholder="Explica el motivo del cambio..."></textarea>
+                    <textarea id="statusChangeReason" class="form-input form-textarea" rows="3" maxlength="500"
+                        placeholder="Explica el motivo del cambio..."></textarea>
                     <small class="form-hint">Máximo 500 caracteres</small>
                 </div>
                 <div class="btn-group">
@@ -717,6 +751,15 @@
         </div>
     </div>
 
+    <!-- Módulos JS separados por funcionalidad (orden importa) -->
+    <script src="./frontend/js/core.js"></script>
+    <script src="./frontend/js/utils.js"></script>
+    <script src="./frontend/js/ui.js"></script>
+    <script src="./frontend/js/auth.js"></script>
+    <script src="./frontend/js/profile.js"></script>
+    <script src="./frontend/js/home.js"></script>
+    <script src="./frontend/js/files.js"></script>
+    <script src="./frontend/js/admin-users.js"></script>
     <script src="./frontend/js/app.js"></script>
 </body>
 
