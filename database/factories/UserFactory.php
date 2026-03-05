@@ -37,6 +37,8 @@ class UserFactory extends Factory
             'dni' => fake()->numerify('########'),
             'mobile' => fake()->phoneNumber(),
             'semantic_context' => fake()->sentence(),
+            'last_access_at' => fake()->dateTimeThisYear(),
+            'created_at' => fake()->dateTimeThisYear(),
         ];
     }
 
