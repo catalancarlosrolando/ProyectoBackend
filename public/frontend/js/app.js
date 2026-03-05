@@ -165,6 +165,16 @@ async function initApp() {
         });
     });
 
+    // ── Channels buttons ──
+    document.getElementById('btnCreateChannel')?.addEventListener('click', openCreateChannelModal);
+    document.getElementById('btnRefreshChannels')?.addEventListener('click', loadChannels);
+    document.getElementById('btnCloseChannelDetail')?.addEventListener('click', () => {
+        document.getElementById('channelDetailCard').style.display = 'none';
+        state.channels.selectedChannelId = null;
+    });
+    document.getElementById('btnChannelFormSubmit')?.addEventListener('click', submitChannelForm);
+    document.getElementById('btnMediaAssignSubmit')?.addEventListener('click', submitMediaAssign);
+
     console.log('✅ Difexa Frontend inicializado');
 }
 

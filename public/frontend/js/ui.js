@@ -67,6 +67,7 @@ function navigateTo(sectionName) {
     if (sectionName === 'profile') loadProfile();
     if (sectionName === 'dashboard') loadDashboard();
     if (sectionName === 'admin-users') loadAdminUsers();
+    if (sectionName === 'channels') loadChannels();
 }
 
 function capitalize(str) {

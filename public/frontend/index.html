@@ -43,6 +43,10 @@
                         <span class="material-symbols-rounded nav-icon">group</span>
                         <span>Usuarios</span>
                     </a>
+                    <a href="#" class="nav-link admin-only" data-section="channels" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">podcasts</span>
+                        <span>Canales</span>
+                    </a>
                     <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
                         <span class="material-symbols-rounded nav-icon">dashboard</span>
                         <span>Dashboard</span>
@@ -598,6 +602,99 @@
                 </div>
             </section>
 
+            <!-- ========== CHANNELS SECTION ========== -->
+            <section id="sectionChannels" class="section">
+                <div class="section__header">
+                    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h2 class="section__title">Gestión de Canales</h2>
+                            <p class="section__subtitle">Crea canales temáticos, asocia medios de publicación y configura el contexto para IA.</p>
+                        </div>
+                        <button class="btn btn--primary" id="btnCreateChannel">
+                            <span class="material-symbols-rounded">add</span>
+                            <span>Nuevo Canal</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla / Cards de canales -->
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">podcasts</span>
+                            <span class="au-table-title-text">Canales</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnRefreshChannels">
+                            <span class="material-symbols-rounded">refresh</span>
+                            <span class="au-btn-label">Actualizar</span>
+                        </button>
+                    </div>
+                    <div id="channelsLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando canales...</p>
+                    </div>
+                    <div id="channelsEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded" style="font-size:2.5rem;color:var(--on-surface-variant);">podcasts</span>
+                        <p>No hay canales creados aún</p>
+                        <button class="btn btn--primary btn--sm" onclick="openCreateChannelModal()" style="margin-top:0.5rem;">
+                            <span class="material-symbols-rounded">add</span> Crear primer canal
+                        </button>
+                    </div>
+                    <div id="channelsTableWrapper" style="display:none;">
+                        <!-- Desktop table -->
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col ch-col--name">NOMBRE</span>
+                                <span class="au-col ch-col--type">TIPO</span>
+                                <span class="au-col ch-col--desc">DESCRIPCIÓN</span>
+                                <span class="au-col ch-col--medias">MEDIOS</span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="channelsTableBody"></div>
+                        </div>
+                        <!-- Mobile cards -->
+                        <div class="au-mobile-cards" id="channelsMobileCards"></div>
+                    </div>
+                </div>
+
+                <!-- Detalle de canal -->
+                <div class="au-table-card" id="channelDetailCard" style="display:none;">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">podcasts</span>
+                            <span class="au-table-title-text" id="channelDetailTitle">Detalle del Canal</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnCloseChannelDetail">
+                            <span class="material-symbols-rounded">close</span>
+                            <span class="au-btn-label">Cerrar</span>
+                        </button>
+                    </div>
+                    <div class="au-detail-body">
+                        <div class="user-detail-grid">
+                            <div class="user-detail-info">
+                                <div class="profile-details">
+                                    <div class="detail-row"><span class="detail-label">Nombre</span><span class="detail-value" id="cdName">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Tipo</span><span class="detail-value" id="cdType">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Descripción</span><span class="detail-value" id="cdDescription">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Contexto IA</span><span class="detail-value ch-context-text" id="cdSemanticContext">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Creado</span><span class="detail-value" id="cdCreatedAt">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Actualizado</span><span class="detail-value" id="cdUpdatedAt">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Última modificación</span><span class="detail-value" id="cdLastModified">—</span></div>
+                                    <div class="detail-row"><span class="detail-label">Medios asociados</span>
+                                        <div class="ch-detail-medias-list" id="cdMedias"><span class="au-role-badge au-role-badge--muted">—</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="user-detail-actions">
+                                <h4 class="au-actions-title">Acciones rápidas</h4>
+                                <div class="action-buttons-stack" id="cdActions"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- ========== DASHBOARD SECTION ========== -->
             <section id="sectionDashboard" class="section">
                 <div class="section__header">
@@ -852,6 +949,67 @@
         </div>
     </div>
 
+    <!-- ========== MODAL: CHANNEL FORM (Create/Edit) ========== -->
+    <div id="channelFormModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title" id="channelFormTitle">Crear Canal</h2>
+                <button class="modal__close" data-close-modal="channelFormModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="alert alert--error" id="channelFormError" style="display:none;"></div>
+                <div class="form-group">
+                    <label for="channelFormName" class="form-label">Nombre del Canal *</label>
+                    <input type="text" id="channelFormName" class="form-input" placeholder="Ej: Canal Deportes" required maxlength="255">
+                    <small class="form-hint">Debe ser único en el sistema</small>
+                </div>
+                <div class="form-group">
+                    <label for="channelFormType" class="form-label">Tipo *</label>
+                    <select id="channelFormType" class="form-input">
+                        <option value="">Seleccionar tipo...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="channelFormDesc" class="form-label">Descripción</label>
+                    <textarea id="channelFormDesc" class="form-input form-textarea" rows="2" maxlength="1000" placeholder="Descripción del canal..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="channelFormContext" class="form-label">Contexto para IA</label>
+                    <textarea id="channelFormContext" class="form-input form-textarea" rows="3" maxlength="2000" placeholder="Texto que guiará al modelo de IA en la generación de contenido para este canal..."></textarea>
+                    <small class="form-hint">Este texto guía al modelo de IA para generar contenido adecuado</small>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn--primary" id="btnChannelFormSubmit">Crear Canal</button>
+                    <button class="btn btn--outline" data-close-modal="channelFormModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: MEDIA ASSIGN ========== -->
+    <div id="mediaAssignModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title">Gestionar Medios del Canal</h2>
+                <button class="modal__close" data-close-modal="mediaAssignModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los medios de publicación que deseas asociar a este canal.</p>
+                <div id="mediaAssignLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando medios...</p>
+                </div>
+                <div id="mediaAssignContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;">
+                    <button class="btn btn--primary" id="btnMediaAssignSubmit">Guardar Medios</button>
+                    <button class="btn btn--outline" data-close-modal="mediaAssignModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== MODAL: CONFIRM ========== -->
     <div id="confirmModal" class="modal">
         <div class="modal__overlay"></div>
@@ -879,6 +1037,7 @@
     <script src="./frontend/js/home.js"></script>
     <script src="./frontend/js/files.js"></script>
     <script src="./frontend/js/admin-users.js"></script>
+    <script src="./frontend/js/channels.js"></script>
     <script src="./frontend/js/app.js"></script>
 </body>
 

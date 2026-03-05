@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\UserAdminController;
+use App\Http\Controllers\Api\ChannelController;
+use App\Http\Controllers\Api\ChannelMediaController;
 
 Route::get('/ping', fn() => response()->json([
     'status' => 'success',
@@ -84,6 +86,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{user}/revoke-role', [UserAdminController::class, 'revokeRole']);
         Route::get('/{user}/history', [UserAdminController::class, 'history']);
     });
+
+    // ── Canales temáticos de difusión ──
+    Route::get('/channels/types', [ChannelController::class, 'types']);
+    Route::apiResource('channels', ChannelController::class);
+
+    // ── Medios de publicación ──
+    Route::get('/media-types', [ChannelMediaController::class, 'mediaTypes']);
+    Route::get('/medias', [ChannelMediaController::class, 'indexMedias']);
+
+    // ── Asociación canal ↔ medios (channel_medias) ──
+    Route::get('/channels/{channel}/medias', [ChannelMediaController::class, 'index']);
+    Route::post('/channels/{channel}/medias', [ChannelMediaController::class, 'store']);
+    Route::delete('/channels/{channel}/medias', [ChannelMediaController::class, 'destroy']);
 });
 
 

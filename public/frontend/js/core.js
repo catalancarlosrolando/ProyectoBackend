@@ -30,6 +30,12 @@ const state = {
         sortBy: null,
         sortOrder: null,
     },
+    // Channels
+    channels: {
+        selectedChannelId: null,
+        editingChannelId: null,
+        mediaAssignChannelId: null,
+    },
 };
 
 // ── Storage ──
