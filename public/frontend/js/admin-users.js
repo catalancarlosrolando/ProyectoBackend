@@ -89,43 +89,130 @@ async function loadAdminUsers(page = 1) {
     }
 }
 
+const STATUS_ICONS = {
+    registered: 'check_circle',
+    verified: 'verified',
+    approved: 'task_alt',
+    disabled: 'block',
+    deleted: 'delete',
+};
+
+const STATUS_COLORS = {
+    registered: { icon: '#388E3C', text: '#388E3C', bg: '#BBDEFB' },
+    verified: { icon: '#1E90FF', text: '#1E90FF', bg: '#D4E9FF' },
+    approved: { icon: '#388E3C', text: '#388E3C', bg: '#E8F5E9' },
+    disabled: { icon: '#fb6e4b', text: '#fb6e4b', bg: '#FFF3E0' },
+    deleted: { icon: '#922926', text: '#922926', bg: '#FFEBEE' },
+};
+
+function getUserInitials(name) {
+    if (!name) return '??';
+    const parts = name.trim().split(/\s+/);
+    return parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : name.substring(0, 2).toUpperCase();
+}
+
+function renderActionButtons(u, size = 16) {
+    let html = `
+        <button class="au-action-btn au-action-btn--view" onclick="viewUserDetail(${u.id})" title="Ver detalle">
+            <span class="material-symbols-rounded" style="font-size:${size}px;">visibility</span>
+        </button>
+        <button class="au-action-btn au-action-btn--history" onclick="viewUserHistory(${u.id})" title="Historial">
+            <span class="material-symbols-rounded" style="font-size:${size}px;">description</span>
+        </button>`;
+    if (u.status === 'registered') {
+        html += `
+        <button class="au-action-btn au-action-btn--approve" onclick="adminAction('approve', ${u.id})" title="Aprobar">
+            <span class="material-symbols-rounded" style="font-size:${size}px;">check</span>
+        </button>
+        <button class="au-action-btn au-action-btn--reject" onclick="adminAction('reject', ${u.id})" title="Rechazar">
+            <span class="material-symbols-rounded" style="font-size:${size}px;">close</span>
+        </button>`;
+    } else if (u.status === 'approved') {
+        html += `
+        <button class="au-action-btn au-action-btn--reject" onclick="adminAction('disable', ${u.id})" title="Deshabilitar">
+            <span class="material-symbols-rounded" style="font-size:${size}px;">block</span>
+        </button>`;
+    } else if (u.status === 'disabled') {
+        html += `
+        <button class="au-action-btn au-action-btn--approve" onclick="adminAction('enable', ${u.id})" title="Habilitar">
+            <span class="material-symbols-rounded" style="font-size:${size}px;">check</span>
+        </button>`;
+    }
+    return html;
+}
+
+function renderStatusBadge(status) {
+    const colors = STATUS_COLORS[status] || { icon: '#49454F', text: '#49454F', bg: '#EEEEEE' };
+    const icon = STATUS_ICONS[status] || 'help';
+    const label = STATUS_LABELS[status] || status;
+    return `<span class="au-status-badge" style="background:${colors.bg};color:${colors.text};">
+        <span class="material-symbols-rounded" style="font-size:16px;color:${colors.icon};">${icon}</span>
+        ${escapeHtml(label.toUpperCase())}
+    </span>`;
+}
+
+function renderRoleBadge(roles) {
+    if (!roles || !roles.length) return '<span class="au-role-badge au-role-badge--muted">—</span>';
+    return roles.map(r => `<span class="au-role-badge">${escapeHtml(r)}</span>`).join('');
+}
+
 function renderUsersTable(users) {
+    // Desktop table rows
     const tbody = document.getElementById('usersTableBody');
     tbody.innerHTML = users.map(u => `
-        <tr>
-            <td><strong>${u.id}</strong></td>
-            <td>
-                <div style="font-weight:500;">${escapeHtml(u.name || '-')}</div>
-                ${u.dni ? `<small class="text-muted">${escapeHtml(u.dni)}</small>` : ''}
-            </td>
-            <td><span style="font-size:0.85rem;">${escapeHtml(u.email)}</span></td>
-            <td><span class="status-badge status-badge--${u.status}">${STATUS_LABELS[u.status] || u.status}</span></td>
-            <td>
-                <div class="tags">
-                    ${(u.roles && u.roles.length)
-            ? u.roles.map(r => `<span class="tag tag--primary">${r}</span>`).join('')
-            : '<span class="tag tag--muted">—</span>'}
-                </div>
-            </td>
-            <td><small>${formatDate(u.created_at)}</small></td>
-            <td>
-                <div class="btn-group btn-group--actions">
-                    <button class="btn btn--sm btn--outline" onclick="viewUserDetail(${u.id})" title="Ver detalle">👁</button>
-                    <button class="btn btn--sm btn--outline" onclick="viewUserHistory(${u.id})" title="Historial">📜</button>
-                    ${u.status === 'registered' ? `
-                        <button class="btn btn--sm btn--success" onclick="adminAction('approve', ${u.id})" title="Aprobar">✓</button>
-                        <button class="btn btn--sm btn--danger" onclick="adminAction('reject', ${u.id})" title="Rechazar">✗</button>
-                    ` : ''}
-                    ${u.status === 'approved' ? `
-                        <button class="btn btn--sm btn--warning" onclick="adminAction('disable', ${u.id})" title="Deshabilitar">⏸</button>
-                    ` : ''}
-                    ${u.status === 'disabled' ? `
-                        <button class="btn btn--sm btn--success" onclick="adminAction('enable', ${u.id})" title="Habilitar">▶</button>
-                    ` : ''}
-                </div>
-            </td>
-        </tr>
+        <div class="au-row">
+            <span class="au-cell au-cell--id">${u.id}</span>
+            <div class="au-cell au-cell--name">
+                <span class="au-name-text">${escapeHtml(u.name || '-')}</span>
+                ${u.dni ? `<span class="au-name-sub">${escapeHtml(u.dni)}</span>` : ''}
+            </div>
+            <span class="au-cell au-cell--email">${escapeHtml(u.email)}</span>
+            <div class="au-cell au-cell--status">${renderStatusBadge(u.status)}</div>
+            <div class="au-cell au-cell--role">${renderRoleBadge(u.roles)}</div>
+            <span class="au-cell au-cell--date">${formatDate(u.created_at)}</span>
+            <div class="au-cell au-cell--actions">${renderActionButtons(u)}</div>
+        </div>
     `).join('');
+
+    // Mobile cards
+    const mobileContainer = document.getElementById('usersMobileCards');
+    mobileContainer.innerHTML = users.map(u => {
+        const initials = getUserInitials(u.name);
+        return `
+        <div class="au-user-card">
+            <div class="au-user-card__top">
+                <div class="au-user-card__left">
+                    <div class="au-user-card__avatar">${initials}</div>
+                    <div class="au-user-card__name-col">
+                        <span class="au-user-card__name">${escapeHtml(u.name || '-')}</span>
+                        <span class="au-user-card__id">ID: ${u.id}</span>
+                    </div>
+                </div>
+                ${renderStatusBadge(u.status)}
+            </div>
+            <div class="au-user-card__divider"></div>
+            <div class="au-user-card__info">
+                <div class="au-user-card__info-row">
+                    <span class="material-symbols-rounded au-user-card__info-icon">mail</span>
+                    <span>${escapeHtml(u.email)}</span>
+                </div>
+                <div class="au-user-card__info-row">
+                    <span class="material-symbols-rounded au-user-card__info-icon">calendar_today</span>
+                    <span>${formatDate(u.created_at)}</span>
+                </div>
+                <div class="au-user-card__info-row au-user-card__info-row--between">
+                    <div class="au-user-card__rol-label">
+                        <span class="material-symbols-rounded au-user-card__info-icon">shield_person</span>
+                        <span>Rol:</span>
+                    </div>
+                    ${renderRoleBadge(u.roles)}
+                </div>
+            </div>
+            <div class="au-user-card__actions">${renderActionButtons(u, 18)}</div>
+        </div>`;
+    }).join('');
 }
 
 function renderPagination(pagination) {
@@ -176,21 +263,21 @@ async function viewUserDetail(userId) {
         state.adminUsers.selectedUserId = u.id;
 
         document.getElementById('userDetailTitle').textContent = `Detalle: ${u.name}`;
-        document.getElementById('userDetailAvatar').textContent = (u.name || '?')[0].toUpperCase();
+        document.getElementById('userDetailAvatar').textContent = getUserInitials(u.name);
         document.getElementById('udId').textContent = u.id;
         document.getElementById('udName').textContent = u.name || '-';
         document.getElementById('udEmail').textContent = u.email;
         document.getElementById('udDni').textContent = u.dni || '-';
         document.getElementById('udMobile').textContent = u.mobile || '-';
-        document.getElementById('udStatus').innerHTML = `<span class="status-badge status-badge--${u.status}">${u.status_label || u.status}</span>`;
+        document.getElementById('udStatus').innerHTML = renderStatusBadge(u.status);
         document.getElementById('udVerified').textContent = u.email_verified_at ? '✅ ' + formatDate(u.email_verified_at) : '❌ No';
         document.getElementById('udLastAccess').textContent = u.last_access_at ? formatDate(u.last_access_at) : 'Nunca';
         document.getElementById('udCreatedAt').textContent = formatDate(u.created_at);
         document.getElementById('udRejection').textContent = u.rejection_reason || '-';
 
         document.getElementById('udRoles').innerHTML = (u.roles?.length)
-            ? u.roles.map(r => `<span class="tag tag--primary">${r}</span>`).join('')
-            : '<span class="tag tag--muted">Sin roles</span>';
+            ? u.roles.map(r => `<span class="au-role-badge">${r}</span>`).join('')
+            : '<span class="au-role-badge au-role-badge--muted">Sin roles</span>';
 
         document.getElementById('udPermissions').innerHTML = (u.permissions?.length)
             ? u.permissions.map(p => `<span class="tag tag--info">${p}</span>`).join('')
@@ -199,18 +286,18 @@ async function viewUserDetail(userId) {
         // Build action buttons
         let actions = '';
         if (u.status === 'registered') {
-            actions += `<button class="btn btn--success btn--sm" onclick="adminAction('approve', ${u.id})">✓ Aprobar</button>`;
-            actions += `<button class="btn btn--danger btn--sm" onclick="adminAction('reject', ${u.id})">✗ Rechazar</button>`;
+            actions += `<button class="btn btn--success btn--sm" onclick="adminAction('approve', ${u.id})"><span class="material-symbols-rounded" style="font-size:16px;">check</span> Aprobar</button>`;
+            actions += `<button class="btn btn--danger btn--sm" onclick="adminAction('reject', ${u.id})"><span class="material-symbols-rounded" style="font-size:16px;">close</span> Rechazar</button>`;
         }
         if (u.status === 'approved') {
-            actions += `<button class="btn btn--warning btn--sm" onclick="adminAction('disable', ${u.id})">⏸ Deshabilitar</button>`;
+            actions += `<button class="btn btn--warning btn--sm" onclick="adminAction('disable', ${u.id})"><span class="material-symbols-rounded" style="font-size:16px;">block</span> Deshabilitar</button>`;
         }
         if (u.status === 'disabled') {
-            actions += `<button class="btn btn--success btn--sm" onclick="adminAction('enable', ${u.id})">▶ Habilitar</button>`;
+            actions += `<button class="btn btn--success btn--sm" onclick="adminAction('enable', ${u.id})"><span class="material-symbols-rounded" style="font-size:16px;">check</span> Habilitar</button>`;
         }
-        actions += `<button class="btn btn--info btn--sm" onclick="openRoleModal('assign', ${u.id})">🏷 Asignar Rol</button>`;
-        actions += `<button class="btn btn--outline btn--sm" onclick="openRoleModal('revoke', ${u.id})">🏷 Revocar Rol</button>`;
-        actions += `<button class="btn btn--outline btn--sm" onclick="viewUserHistory(${u.id})">📜 Ver Historial</button>`;
+        actions += `<button class="btn btn--info btn--sm" onclick="openRoleModal('assign', ${u.id})"><span class="material-symbols-rounded" style="font-size:16px;">shield_person</span> Asignar Rol</button>`;
+        actions += `<button class="btn btn--outline btn--sm" onclick="openRoleModal('revoke', ${u.id})"><span class="material-symbols-rounded" style="font-size:16px;">shield</span> Revocar Rol</button>`;
+        actions += `<button class="btn btn--outline btn--sm" onclick="viewUserHistory(${u.id})"><span class="material-symbols-rounded" style="font-size:16px;">history</span> Ver Historial</button>`;
 
         document.getElementById('udActions').innerHTML = actions;
 
@@ -335,7 +422,7 @@ async function viewUserHistory(userId) {
         const history = res.data?.history || [];
 
         document.getElementById('userHistoryTitle').textContent =
-            `📜 Historial: ${res.data?.user_name || 'Usuario #' + userId}`;
+            `Historial: ${res.data?.user_name || 'Usuario #' + userId}`;
 
         loading.style.display = 'none';
 

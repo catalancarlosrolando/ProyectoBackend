@@ -144,6 +144,14 @@ async function initApp() {
     document.getElementById('btnCloseHistory')?.addEventListener('click', () => {
         document.getElementById('userHistoryCard').style.display = 'none';
     });
+
+    // Filters toggle (mobile collapsible)
+    document.getElementById('btnFiltersToggle')?.addEventListener('click', () => {
+        const btn = document.getElementById('btnFiltersToggle');
+        const body = document.getElementById('filtersBody');
+        btn.classList.toggle('open');
+        body.classList.toggle('open');
+    });
     document.getElementById('btnStatusChangeConfirm')?.addEventListener('click', confirmStatusChange);
     document.getElementById('btnRoleConfirm')?.addEventListener('click', confirmRoleChange);
 
