@@ -9,14 +9,21 @@ function updateAuthUI() {
     const authOnlyEls = document.querySelectorAll('.auth-only');
     const adminOnlyEls = document.querySelectorAll('.admin-only');
     const welcome = document.getElementById('userWelcome');
+    const welcomeGroup = document.getElementById('userWelcomeGroup');
+    const userAvatar = document.getElementById('userAvatar');
     const btnLogin = document.getElementById('btnLogin');
     const btnRegister = document.getElementById('btnRegister');
     const btnLogout = document.getElementById('btnLogout');
     const guestActions = document.getElementById('guestActions');
 
     if (state.isAuthenticated) {
-        welcome.textContent = `👋 ${state.user?.name || 'Usuario'}`;
-        welcome.style.display = 'inline-flex';
+        const name = state.user?.name || 'Usuario';
+        welcome.textContent = name;
+        if (userAvatar) {
+            const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            userAvatar.textContent = initials;
+        }
+        if (welcomeGroup) welcomeGroup.style.display = 'flex';
         btnLogin.style.display = 'none';
         btnRegister.style.display = 'none';
         btnLogout.style.display = 'inline-flex';
@@ -27,7 +34,7 @@ function updateAuthUI() {
             state.permissions.includes('gestionar-usuarios');
         adminOnlyEls.forEach(el => el.style.display = hasAdminAccess ? '' : 'none');
     } else {
-        welcome.style.display = 'none';
+        if (welcomeGroup) welcomeGroup.style.display = 'none';
         btnLogin.style.display = '';
         btnRegister.style.display = '';
         btnLogout.style.display = 'none';

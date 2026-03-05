@@ -5,6 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Difexa - Frontend</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
     <link rel="stylesheet" href="./frontend/css/styles.css">
 </head>
 
@@ -12,37 +20,50 @@
     <div class="app">
         <!-- Header / Navbar -->
         <header class="navbar">
-            <div class="navbar__brand">
-                <span class="navbar__logo">◆</span>
-                <h1 class="navbar__title">Difexa</h1>
-                <span class="navbar__badge">API v1.0</span>
+            <div class="navbar__left">
+                <div class="navbar__brand">
+                    <span class="navbar__logo-dot"></span>
+                    <h1 class="navbar__title">Difexa</h1>
+                    <span class="navbar__badge">API v1.0</span>
+                </div>
+                <nav class="navbar__nav" id="mainNav">
+                    <a href="#" class="nav-link active" data-section="home">
+                        <span class="material-symbols-rounded nav-icon">home</span>
+                        <span>Inicio</span>
+                    </a>
+                    <a href="#" class="nav-link auth-only" data-section="profile" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">person</span>
+                        <span>Perfil</span>
+                    </a>
+                    <a href="#" class="nav-link" data-section="files">
+                        <span class="material-symbols-rounded nav-icon">folder</span>
+                        <span>Archivos</span>
+                    </a>
+                    <a href="#" class="nav-link admin-only" data-section="admin-users" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">group</span>
+                        <span>Usuarios</span>
+                    </a>
+                    <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">dashboard</span>
+                        <span>Dashboard</span>
+                    </a>
+                </nav>
             </div>
-            <nav class="navbar__nav" id="mainNav">
-                <a href="#" class="nav-link active" data-section="home">
-                    <span class="nav-icon">🏠</span> Inicio
-                </a>
-                <a href="#" class="nav-link auth-only" data-section="profile" style="display:none;">
-                    <span class="nav-icon">👤</span> Perfil
-                </a>
-                <a href="#" class="nav-link" data-section="files">
-                    <span class="nav-icon">📁</span> Archivos
-                </a>
-                <a href="#" class="nav-link admin-only" data-section="admin-users" style="display:none;">
-                    <span class="nav-icon">👥</span> Usuarios
-                </a>
-                <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
-                    <span class="nav-icon">📊</span> Dashboard
-                </a>
-            </nav>
             <div class="navbar__actions">
-                <span id="userWelcome" class="user-badge" style="display:none;"></span>
+                <div id="userWelcomeGroup" class="navbar__user-group" style="display:none;">
+                    <div class="navbar__avatar" id="userAvatar">NA</div>
+                    <span id="userWelcome" class="navbar__user-name"></span>
+                </div>
                 <button id="btnLogin" class="btn btn--outline">Iniciar Sesión</button>
                 <button id="btnRegister" class="btn btn--primary btn--sm">Registrarse</button>
-                <button id="btnLogout" class="btn btn--ghost" style="display:none;">
-                    Cerrar Sesión
+                <button id="btnLogout" class="btn btn--ghost-nav" style="display:none;">
+                    <span class="material-symbols-rounded">logout</span>
+                    <span>Cerrar Sesión</span>
                 </button>
             </div>
-            <button class="navbar__toggle" id="navToggle">☰</button>
+            <button class="navbar__toggle" id="navToggle">
+                <span class="material-symbols-rounded">menu</span>
+            </button>
         </header>
 
         <!-- Toast notifications -->
@@ -65,45 +86,78 @@
 
                 <div id="homeContent" style="display:none;">
                     <div class="stats-grid">
-                        <div class="stat-card stat-card--success">
-                            <div class="stat-card__icon">✅</div>
-                            <div class="stat-card__info">
-                                <span class="stat-card__label">Estado</span>
-                                <span class="stat-card__value" id="apiStatus">Conectado</span>
-                            </div>
-                        </div>
+                        <!-- Card 1: Estado -->
                         <div class="stat-card">
-                            <div class="stat-card__icon">💬</div>
-                            <div class="stat-card__info">
-                                <span class="stat-card__label">Mensaje</span>
-                                <span class="stat-card__value" id="apiMessage">-</span>
+                            <div class="stat-card__top">
+                                <div class="stat-card__icon-bg stat-card__icon-bg--success">
+                                    <span class="material-symbols-rounded">check_circle</span>
+                                </div>
+                                <div class="stat-card__trend stat-card__trend--success">
+                                    <span class="material-symbols-rounded">wifi</span>
+                                    <span>Online</span>
+                                </div>
                             </div>
+                            <span class="stat-card__value" id="apiStatus">Conectado</span>
+                            <span class="stat-card__label">ESTADO</span>
                         </div>
+                        <!-- Card 2: Mensaje -->
                         <div class="stat-card">
-                            <div class="stat-card__icon">🏷️</div>
-                            <div class="stat-card__info">
-                                <span class="stat-card__label">Versión</span>
-                                <span class="stat-card__value" id="apiVersion">-</span>
+                            <div class="stat-card__top">
+                                <div class="stat-card__icon-bg stat-card__icon-bg--info">
+                                    <span class="material-symbols-rounded">chat_bubble</span>
+                                </div>
+                                <div class="stat-card__trend stat-card__trend--success">
+                                    <span class="material-symbols-rounded">check</span>
+                                    <span>OK</span>
+                                </div>
                             </div>
+                            <span class="stat-card__value" id="apiMessage">-</span>
+                            <span class="stat-card__label">MENSAJE</span>
                         </div>
+                        <!-- Card 3: Versión -->
                         <div class="stat-card">
-                            <div class="stat-card__icon">🕐</div>
-                            <div class="stat-card__info">
-                                <span class="stat-card__label">Timestamp</span>
-                                <span class="stat-card__value" id="apiTimestamp">-</span>
+                            <div class="stat-card__top">
+                                <div class="stat-card__icon-bg stat-card__icon-bg--warning">
+                                    <span class="material-symbols-rounded">update</span>
+                                </div>
+                                <div class="stat-card__trend stat-card__trend--success">
+                                    <span class="material-symbols-rounded">verified</span>
+                                    <span>Stable</span>
+                                </div>
                             </div>
+                            <span class="stat-card__value" id="apiVersion">-</span>
+                            <span class="stat-card__label">VERSIÓN</span>
+                        </div>
+                        <!-- Card 4: Timestamp -->
+                        <div class="stat-card">
+                            <div class="stat-card__top">
+                                <div class="stat-card__icon-bg stat-card__icon-bg--primary">
+                                    <span class="material-symbols-rounded">schedule</span>
+                                </div>
+                                <div class="stat-card__trend stat-card__trend--primary">
+                                    <span class="material-symbols-rounded">today</span>
+                                    <span id="apiDate">-</span>
+                                </div>
+                            </div>
+                            <span class="stat-card__value" id="apiTimestamp">-</span>
+                            <span class="stat-card__label">TIMESTAMP</span>
                         </div>
                     </div>
 
-                    <!-- Ping test -->
-                    <div class="card">
+                    <!-- Health Check -->
+                    <div class="card card--health">
                         <div class="card__header">
                             <h3 class="card__title">Health Check</h3>
-                            <button class="btn btn--sm btn--outline" id="btnPing">🔄 Ping</button>
+                            <button class="btn btn--primary" id="btnPing">
+                                <span class="material-symbols-rounded">play_arrow</span>
+                                Ping
+                            </button>
                         </div>
-                        <div class="card__body">
-                            <div id="pingResult" class="code-block">
-                                <pre>Haz clic en "Ping" para verificar el estado de la API</pre>
+                        <div id="pingResult" class="code-block">
+                            <pre>Haz clic en "Ping" para verificar el estado de la API</pre>
+                            <div class="code-block__meta" id="pingMeta" style="display:none;">
+                                <span class="material-symbols-rounded">timer</span>
+                                <span id="pingResponseTime">Tiempo de respuesta: -</span>
                             </div>
                         </div>
                     </div>
@@ -125,7 +179,9 @@
                 </div>
 
                 <div id="homeError" class="error-state" style="display:none;">
-                    <div class="error-state__icon">⚠️</div>
+                    <div class="error-state__icon">
+                        <span class="material-symbols-rounded">warning</span>
+                    </div>
                     <h3>Error al conectar con la API</h3>
                     <p id="homeErrorMessage">No se pudo conectar con el servidor.</p>
                     <button class="btn btn--primary" id="btnRetry">Reintentar</button>
@@ -543,8 +599,14 @@
         <footer class="footer">
             <p>&copy; 2026 Difexa — Microservicios API. Todos los derechos reservados.</p>
             <div class="footer__links">
-                <a href="/docs" class="footer__link">📚 Documentación</a>
-                <a href="/" class="footer__link">🔧 API Client</a>
+                <a href="/docs" class="footer__link">
+                    <span class="material-symbols-rounded">description</span>
+                    Documentación
+                </a>
+                <a href="/" class="footer__link">
+                    <span class="material-symbols-rounded">terminal</span>
+                    API Client
+                </a>
             </div>
         </footer>
     </div>

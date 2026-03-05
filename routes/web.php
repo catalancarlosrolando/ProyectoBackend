@@ -3,7 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DocumentationController;
 
-Route::get('/', fn() => view('api-client'));
+Route::get('/apiClient', fn() => view('api-client'));
+
+Route::get('/', function () {
+    return redirect('/frontend');
+});
 
 // Ruta para el frontend SPA
 Route::get('/frontend', function () {
