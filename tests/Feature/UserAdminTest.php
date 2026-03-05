@@ -28,14 +28,14 @@ function setupRolesAndPermissions(): void
         Permission::firstOrCreate(['name' => $permission]);
     }
 
-    $roleUser = Role::firstOrCreate(['name' => 'user']);
+    $roleUser = Role::firstOrCreate(['name' => 'publicador']);
     $roleUser->syncPermissions(['editar-contenido']);
 
-    $roleModerator = Role::firstOrCreate(['name' => 'moderator']);
+    $roleModerator = Role::firstOrCreate(['name' => 'moderador']);
     $roleModerator->syncPermissions(['editar-contenido', 'eliminar-contenido', 'ver-reportes']);
 
-    $roleVerified = Role::firstOrCreate(['name' => 'verified']);
-    $roleVerified->syncPermissions(['acceder-panel-admin']);
+    //$roleVerified = Role::firstOrCreate(['name' => 'verified']);
+    //$roleVerified->syncPermissions(['acceder-panel-admin']);
 
     $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
     $roleAdmin->syncPermissions(Permission::all());
@@ -78,7 +78,7 @@ describe('Listado de usuarios (GET /api/admin/users)', function () {
 
     it('requiere permiso gestionar-usuarios', function () {
         $user = User::factory()->create();
-        $user->assignRole('user');
+        $user->assignRole('publicador');
 
         $response = $this->actingAs($user)->getJson('/api/admin/users');
         $response->assertStatus(403);
@@ -120,10 +120,10 @@ describe('Listado de usuarios (GET /api/admin/users)', function () {
     it('filtra por rol', function () {
         $admin = createAdmin();
         $moderator = User::factory()->create();
-        $moderator->assignRole('moderator');
+        $moderator->assignRole('moderador');
         User::factory()->count(2)->create();
 
-        $response = $this->actingAs($admin)->getJson('/api/admin/users?role=moderator');
+        $response = $this->actingAs($admin)->getJson('/api/admin/users?role=moderador');
 
         $response->assertStatus(200);
         expect($response->json('data.pagination.total'))->toBe(1);
@@ -222,7 +222,7 @@ describe('Detalle de usuario (GET /api/admin/users/{user})', function () {
     it('muestra el detalle de un usuario', function () {
         $admin = createAdmin();
         $user = User::factory()->create(['status' => UserStatus::REGISTERED->value, 'dni' => '11111111A']);
-        $user->assignRole('user');
+        $user->assignRole('publicador');
 
         $response = $this->actingAs($admin)->getJson("/api/admin/users/{$user->id}");
 
@@ -531,13 +531,13 @@ describe('Asignar rol (POST /api/admin/users/{user}/assign-role)', function () {
         $user = User::factory()->create();
 
         $response = $this->actingAs($admin)->postJson("/api/admin/users/{$user->id}/assign-role", [
-            'role' => 'moderator',
+            'role' => 'moderador',
         ]);
 
         $response->assertStatus(200)
             ->assertJson(['status' => 'success']);
 
-        expect($user->fresh()->hasRole('moderator'))->toBeTrue();
+        expect($user->fresh()->hasRole('moderador'))->toBeTrue();
     });
 
     it('registra historial al asignar rol', function () {
@@ -545,22 +545,22 @@ describe('Asignar rol (POST /api/admin/users/{user}/assign-role)', function () {
         $user = User::factory()->create();
 
         $this->actingAs($admin)->postJson("/api/admin/users/{$user->id}/assign-role", [
-            'role' => 'moderator',
+            'role' => 'moderador',
         ]);
 
         $history = UserStatusHistory::where('user_id', $user->id)->first();
         expect($history)->not->toBeNull();
         expect($history->action)->toBe(UserStatusHistory::ACTION_ROLE_ASSIGNED);
-        expect($history->new_value)->toBe('moderator');
+        expect($history->new_value)->toBe('moderador');
     });
 
     it('no permite asignar un rol que ya tiene', function () {
         $admin = createAdmin();
         $user = User::factory()->create();
-        $user->assignRole('moderator');
+        $user->assignRole('moderador');
 
         $response = $this->actingAs($admin)->postJson("/api/admin/users/{$user->id}/assign-role", [
-            'role' => 'moderator',
+            'role' => 'moderador',
         ]);
 
         $response->assertStatus(422)
@@ -601,31 +601,31 @@ describe('Revocar rol (POST /api/admin/users/{user}/revoke-role)', function () {
     it('revoca un rol de un usuario', function () {
         $admin = createAdmin();
         $user = User::factory()->create();
-        $user->assignRole('moderator');
+        $user->assignRole('moderador');
 
         $response = $this->actingAs($admin)->postJson("/api/admin/users/{$user->id}/revoke-role", [
-            'role' => 'moderator',
+            'role' => 'moderador',
         ]);
 
         $response->assertStatus(200)
             ->assertJson(['status' => 'success']);
 
-        expect($user->fresh()->hasRole('moderator'))->toBeFalse();
+        expect($user->fresh()->hasRole('moderador'))->toBeFalse();
     });
 
     it('registra historial al revocar rol', function () {
         $admin = createAdmin();
         $user = User::factory()->create();
-        $user->assignRole('moderator');
+        $user->assignRole('moderador');
 
         $this->actingAs($admin)->postJson("/api/admin/users/{$user->id}/revoke-role", [
-            'role' => 'moderator',
+            'role' => 'moderador',
         ]);
 
         $history = UserStatusHistory::where('user_id', $user->id)->first();
         expect($history)->not->toBeNull();
         expect($history->action)->toBe(UserStatusHistory::ACTION_ROLE_REVOKED);
-        expect($history->old_value)->toBe('moderator');
+        expect($history->old_value)->toBe('moderador');
     });
 
     it('no permite revocar un rol que no tiene', function () {
@@ -633,7 +633,7 @@ describe('Revocar rol (POST /api/admin/users/{user}/revoke-role)', function () {
         $user = User::factory()->create();
 
         $response = $this->actingAs($admin)->postJson("/api/admin/users/{$user->id}/revoke-role", [
-            'role' => 'moderator',
+            'role' => 'moderador',
         ]);
 
         $response->assertStatus(422)

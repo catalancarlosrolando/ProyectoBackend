@@ -18,10 +18,10 @@ class UserSeeder extends Seeder
         }
 
         $this->createConfigUser('ADMIN', 'admin');
-        $this->createConfigUser('USER', 'user');
+        $this->createConfigUser('USER', 'publicador');
 
         User::factory(60)->create()->each(function ($user) {
-            $user->assignRole('user');
+            $user->assignRole('publicador');
         });
 
         $this->command->info('Usuarios sembrados correctamente.');

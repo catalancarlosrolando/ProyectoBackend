@@ -26,7 +26,7 @@ class PostSeeder extends Seeder
 
         // 1. Obtener usuarios
         $adminUser = User::role('admin')->first();
-        $regularUsers = User::role('user')->limit(5)->get();
+        $regularUsers = User::role('publicador')->limit(5)->get();
 
         // 2. Validar usuarios
         if (!$adminUser || $regularUsers->isEmpty()) {
