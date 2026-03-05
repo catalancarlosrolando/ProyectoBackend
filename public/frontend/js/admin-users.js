@@ -20,6 +20,45 @@ const ACTION_LABELS = {
     disabled: 'Deshabilitado',
 };
 
+const SORT_FIELDS = ['name', 'email', 'created_at', 'last_access_at', 'status'];
+
+function toggleAdminSort(field) {
+    if (!SORT_FIELDS.includes(field)) return;
+
+    if (state.adminUsers.sortBy === field) {
+        // Cycle: asc → desc → none
+        if (state.adminUsers.sortOrder === 'asc') {
+            state.adminUsers.sortOrder = 'desc';
+        } else {
+            state.adminUsers.sortBy = null;
+            state.adminUsers.sortOrder = null;
+        }
+    } else {
+        state.adminUsers.sortBy = field;
+        state.adminUsers.sortOrder = 'asc';
+    }
+
+    updateSortIcons();
+    loadAdminUsers(1);
+}
+
+function updateSortIcons() {
+    SORT_FIELDS.forEach(f => {
+        const icon = document.getElementById('sortIcon-' + f);
+        if (!icon) return;
+
+        const col = icon.closest('.au-col--sortable');
+
+        if (state.adminUsers.sortBy === f) {
+            icon.textContent = state.adminUsers.sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward';
+            col?.classList.add('au-col--sorted');
+        } else {
+            icon.textContent = 'unfold_more';
+            col?.classList.remove('au-col--sorted');
+        }
+    });
+}
+
 function getAdminFilters() {
     const filters = {};
     const name = document.getElementById('filterName')?.value.trim();
@@ -43,6 +82,12 @@ function getAdminFilters() {
     if (registeredTo) filters.registered_to = registeredTo;
     if (lastAccessFrom) filters.last_access_from = lastAccessFrom;
     if (lastAccessTo) filters.last_access_to = lastAccessTo;
+
+    // Sort
+    if (state.adminUsers.sortBy) {
+        filters.sort_by = state.adminUsers.sortBy;
+        filters.sort_order = state.adminUsers.sortOrder || 'asc';
+    }
 
     return filters;
 }
@@ -172,6 +217,7 @@ function renderUsersTable(users) {
             <div class="au-cell au-cell--status">${renderStatusBadge(u.status)}</div>
             <div class="au-cell au-cell--role">${renderRoleBadge(u.roles)}</div>
             <span class="au-cell au-cell--date">${formatDate(u.created_at)}</span>
+            <span class="au-cell au-cell--date">${u.last_access_at ? formatDate(u.last_access_at) : 'Nunca'}</span>
             <div class="au-cell au-cell--actions">${renderActionButtons(u)}</div>
         </div>
     `).join('');
@@ -201,6 +247,10 @@ function renderUsersTable(users) {
                 <div class="au-user-card__info-row">
                     <span class="material-symbols-rounded au-user-card__info-icon">calendar_today</span>
                     <span>${formatDate(u.created_at)}</span>
+                </div>
+                <div class="au-user-card__info-row">
+                    <span class="material-symbols-rounded au-user-card__info-icon">schedule</span>
+                    <span>Últ. acceso: ${u.last_access_at ? formatDate(u.last_access_at) : 'Nunca'}</span>
                 </div>
                 <div class="au-user-card__info-row au-user-card__info-row--between">
                     <div class="au-user-card__rol-label">
@@ -463,5 +513,9 @@ function clearAdminFilters() {
     document.getElementById('filterRegisteredTo').value = '';
     document.getElementById('filterLastAccessFrom').value = '';
     document.getElementById('filterLastAccessTo').value = '';
+    // Reset sort
+    state.adminUsers.sortBy = null;
+    state.adminUsers.sortOrder = null;
+    updateSortIcons();
     loadAdminUsers(1);
 }

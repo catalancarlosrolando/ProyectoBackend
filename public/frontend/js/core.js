@@ -27,6 +27,8 @@ const state = {
         statusChangeUserId: null,
         roleAction: null,
         roleUserId: null,
+        sortBy: null,
+        sortOrder: null,
     },
 };
 

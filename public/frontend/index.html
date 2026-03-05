@@ -474,11 +474,27 @@
                         <div class="au-desktop-table">
                             <div class="au-col-headers">
                                 <span class="au-col au-col--id">ID</span>
-                                <span class="au-col au-col--name">NOMBRE</span>
-                                <span class="au-col au-col--email">EMAIL</span>
-                                <span class="au-col au-col--status">ESTADO</span>
+                                <span class="au-col au-col--name au-col--sortable" data-sort="name" onclick="toggleAdminSort('name')">
+                                    NOMBRE
+                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-name">unfold_more</span>
+                                </span>
+                                <span class="au-col au-col--email au-col--sortable" data-sort="email" onclick="toggleAdminSort('email')">
+                                    EMAIL
+                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-email">unfold_more</span>
+                                </span>
+                                <span class="au-col au-col--status au-col--sortable" data-sort="status" onclick="toggleAdminSort('status')">
+                                    ESTADO
+                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-status">unfold_more</span>
+                                </span>
                                 <span class="au-col au-col--role">ROLES</span>
-                                <span class="au-col au-col--date">REGISTRO</span>
+                                <span class="au-col au-col--date au-col--sortable" data-sort="created_at" onclick="toggleAdminSort('created_at')">
+                                    REGISTRO
+                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-created_at">unfold_more</span>
+                                </span>
+                                <span class="au-col au-col--date au-col--sortable" data-sort="last_access_at" onclick="toggleAdminSort('last_access_at')">
+                                    ÚLT. ACCESO
+                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-last_access_at">unfold_more</span>
+                                </span>
                                 <span class="au-col au-col--actions">ACCIONES</span>
                             </div>
                             <div id="usersTableBody"></div>
