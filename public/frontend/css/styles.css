@@ -2256,3 +2256,84 @@ select.au-filter-input {
         grid-column: 1 / -1;
     }
 }
+
+/* ── User-Channels Section ── */
+
+.uc-col--name {
+    width: 250px;
+}
+
+.uc-col--channels {
+    flex: 1;
+    min-width: 200px;
+}
+
+.uc-col--count {
+    width: 80px;
+    text-align: center;
+}
+
+.uc-cell--name {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.uc-cell--channels {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.uc-cell--count {
+    width: 80px;
+    text-align: center;
+}
+
+.uc-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 0.5rem;
+    border-radius: var(--radius-full, 9999px);
+    background: var(--primary, #6750A4);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+.uc-detail-channels-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.uc-channel-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    background: var(--surface-variant);
+    border-radius: var(--radius-md);
+    flex-wrap: wrap;
+}
+
+.uc-channel-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.uc-channel-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--on-surface);
+}

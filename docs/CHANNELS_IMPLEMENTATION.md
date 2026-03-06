@@ -4,6 +4,8 @@
 
 Sistema de gestión de **canales temáticos de difusión** que permite a los administradores crear, editar y eliminar canales categorizados, asociar medios de publicación (pantallas, redes sociales, plataformas editoriales) y configurar contextos semánticos para guiar la generación de contenido por IA.
 
+También incluye la **asignación de canales a usuarios publicadores**, permitiendo al administrador controlar qué publicadores pueden gestionar contenido en cada canal, con notificaciones automáticas por email.
+
 ---
 
 ## Criterios de Aceptación
@@ -20,6 +22,16 @@ Sistema de gestión de **canales temáticos de difusión** que permite a los adm
 | Canal disponible inmediatamente tras su creación | ✅ |
 | Registrar quién realizó la última modificación y cuándo | ✅ |
 
+### Asignación de Canales a Publicadores
+
+| Criterio | Estado |
+|---|:---:|
+| Mostrar lista de canales y usuarios con rol publicador | ✅ |
+| Seleccionar múltiples canales para un publicador | ✅ |
+| Revocar acceso a canales previamente asignados | ✅ |
+| Notificación al publicador al asignar/revocar canales | ✅ |
+| Cambios aplicados inmediatamente sin reiniciar sesión | ✅ |
+
 ---
 
 ## Arquitectura de Archivos
@@ -35,15 +47,21 @@ app/
 ├── Http/
 │   ├── Controllers/Api/
 │   │   ├── ChannelController.php      # CRUD de canales
-│   │   └── ChannelMediaController.php # Gestión medios + asociación canal↔medios
+│   │   ├── ChannelMediaController.php # Gestión medios + asociación canal↔medios
+│   │   └── UserChannelController.php  # Asignación canales↔publicadores
 │   └── Requests/
 │       ├── StoreChannelRequest.php       # Validación crear canal (name unique)
 │       ├── UpdateChannelRequest.php      # Validación actualizar canal
-│       └── StoreChannelMediaRequest.php  # Validación asociar medios
+│       ├── StoreChannelMediaRequest.php  # Validación asociar medios
+│       └── SyncUserChannelsRequest.php   # Validación asignar/revocar canales a publicadores
+├── Notifications/
+│   ├── ChannelAssignedNotification.php   # Email al asignar canales
+│   └── ChannelRevokedNotification.php    # Email al revocar canales
 database/
 ├── migrations/
 │   ├── 2025_10_15_200149_create_channels_table.php
 │   ├── 2025_10_15_200638_create_medias_table.php
+│   ├── 2025_10_15_220648_create_user_channels_table.php  # Pivote user↔channel (ya existente)
 │   ├── 2025_10_15_223708_create_channel_medias_table.php
 │   ├── 2026_03_05_000001_add_unique_to_channels_name.php  # Constraint UNIQUE
 │   └── 2026_03_05_000002_add_last_modified_to_channels_table.php  # Tracking modificaciones
@@ -52,7 +70,8 @@ routes/
 public/
 └── frontend/
     └── js/
-        └── channels.js          # Frontend para gestión de canales
+        ├── channels.js          # Frontend para gestión de canales
+        └── user-channels.js     # Frontend para asignación canales↔publicadores
 ```
 
 ---
@@ -86,6 +105,15 @@ Todos los endpoints requieren autenticación (`auth:sanctum`).
 | `GET` | `/api/admin/channels/{id}/medias` | Medios asociados a un canal | — |
 | `POST` | `/api/admin/channels/{id}/medias` | Asociar medios al canal | `{ "media_ids": [1, 2, 3] }` |
 | `DELETE` | `/api/admin/channels/{id}/medias` | Desasociar medios del canal | `{ "media_ids": [1, 2] }` |
+
+### Asignación Canales ↔ Publicadores
+
+| Método | Ruta | Descripción | Body |
+|--------|------|-------------|------|
+| `GET` | `/api/admin/user-channels/publishers` | Listar publicadores con sus canales | — |
+| `GET` | `/api/admin/user-channels/{user}` | Canales asignados a un publicador | — |
+| `POST` | `/api/admin/user-channels/{user}` | Asignar canales al publicador | `{ "channel_ids": [1, 2, 3] }` |
+| `DELETE` | `/api/admin/user-channels/{user}` | Revocar canales del publicador | `{ "channel_ids": [1, 2] }` |
 
 ---
 

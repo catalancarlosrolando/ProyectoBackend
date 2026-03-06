@@ -175,6 +175,14 @@ async function initApp() {
     document.getElementById('btnChannelFormSubmit')?.addEventListener('click', submitChannelForm);
     document.getElementById('btnMediaAssignSubmit')?.addEventListener('click', submitMediaAssign);
 
+    // ── User-Channels (asignación publicadores) ──
+    document.getElementById('btnRefreshUc')?.addEventListener('click', () => loadUserChannels(state.userChannels.currentPage));
+    document.getElementById('btnCloseUcDetail')?.addEventListener('click', () => {
+        document.getElementById('ucDetailCard').style.display = 'none';
+        state.userChannels.selectedUserId = null;
+    });
+    document.getElementById('btnUcAssignSubmit')?.addEventListener('click', submitAssignChannels);
+
     console.log('✅ Difexa Frontend inicializado');
 }
 

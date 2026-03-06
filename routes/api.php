@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\UserAdminController;
 use App\Http\Controllers\Api\ChannelController;
 use App\Http\Controllers\Api\ChannelMediaController;
+use App\Http\Controllers\Api\UserChannelController;
 
 Route::get('/ping', fn() => response()->json([
     'status' => 'success',
@@ -106,6 +107,14 @@ Route::middleware('auth:sanctum')->group(function () {
         // ── Si no quiero usar apiResource
         //Route::get('/', [ChannelMediaController::class, 'index']);
         //Route::post('/', [ChannelMediaController::class, 'store']);
+    });
+
+    // ── Asignación de canales a publicadores ──
+    Route::prefix('admin/user-channels')->middleware('permission:gestionar-canales')->group(function () {
+        Route::get('/publishers', [UserChannelController::class, 'publishers']);
+        Route::get('/{user}', [UserChannelController::class, 'show']);
+        Route::post('/{user}', [UserChannelController::class, 'store']);
+        Route::delete('/{user}', [UserChannelController::class, 'destroy']);
     });
 });
 

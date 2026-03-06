@@ -36,6 +36,13 @@ const state = {
         editingChannelId: null,
         mediaAssignChannelId: null,
     },
+    // User-Channels (asignación publicadores)
+    userChannels: {
+        selectedUserId: null,
+        assignUserId: null,
+        currentPage: 1,
+        lastPage: 1,
+    },
 };
 
 // ── Storage ──

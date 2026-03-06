@@ -47,6 +47,10 @@
                         <span class="material-symbols-rounded nav-icon">podcasts</span>
                         <span>Canales</span>
                     </a>
+                    <a href="#" class="nav-link admin-only" data-section="user-channels" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">group_add</span>
+                        <span>Asignar Canales</span>
+                    </a>
                     <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
                         <span class="material-symbols-rounded nav-icon">dashboard</span>
                         <span>Dashboard</span>
@@ -478,26 +482,36 @@
                         <div class="au-desktop-table">
                             <div class="au-col-headers">
                                 <span class="au-col au-col--id">ID</span>
-                                <span class="au-col au-col--name au-col--sortable" data-sort="name" onclick="toggleAdminSort('name')">
+                                <span class="au-col au-col--name au-col--sortable" data-sort="name"
+                                    onclick="toggleAdminSort('name')">
                                     NOMBRE
-                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-name">unfold_more</span>
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-name">unfold_more</span>
                                 </span>
-                                <span class="au-col au-col--email au-col--sortable" data-sort="email" onclick="toggleAdminSort('email')">
+                                <span class="au-col au-col--email au-col--sortable" data-sort="email"
+                                    onclick="toggleAdminSort('email')">
                                     EMAIL
-                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-email">unfold_more</span>
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-email">unfold_more</span>
                                 </span>
-                                <span class="au-col au-col--status au-col--sortable" data-sort="status" onclick="toggleAdminSort('status')">
+                                <span class="au-col au-col--status au-col--sortable" data-sort="status"
+                                    onclick="toggleAdminSort('status')">
                                     ESTADO
-                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-status">unfold_more</span>
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-status">unfold_more</span>
                                 </span>
                                 <span class="au-col au-col--role">ROLES</span>
-                                <span class="au-col au-col--date au-col--sortable" data-sort="created_at" onclick="toggleAdminSort('created_at')">
+                                <span class="au-col au-col--date au-col--sortable" data-sort="created_at"
+                                    onclick="toggleAdminSort('created_at')">
                                     REGISTRO
-                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-created_at">unfold_more</span>
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-created_at">unfold_more</span>
                                 </span>
-                                <span class="au-col au-col--date au-col--sortable" data-sort="last_access_at" onclick="toggleAdminSort('last_access_at')">
+                                <span class="au-col au-col--date au-col--sortable" data-sort="last_access_at"
+                                    onclick="toggleAdminSort('last_access_at')">
                                     ÚLT. ACCESO
-                                    <span class="material-symbols-rounded au-sort-icon" id="sortIcon-last_access_at">unfold_more</span>
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-last_access_at">unfold_more</span>
                                 </span>
                                 <span class="au-col au-col--actions">ACCIONES</span>
                             </div>
@@ -605,10 +619,12 @@
             <!-- ========== CHANNELS SECTION ========== -->
             <section id="sectionChannels" class="section">
                 <div class="section__header">
-                    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                    <div
+                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
                         <div>
                             <h2 class="section__title">Gestión de Canales</h2>
-                            <p class="section__subtitle">Crea canales temáticos, asocia medios de publicación y configura el contexto para IA.</p>
+                            <p class="section__subtitle">Crea canales temáticos, asocia medios de publicación y
+                                configura el contexto para IA.</p>
                         </div>
                         <button class="btn btn--primary" id="btnCreateChannel">
                             <span class="material-symbols-rounded">add</span>
@@ -634,9 +650,11 @@
                         <p>Cargando canales...</p>
                     </div>
                     <div id="channelsEmpty" class="empty-state" style="display:none;">
-                        <span class="material-symbols-rounded" style="font-size:2.5rem;color:var(--on-surface-variant);">podcasts</span>
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">podcasts</span>
                         <p>No hay canales creados aún</p>
-                        <button class="btn btn--primary btn--sm" onclick="openCreateChannelModal()" style="margin-top:0.5rem;">
+                        <button class="btn btn--primary btn--sm" onclick="openCreateChannelModal()"
+                            style="margin-top:0.5rem;">
                             <span class="material-symbols-rounded">add</span> Crear primer canal
                         </button>
                     </div>
@@ -674,21 +692,118 @@
                         <div class="user-detail-grid">
                             <div class="user-detail-info">
                                 <div class="profile-details">
-                                    <div class="detail-row"><span class="detail-label">Nombre</span><span class="detail-value" id="cdName">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Tipo</span><span class="detail-value" id="cdType">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Descripción</span><span class="detail-value" id="cdDescription">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Contexto IA</span><span class="detail-value ch-context-text" id="cdSemanticContext">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Creado</span><span class="detail-value" id="cdCreatedAt">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Actualizado</span><span class="detail-value" id="cdUpdatedAt">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Última modificación</span><span class="detail-value" id="cdLastModified">—</span></div>
+                                    <div class="detail-row"><span class="detail-label">Nombre</span><span
+                                            class="detail-value" id="cdName">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Tipo</span><span
+                                            class="detail-value" id="cdType">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Descripción</span><span
+                                            class="detail-value" id="cdDescription">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Contexto IA</span><span
+                                            class="detail-value ch-context-text" id="cdSemanticContext">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Creado</span><span
+                                            class="detail-value" id="cdCreatedAt">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Actualizado</span><span
+                                            class="detail-value" id="cdUpdatedAt">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Última modificación</span><span
+                                            class="detail-value" id="cdLastModified">—</span></div>
                                     <div class="detail-row"><span class="detail-label">Medios asociados</span>
-                                        <div class="ch-detail-medias-list" id="cdMedias"><span class="au-role-badge au-role-badge--muted">—</span></div>
+                                        <div class="ch-detail-medias-list" id="cdMedias"><span
+                                                class="au-role-badge au-role-badge--muted">—</span></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="user-detail-actions">
                                 <h4 class="au-actions-title">Acciones rápidas</h4>
                                 <div class="action-buttons-stack" id="cdActions"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== USER-CHANNELS SECTION ========== -->
+            <section id="sectionUser-channels" class="section">
+                <div class="section__header">
+                    <div
+                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h2 class="section__title">Asignación de Canales a Publicadores</h2>
+                            <p class="section__subtitle">Gestiona qué canales puede administrar cada publicador. Los
+                                cambios se aplican inmediatamente.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla / Cards de publicadores -->
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">group_add</span>
+                            <span class="au-table-title-text">Publicadores</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnRefreshUc">
+                            <span class="material-symbols-rounded">refresh</span>
+                            <span class="au-btn-label">Actualizar</span>
+                        </button>
+                    </div>
+                    <div id="ucLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando publicadores...</p>
+                    </div>
+                    <div id="ucEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">group_off</span>
+                        <p>No hay usuarios con rol publicador</p>
+                    </div>
+                    <div id="ucTableWrapper" style="display:none;">
+                        <!-- Desktop table -->
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col uc-col--name">PUBLICADOR</span>
+                                <span class="au-col uc-col--channels">CANALES ASIGNADOS</span>
+                                <span class="au-col uc-col--count">TOTAL</span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="ucTableBody"></div>
+                        </div>
+                        <!-- Mobile cards -->
+                        <div class="au-mobile-cards" id="ucMobileCards"></div>
+                        <div class="pagination-bar" id="ucPagination"></div>
+                    </div>
+                </div>
+
+                <!-- Detalle canales del publicador -->
+                <div class="au-table-card" id="ucDetailCard" style="display:none;">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">person</span>
+                            <span class="au-table-title-text" id="ucDetailTitle">Canales del Publicador</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnCloseUcDetail">
+                            <span class="material-symbols-rounded">close</span>
+                            <span class="au-btn-label">Cerrar</span>
+                        </button>
+                    </div>
+                    <div class="au-detail-body">
+                        <div class="user-detail-grid">
+                            <div class="user-detail-info">
+                                <div class="profile-details">
+                                    <div class="detail-row"><span class="detail-label">Nombre</span><span
+                                            class="detail-value" id="ucDetailName">-</span></div>
+                                    <div class="detail-row"><span class="detail-label">Email</span><span
+                                            class="detail-value" id="ucDetailEmail">-</span></div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Canales asignados</span>
+                                        <div class="uc-detail-channels-list" id="ucDetailChannelsList">
+                                            <span class="au-role-badge au-role-badge--muted">—</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="user-detail-actions">
+                                <h4 class="au-actions-title">Acciones rápidas</h4>
+                                <div class="action-buttons-stack" id="ucDetailActions"></div>
                             </div>
                         </div>
                     </div>
@@ -961,7 +1076,8 @@
                 <div class="alert alert--error" id="channelFormError" style="display:none;"></div>
                 <div class="form-group">
                     <label for="channelFormName" class="form-label">Nombre del Canal *</label>
-                    <input type="text" id="channelFormName" class="form-input" placeholder="Ej: Canal Deportes" required maxlength="255">
+                    <input type="text" id="channelFormName" class="form-input" placeholder="Ej: Canal Deportes" required
+                        maxlength="255">
                     <small class="form-hint">Debe ser único en el sistema</small>
                 </div>
                 <div class="form-group">
@@ -972,11 +1088,13 @@
                 </div>
                 <div class="form-group">
                     <label for="channelFormDesc" class="form-label">Descripción</label>
-                    <textarea id="channelFormDesc" class="form-input form-textarea" rows="2" maxlength="1000" placeholder="Descripción del canal..."></textarea>
+                    <textarea id="channelFormDesc" class="form-input form-textarea" rows="2" maxlength="1000"
+                        placeholder="Descripción del canal..."></textarea>
                 </div>
                 <div class="form-group">
                     <label for="channelFormContext" class="form-label">Contexto para IA</label>
-                    <textarea id="channelFormContext" class="form-input form-textarea" rows="3" maxlength="2000" placeholder="Texto que guiará al modelo de IA en la generación de contenido para este canal..."></textarea>
+                    <textarea id="channelFormContext" class="form-input form-textarea" rows="3" maxlength="2000"
+                        placeholder="Texto que guiará al modelo de IA en la generación de contenido para este canal..."></textarea>
                     <small class="form-hint">Este texto guía al modelo de IA para generar contenido adecuado</small>
                 </div>
                 <div class="btn-group">
@@ -996,7 +1114,8 @@
                 <button class="modal__close" data-close-modal="mediaAssignModal">&times;</button>
             </div>
             <div class="modal__body">
-                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los medios de publicación que deseas asociar a este canal.</p>
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los medios de publicación que deseas
+                    asociar a este canal.</p>
                 <div id="mediaAssignLoading" class="loading" style="display:none;">
                     <div class="spinner spinner--sm"></div>
                     <p>Cargando medios...</p>
@@ -1005,6 +1124,30 @@
                 <div class="btn-group" style="margin-top:1.5rem;">
                     <button class="btn btn--primary" id="btnMediaAssignSubmit">Guardar Medios</button>
                     <button class="btn btn--outline" data-close-modal="mediaAssignModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: USER-CHANNEL ASSIGN ========== -->
+    <div id="ucAssignModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="ucAssignTitle">Asignar Canales al Publicador</h2>
+                <button class="modal__close" data-close-modal="ucAssignModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los canales que deseas asignar. Los cambios
+                    se aplican inmediatamente y el publicador será notificado por email.</p>
+                <div id="ucAssignLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando canales...</p>
+                </div>
+                <div id="ucAssignContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;">
+                    <button class="btn btn--primary" id="btnUcAssignSubmit">Guardar Asignación</button>
+                    <button class="btn btn--outline" data-close-modal="ucAssignModal">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -1038,6 +1181,7 @@
     <script src="./frontend/js/files.js"></script>
     <script src="./frontend/js/admin-users.js"></script>
     <script src="./frontend/js/channels.js"></script>
+    <script src="./frontend/js/user-channels.js"></script>
     <script src="./frontend/js/app.js"></script>
 </body>
 
