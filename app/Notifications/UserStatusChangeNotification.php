@@ -27,7 +27,7 @@ class UserStatusChangeNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database'];
     }
 
     /**
@@ -70,11 +70,41 @@ class UserStatusChangeNotification extends Notification
     }
 
     /**
-     * Representación como array.
+     * Representación como array (canal database).
      */
     public function toArray(object $notifiable): array
     {
+        $statusEnum = UserStatus::tryFrom($this->newStatus);
+        $statusLabel = $statusEnum?->label() ?? $this->newStatus;
+
+        [$type, $icon, $title, $message] = match ($this->newStatus) {
+            UserStatus::APPROVED->value => [
+                'account_approved', 'check_circle',
+                'Cuenta aprobada',
+                'Tu cuenta ha sido aprobada. Ya puedes acceder al sistema.',
+            ],
+            UserStatus::DISABLED->value => [
+                'account_disabled', 'block',
+                'Cuenta deshabilitada',
+                'Tu cuenta ha sido deshabilitada.' . ($this->reason ? " Motivo: {$this->reason}" : ''),
+            ],
+            UserStatus::DELETED->value => [
+                'account_rejected', 'cancel',
+                'Solicitud rechazada',
+                'Tu solicitud de registro ha sido rechazada.' . ($this->reason ? " Motivo: {$this->reason}" : ''),
+            ],
+            default => [
+                'status_change', 'info',
+                "Estado actualizado: {$statusLabel}",
+                "El estado de tu cuenta cambió a {$statusLabel}." . ($this->reason ? " Motivo: {$this->reason}" : ''),
+            ],
+        };
+
         return [
+            'type' => $type,
+            'icon' => $icon,
+            'title' => $title,
+            'message' => $message,
             'new_status' => $this->newStatus,
             'reason' => $this->reason,
             'admin_name' => $this->adminName,

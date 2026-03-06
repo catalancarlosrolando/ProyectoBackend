@@ -24,7 +24,7 @@ class ChannelRevokedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -40,5 +40,20 @@ class ChannelRevokedNotification extends Notification
             ->when($this->adminName, fn ($m) => $m->line("Revocado por: {$this->adminName}"))
             ->line('Si crees que esto es un error, contacta con el administrador del sistema.')
             ->action('Ir al sistema', url('/'));
+    }
+
+    public function toArray(object $notifiable): array
+    {
+        $count = count($this->channelNames);
+        $list = implode(', ', $this->channelNames);
+
+        return [
+            'type' => 'channel_revoked',
+            'icon' => 'remove_circle',
+            'title' => "Canales revocados ({$count})",
+            'message' => "Se ha revocado tu acceso a: {$list}.",
+            'channel_names' => $this->channelNames,
+            'admin_name' => $this->adminName,
+        ];
     }
 }

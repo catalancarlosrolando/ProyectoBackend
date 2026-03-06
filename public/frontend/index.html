@@ -58,6 +58,12 @@
                 </nav>
             </div>
             <div class="navbar__actions">
+                <!-- Campana de notificaciones -->
+                <button id="btnNotifBell" class="btn btn--icon btn--ghost-nav auth-only notif-bell"
+                    style="display:none;" title="Notificaciones">
+                    <span class="material-symbols-rounded">notifications</span>
+                    <span id="notifBadge" class="notif-badge" style="display:none;">0</span>
+                </button>
                 <div id="userWelcomeGroup" class="navbar__user-group" style="display:none;">
                     <div class="navbar__avatar" id="userAvatar">NA</div>
                     <span id="userWelcome" class="navbar__user-name"></span>
@@ -810,6 +816,36 @@
                 </div>
             </section>
 
+            <!-- ========== NOTIFICATIONS SECTION ========== -->
+            <section id="sectionNotifications" class="section">
+                <div class="section__header">
+                    <h2 class="section__title">
+                        <span class="material-symbols-rounded">notifications</span>
+                        Centro de Notificaciones
+                    </h2>
+                    <p class="section__subtitle">Revisa los eventos importantes de tu cuenta</p>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3 class="card__title">Notificaciones recientes</h3>
+                        <div class="btn-group">
+                            <button class="btn btn--sm btn--outline" id="btnMarkAllRead">
+                                <span class="material-symbols-rounded">done_all</span> Marcar todas leídas
+                            </button>
+                            <button class="btn btn--sm btn--outline" id="btnRefreshNotif">
+                                <span class="material-symbols-rounded">refresh</span> Actualizar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div id="notifList" class="notif-list">
+                            <p class="notif-loading">Cargando notificaciones...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- ========== DASHBOARD SECTION ========== -->
             <section id="sectionDashboard" class="section">
                 <div class="section__header">
@@ -1182,6 +1218,7 @@
     <script src="./frontend/js/admin-users.js"></script>
     <script src="./frontend/js/channels.js"></script>
     <script src="./frontend/js/user-channels.js"></script>
+    <script src="./frontend/js/notifications.js"></script>
     <script src="./frontend/js/app.js"></script>
 </body>
 

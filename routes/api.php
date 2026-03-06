@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\UserAdminController;
 use App\Http\Controllers\Api\ChannelController;
 use App\Http\Controllers\Api\ChannelMediaController;
 use App\Http\Controllers\Api\UserChannelController;
+use App\Http\Controllers\Api\NotificationController;
 
 Route::get('/ping', fn() => response()->json([
     'status' => 'success',
@@ -115,6 +116,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{user}', [UserChannelController::class, 'show']);
         Route::post('/{user}', [UserChannelController::class, 'store']);
         Route::delete('/{user}', [UserChannelController::class, 'destroy']);
+    });
+
+    // ── Notificaciones del usuario autenticado ──
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/read-all', [NotificationController::class, 'markAllRead']);
+        Route::delete('/{id}', [NotificationController::class, 'destroy']);
     });
 });
 

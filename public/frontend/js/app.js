@@ -183,6 +183,11 @@ async function initApp() {
     });
     document.getElementById('btnUcAssignSubmit')?.addEventListener('click', submitAssignChannels);
 
+    // ── Notificaciones ──
+    document.getElementById('btnNotifBell')?.addEventListener('click', () => navigateTo('notifications'));
+    document.getElementById('btnRefreshNotif')?.addEventListener('click', loadNotifications);
+    document.getElementById('btnMarkAllRead')?.addEventListener('click', markAllNotificationsRead);
+
     console.log('✅ Difexa Frontend inicializado');
 }
 

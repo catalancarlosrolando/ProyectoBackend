@@ -43,6 +43,11 @@ const state = {
         currentPage: 1,
         lastPage: 1,
     },
+    // Notificaciones
+    notifications: {
+        items: [],
+        unreadCount: 0,
+    },
 };
 
 // ── Storage ──

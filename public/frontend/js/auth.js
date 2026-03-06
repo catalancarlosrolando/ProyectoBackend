@@ -33,6 +33,9 @@ function updateAuthUI() {
         const hasAdminAccess = state.permissions.includes('acceder-panel-admin') ||
             state.permissions.includes('gestionar-usuarios');
         adminOnlyEls.forEach(el => el.style.display = hasAdminAccess ? '' : 'none');
+
+        // Cargar contador de notificaciones no leídas
+        loadUnreadCount();
     } else {
         if (welcomeGroup) welcomeGroup.style.display = 'none';
         btnLogin.style.display = '';

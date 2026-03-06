@@ -24,7 +24,7 @@ class ChannelAssignedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -41,5 +41,20 @@ class ChannelAssignedNotification extends Notification
             ->line('Ya puedes gestionar contenido en estos canales.')
             ->action('Ir al sistema', url('/'))
             ->line('¡Gracias por ser parte del equipo!');
+    }
+
+    public function toArray(object $notifiable): array
+    {
+        $count = count($this->channelNames);
+        $list = implode(', ', $this->channelNames);
+
+        return [
+            'type' => 'channel_assigned',
+            'icon' => 'add_circle',
+            'title' => "Canales asignados ({$count})",
+            'message' => "Se te han asignado los canales: {$list}.",
+            'channel_names' => $this->channelNames,
+            'admin_name' => $this->adminName,
+        ];
     }
 }
