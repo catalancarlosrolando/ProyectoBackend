@@ -96,7 +96,7 @@ async function loadChannels() {
     tableWrapper.style.display = 'none';
 
     try {
-        const res = await api.get('/channels', true);
+        const res = await api.get('/admin/channels', true);
         const channels = res.data || [];
 
         loading.style.display = 'none';
@@ -196,7 +196,7 @@ async function viewChannelDetail(channelId) {
     card.style.display = '';
 
     try {
-        const res = await api.get(`/channels/${channelId}`, true);
+        const res = await api.get(`/admin/channels/${channelId}`, true);
         const ch = res.data;
         if (!ch) throw new Error('Canal no encontrado');
 
@@ -248,7 +248,7 @@ async function viewChannelDetail(channelId) {
 async function openCreateChannelModal() {
     // Load channel types
     try {
-        const res = await api.get('/channels/types', true);
+        const res = await api.get('/admin/channels/types', true);
         const types = res.data || [];
         const select = document.getElementById('channelFormType');
         select.innerHTML = '<option value="">Seleccionar tipo...</option>' +
@@ -272,11 +272,11 @@ async function openCreateChannelModal() {
 
 async function openEditChannelModal(channelId) {
     try {
-        const res = await api.get(`/channels/${channelId}`, true);
+        const res = await api.get(`/admin/channels/${channelId}`, true);
         const ch = res.data;
 
         // Load types
-        const typesRes = await api.get('/channels/types', true);
+        const typesRes = await api.get('/admin/channels/types', true);
         const types = typesRes.data || [];
         const select = document.getElementById('channelFormType');
         select.innerHTML = '<option value="">Seleccionar tipo...</option>' +
@@ -321,10 +321,10 @@ async function submitChannelForm() {
 
     try {
         if (state.channels.editingChannelId) {
-            await api.request('PUT', `/channels/${state.channels.editingChannelId}`, { body, auth: true });
+            await api.request('PUT', `/admin/channels/${state.channels.editingChannelId}`, { body, auth: true });
             showToast('Canal actualizado correctamente', 'success');
         } else {
-            await api.request('POST', '/channels', { body, auth: true });
+            await api.request('POST', '/admin/channels', { body, auth: true });
             showToast('Canal creado correctamente', 'success');
         }
         closeModal('channelFormModal');
@@ -350,7 +350,7 @@ function confirmDeleteChannel(channelId, channelName) {
         `¿Estás seguro de que deseas eliminar el canal "${channelName}"? Esta acción no se puede deshacer.`,
         async () => {
             try {
-                await api.del(`/channels/${channelId}`, true);
+                await api.del(`/admin/channels/${channelId}`, true);
                 showToast('Canal eliminado correctamente', 'success');
                 closeModal('confirmModal');
                 loadChannels();
@@ -384,8 +384,8 @@ async function openMediaAssignModal(channelId) {
     try {
         // Load all medias and channel's current medias in parallel
         const [allMediasRes, channelMediasRes] = await Promise.all([
-            api.get('/medias', true),
-            api.get(`/channels/${channelId}/medias`, true),
+            api.get('/admin/channels/medias', true),
+            api.get(`/admin/channels/${channelId}/medias`, true),
         ]);
 
         const allMedias = allMediasRes.data || [];
@@ -453,17 +453,17 @@ async function submitMediaAssign() {
 
     try {
         // First get current medias to compute diff
-        const currentRes = await api.get(`/channels/${channelId}/medias`, true);
+        const currentRes = await api.get(`/admin/channels/${channelId}/medias`, true);
         const currentIds = (currentRes.data || []).map(m => m.id);
 
         const toAdd = selectedIds.filter(id => !currentIds.includes(id));
         const toRemove = currentIds.filter(id => !selectedIds.includes(id));
 
         if (toAdd.length > 0) {
-            await api.post(`/channels/${channelId}/medias`, { media_ids: toAdd }, true);
+            await api.post(`/admin/channels/${channelId}/medias`, { media_ids: toAdd }, true);
         }
         if (toRemove.length > 0) {
-            await api.request('DELETE', `/channels/${channelId}/medias`, {
+            await api.request('DELETE', `/admin/channels/${channelId}/medias`, {
                 body: { media_ids: toRemove },
                 auth: true,
             });

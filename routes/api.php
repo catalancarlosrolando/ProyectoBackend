@@ -87,18 +87,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{user}/history', [UserAdminController::class, 'history']);
     });
 
-    // ── Canales temáticos de difusión ──
-    Route::get('/channels/types', [ChannelController::class, 'types']);
-    Route::apiResource('channels', ChannelController::class);
+    Route::prefix('admin/channels')->middleware('permission:gestionar-canales')->group(function () {
 
-    // ── Medios de publicación ──
-    Route::get('/media-types', [ChannelMediaController::class, 'mediaTypes']);
-    Route::get('/medias', [ChannelMediaController::class, 'indexMedias']);
+        // ── Canales temáticos de difusión ──
+        Route::get('/types', [ChannelController::class, 'types']);
 
-    // ── Asociación canal ↔ medios (channel_medias) ──
-    Route::get('/channels/{channel}/medias', [ChannelMediaController::class, 'index']);
-    Route::post('/channels/{channel}/medias', [ChannelMediaController::class, 'store']);
-    Route::delete('/channels/{channel}/medias', [ChannelMediaController::class, 'destroy']);
+        // ── Medios de publicación ──
+        Route::get('/media-types', [ChannelMediaController::class, 'mediaTypes']);
+        Route::get('/medias', [ChannelMediaController::class, 'indexMedias']);
+
+        // ── Asociación canal ↔ medios (channel_medias) ──
+        Route::get('/{channel}/medias', [ChannelMediaController::class, 'index']);
+        Route::post('/{channel}/medias', [ChannelMediaController::class, 'store']);
+        Route::delete('/{channel}/medias', [ChannelMediaController::class, 'destroy']);
+
+        Route::apiResource('/', ChannelController::class)->parameters(['' => 'channel']);
+
+        // ── Si no quiero usar apiResource
+        //Route::get('/', [ChannelMediaController::class, 'index']);
+        //Route::post('/', [ChannelMediaController::class, 'store']);
+    });
 });
 
 

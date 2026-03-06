@@ -65,27 +65,27 @@ Todos los endpoints requieren autenticación (`auth:sanctum`).
 
 | Método | Ruta | Descripción | Body |
 |--------|------|-------------|------|
-| `GET` | `/api/channels` | Listar todos los canales con sus medios | — |
-| `POST` | `/api/channels` | Crear un nuevo canal | `{ name, description, type, semantic_context }` |
-| `GET` | `/api/channels/{id}` | Detalle de un canal | — |
-| `PUT` | `/api/channels/{id}` | Actualizar un canal | `{ name?, description?, type?, semantic_context? }` |
-| `DELETE` | `/api/channels/{id}` | Eliminar un canal | — |
-| `GET` | `/api/channels/types` | Listar tipos de canal disponibles | — |
+| `GET` | `/api/admin/channels` | Listar todos los canales con sus medios | — |
+| `POST` | `/api/admin/channels` | Crear un nuevo canal | `{ name, description, type, semantic_context }` |
+| `GET` | `/api/admin/channels/{id}` | Detalle de un canal | — |
+| `PUT` | `/api/admin/channels/{id}` | Actualizar un canal | `{ name?, description?, type?, semantic_context? }` |
+| `DELETE` | `/api/admin/channels/{id}` | Eliminar un canal | — |
+| `GET` | `/api/admin/channels/types` | Listar tipos de canal disponibles | — |
 
 ### Medios
 
 | Método | Ruta | Descripción | Params/Body |
 |--------|------|-------------|-------------|
-| `GET` | `/api/media-types` | Listar tipos de medio (enum) | — |
-| `GET` | `/api/medias` | Listar medios disponibles | `?type=social_media&name=instagram` |
+| `GET` | `/api/admin/channels/media-types` | Listar tipos de medio (enum) | — |
+| `GET` | `/api/admin/channels/medias` | Listar medios disponibles | `?type=social_media&name=instagram` |
 
 ### Asociación Canal ↔ Medios
 
 | Método | Ruta | Descripción | Body |
 |--------|------|-------------|------|
-| `GET` | `/api/channels/{id}/medias` | Medios asociados a un canal | — |
-| `POST` | `/api/channels/{id}/medias` | Asociar medios al canal | `{ "media_ids": [1, 2, 3] }` |
-| `DELETE` | `/api/channels/{id}/medias` | Desasociar medios del canal | `{ "media_ids": [1, 2] }` |
+| `GET` | `/api/admin/channels/{id}/medias` | Medios asociados a un canal | — |
+| `POST` | `/api/admin/channels/{id}/medias` | Asociar medios al canal | `{ "media_ids": [1, 2, 3] }` |
+| `DELETE` | `/api/admin/channels/{id}/medias` | Desasociar medios del canal | `{ "media_ids": [1, 2] }` |
 
 ---
 
@@ -175,7 +175,7 @@ curl -X POST /api/channels \
 ### Asociar medios al canal
 
 ```bash
-curl -X POST /api/channels/1/medias \
+curl -X POST /api/admin/channels/1/medias \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{ "media_ids": [1, 5, 9] }'

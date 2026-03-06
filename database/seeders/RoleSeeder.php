@@ -29,6 +29,7 @@ class RoleSeeder extends Seeder
             'editar-contenido',
             'eliminar-contenido',
             'ver-reportes',
+            'gestionar-canales',
         ];
 
         foreach ($permissions as $permission) {
