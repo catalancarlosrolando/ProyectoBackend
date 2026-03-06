@@ -26,7 +26,7 @@ class UserStatusChangeNotification extends Notification
      * Canales de entrega.
      */
     public function via(object $notifiable): array
-    {
+    {   //elimine mail para que no se envíe correo, solo se guarde en la base de datos.
         return ['database'];
     }
 
@@ -103,7 +103,7 @@ class UserStatusChangeNotification extends Notification
         return [
             'type' => $type,
             'icon' => $icon,
-            'title' => $title,
+            'title' => $title, //aqui podria usar el objeto $notifiable para personalizar el mensaje con el nombre del usuario, por ejemplo: "Cuenta aprobada, Juan"
             'message' => $message,
             'new_status' => $this->newStatus,
             'reason' => $this->reason,

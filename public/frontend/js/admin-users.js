@@ -430,10 +430,10 @@ async function confirmRoleChange() {
     const role = document.getElementById('roleSelect').value;
     const btn = document.getElementById('btnRoleConfirm');
 
-    if (!role) {
-        showToast('Selecciona un rol', 'warning');
-        return;
-    }
+    //if (!role) {
+    //    showToast('Selecciona un rol', 'warning');
+    //    return;
+    //}
 
     const endpoint = action === 'assign' ? 'assign-role' : 'revoke-role';
     btn.disabled = true;
