@@ -130,15 +130,23 @@ function renderChannelsTable(channels) {
             </div>
             <div class="au-cell ch-cell--medias">${renderChannelMediasList(ch.medias)}</div>
             <div class="au-cell au-cell--actions">
-                <button class="au-action-btn au-action-btn--view" onclick="viewChannelDetail(${ch.id})" title="Ver detalle">
-                    <span class="material-symbols-rounded" style="font-size:16px;">visibility</span>
-                </button>
-                <button class="au-action-btn au-action-btn--history" onclick="openEditChannelModal(${ch.id})" title="Editar">
-                    <span class="material-symbols-rounded" style="font-size:16px;">edit</span>
-                </button>
-                <button class="au-action-btn au-action-btn--reject" onclick="confirmDeleteChannel(${ch.id}, '${escapeHtml(ch.name)}')" title="Eliminar">
-                    <span class="material-symbols-rounded" style="font-size:16px;">delete</span>
-                </button>
+                <div class="au-actions-dropdown">
+                    <button class="au-actions-trigger" onclick="toggleActionsMenu(event, this)" title="Acciones">
+                        <span class="material-symbols-rounded" style="font-size:20px">more_vert</span>
+                    </button>
+                    <div class="au-actions-menu">
+                        <button class="au-actions-menu__item" onclick="openEditChannelModal(${ch.id})">
+                            <span class="material-symbols-rounded">edit</span> Editar
+                        </button>
+                        <button class="au-actions-menu__item au-actions-menu__item--info" onclick="openMediaAssignModal(${ch.id})">
+                            <span class="material-symbols-rounded">add_link</span> Gestionar medios
+                        </button>
+                        <div class="au-actions-menu__sep"></div>
+                        <button class="au-actions-menu__item au-actions-menu__item--danger" onclick="confirmDeleteChannel(${ch.id}, '${escapeHtml(ch.name)}')">
+                            <span class="material-symbols-rounded">delete</span> Eliminar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     `).join('');
@@ -175,73 +183,29 @@ function renderChannelsTable(channels) {
                 </div>
             </div>
             <div class="au-user-card__actions">
-                <button class="au-action-btn au-action-btn--view" onclick="viewChannelDetail(${ch.id})" title="Ver detalle">
-                    <span class="material-symbols-rounded" style="font-size:18px;">visibility</span>
-                </button>
-                <button class="au-action-btn au-action-btn--history" onclick="openEditChannelModal(${ch.id})" title="Editar">
-                    <span class="material-symbols-rounded" style="font-size:18px;">edit</span>
-                </button>
-                <button class="au-action-btn au-action-btn--reject" onclick="confirmDeleteChannel(${ch.id}, '${escapeHtml(ch.name)}')" title="Eliminar">
-                    <span class="material-symbols-rounded" style="font-size:18px;">delete</span>
-                </button>
+                <div class="au-actions-dropdown">
+                    <button class="au-actions-trigger" onclick="toggleActionsMenu(event, this)" title="Acciones">
+                        <span class="material-symbols-rounded" style="font-size:20px">more_vert</span>
+                    </button>
+                    <div class="au-actions-menu">
+                        <button class="au-actions-menu__item" onclick="openEditChannelModal(${ch.id})">
+                            <span class="material-symbols-rounded">edit</span> Editar
+                        </button>
+                        <button class="au-actions-menu__item au-actions-menu__item--info" onclick="openMediaAssignModal(${ch.id})">
+                            <span class="material-symbols-rounded">add_link</span> Gestionar medios
+                        </button>
+                        <div class="au-actions-menu__sep"></div>
+                        <button class="au-actions-menu__item au-actions-menu__item--danger" onclick="confirmDeleteChannel(${ch.id}, '${escapeHtml(ch.name)}')">
+                            <span class="material-symbols-rounded">delete</span> Eliminar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     `).join('');
 }
 
-// ── View Channel Detail ──
 
-async function viewChannelDetail(channelId) {
-    const card = document.getElementById('channelDetailCard');
-    card.style.display = '';
-
-    try {
-        const res = await api.get(`/admin/channels/${channelId}`, true);
-        const ch = res.data;
-        if (!ch) throw new Error('Canal no encontrado');
-
-        state.channels.selectedChannelId = ch.id;
-
-        document.getElementById('channelDetailTitle').textContent = `Detalle: ${ch.name}`;
-        document.getElementById('cdName').textContent = ch.name;
-        document.getElementById('cdType').innerHTML = renderChannelTypeBadge(ch.type);
-        document.getElementById('cdDescription').textContent = ch.description || '—';
-        document.getElementById('cdSemanticContext').textContent = ch.semantic_context || '—';
-        document.getElementById('cdCreatedAt').textContent = formatDate(ch.created_at);
-        document.getElementById('cdUpdatedAt').textContent = formatDate(ch.updated_at);
-
-        // Última modificación
-        const modifiedContainer = document.getElementById('cdLastModified');
-        if (modifiedContainer) {
-            modifiedContainer.innerHTML = renderLastModifiedInfo(ch);
-        }
-
-        // Medias list
-        const mediasContainer = document.getElementById('cdMedias');
-        if (ch.medias && ch.medias.length > 0) {
-            mediasContainer.innerHTML = ch.medias.map(m => `
-                <div class="ch-detail-media-item">
-                    ${renderMediaTypeBadge(m.type)}
-                    <span class="ch-detail-media-name">${escapeHtml(m.name)}</span>
-                    <span class="ch-detail-media-status">${m.is_active ? '🟢 Activo' : '🔴 Inactivo'}</span>
-                </div>
-            `).join('');
-        } else {
-            mediasContainer.innerHTML = '<span class="au-role-badge au-role-badge--muted">Sin medios asociados</span>';
-        }
-
-        // Actions
-        let actions = '';
-        actions += `<button class="btn btn--primary btn--sm" onclick="openEditChannelModal(${ch.id})"><span class="material-symbols-rounded" style="font-size:16px;">edit</span> Editar Canal</button>`;
-        actions += `<button class="btn btn--info btn--sm" onclick="openMediaAssignModal(${ch.id})"><span class="material-symbols-rounded" style="font-size:16px;">add_link</span> Gestionar Medios</button>`;
-        actions += `<button class="btn btn--danger btn--sm" onclick="confirmDeleteChannel(${ch.id}, '${escapeHtml(ch.name)}')"><span class="material-symbols-rounded" style="font-size:16px;">delete</span> Eliminar</button>`;
-        document.getElementById('cdActions').innerHTML = actions;
-
-        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (err) {
-        showToast('Error al cargar detalle: ' + err.message, 'error');
-    }
-}
 
 // ── Create Channel ──
 
@@ -330,9 +294,7 @@ async function submitChannelForm() {
         closeModal('channelFormModal');
         loadChannels();
 
-        if (state.channels.selectedChannelId === state.channels.editingChannelId && state.channels.editingChannelId) {
-            viewChannelDetail(state.channels.editingChannelId);
-        }
+
     } catch (err) {
         errorDiv.textContent = err.message;
         errorDiv.style.display = 'block';
@@ -355,11 +317,7 @@ function confirmDeleteChannel(channelId, channelName) {
                 closeModal('confirmModal');
                 loadChannels();
 
-                // Close detail if viewing
-                if (state.channels.selectedChannelId === channelId) {
-                    document.getElementById('channelDetailCard').style.display = 'none';
-                    state.channels.selectedChannelId = null;
-                }
+
             } catch (err) {
                 showToast('Error al eliminar: ' + err.message, 'error');
                 closeModal('confirmModal');
@@ -473,9 +431,7 @@ async function submitMediaAssign() {
         closeModal('mediaAssignModal');
         loadChannels();
 
-        if (state.channels.selectedChannelId === channelId) {
-            viewChannelDetail(channelId);
-        }
+
     } catch (err) {
         showToast('Error al actualizar medios: ' + err.message, 'error');
     } finally {

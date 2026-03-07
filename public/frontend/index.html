@@ -529,97 +529,6 @@
                     </div>
                 </div>
 
-                <!-- Detalle de usuario -->
-                <div class="au-table-card" id="userDetailCard" style="display:none;">
-                    <div class="au-table-header">
-                        <div class="au-table-title">
-                            <span class="material-symbols-rounded au-table-icon">person</span>
-                            <span class="au-table-title-text" id="userDetailTitle">Detalle del Usuario</span>
-                        </div>
-                        <button class="btn btn--outline" id="btnCloseDetail">
-                            <span class="material-symbols-rounded">close</span>
-                            <span class="au-btn-label">Cerrar</span>
-                        </button>
-                    </div>
-                    <div class="au-detail-body">
-                        <div class="user-detail-grid">
-                            <div class="user-detail-info">
-                                <div class="au-detail-avatar" id="userDetailAvatar">?</div>
-                                <div class="profile-details">
-                                    <div class="detail-row"><span class="detail-label">ID</span><span
-                                            class="detail-value" id="udId">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Nombre</span><span
-                                            class="detail-value" id="udName">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Email</span><span
-                                            class="detail-value" id="udEmail">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">DNI</span><span
-                                            class="detail-value" id="udDni">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Móvil</span><span
-                                            class="detail-value" id="udMobile">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Estado</span><span
-                                            class="detail-value" id="udStatus">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Email verificado</span><span
-                                            class="detail-value" id="udVerified">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Último acceso</span><span
-                                            class="detail-value" id="udLastAccess">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Registrado</span><span
-                                            class="detail-value" id="udCreatedAt">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Motivo rechazo</span><span
-                                            class="detail-value" id="udRejection">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Roles</span>
-                                        <div class="tags" id="udRoles"><span class="tag tag--muted">-</span></div>
-                                    </div>
-                                    <div class="detail-row"><span class="detail-label">Permisos</span>
-                                        <div class="tags" id="udPermissions"><span class="tag tag--muted">-</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="user-detail-actions">
-                                <h4 class="au-actions-title">Acciones rápidas</h4>
-                                <div class="action-buttons-stack" id="udActions"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Historial -->
-                <div class="au-table-card" id="userHistoryCard" style="display:none;">
-                    <div class="au-table-header">
-                        <div class="au-table-title">
-                            <span class="material-symbols-rounded au-table-icon">history</span>
-                            <span class="au-table-title-text" id="userHistoryTitle">Historial de Cambios</span>
-                        </div>
-                        <button class="btn btn--outline" id="btnCloseHistory">
-                            <span class="material-symbols-rounded">close</span>
-                            <span class="au-btn-label">Cerrar</span>
-                        </button>
-                    </div>
-                    <div style="padding:0;">
-                        <div id="historyLoading" class="loading" style="display:none;">
-                            <div class="spinner spinner--sm"></div>
-                        </div>
-                        <div id="historyEmpty" class="empty-state" style="display:none;">
-                            <p>No hay historial para este usuario</p>
-                        </div>
-                        <div id="historyTableWrapper" style="display:none;">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Acción</th>
-                                            <th>Anterior</th>
-                                            <th>Nuevo</th>
-                                            <th>Motivo</th>
-                                            <th>Admin</th>
-                                            <th>Fecha</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="historyTableBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </section>
 
             <!-- ========== CHANNELS SECTION ========== -->
@@ -682,49 +591,6 @@
                     </div>
                 </div>
 
-                <!-- Detalle de canal -->
-                <div class="au-table-card" id="channelDetailCard" style="display:none;">
-                    <div class="au-table-header">
-                        <div class="au-table-title">
-                            <span class="material-symbols-rounded au-table-icon">podcasts</span>
-                            <span class="au-table-title-text" id="channelDetailTitle">Detalle del Canal</span>
-                        </div>
-                        <button class="btn btn--outline" id="btnCloseChannelDetail">
-                            <span class="material-symbols-rounded">close</span>
-                            <span class="au-btn-label">Cerrar</span>
-                        </button>
-                    </div>
-                    <div class="au-detail-body">
-                        <div class="user-detail-grid">
-                            <div class="user-detail-info">
-                                <div class="profile-details">
-                                    <div class="detail-row"><span class="detail-label">Nombre</span><span
-                                            class="detail-value" id="cdName">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Tipo</span><span
-                                            class="detail-value" id="cdType">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Descripción</span><span
-                                            class="detail-value" id="cdDescription">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Contexto IA</span><span
-                                            class="detail-value ch-context-text" id="cdSemanticContext">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Creado</span><span
-                                            class="detail-value" id="cdCreatedAt">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Actualizado</span><span
-                                            class="detail-value" id="cdUpdatedAt">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Última modificación</span><span
-                                            class="detail-value" id="cdLastModified">—</span></div>
-                                    <div class="detail-row"><span class="detail-label">Medios asociados</span>
-                                        <div class="ch-detail-medias-list" id="cdMedias"><span
-                                                class="au-role-badge au-role-badge--muted">—</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="user-detail-actions">
-                                <h4 class="au-actions-title">Acciones rápidas</h4>
-                                <div class="action-buttons-stack" id="cdActions"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </section>
 
             <!-- ========== USER-CHANNELS SECTION ========== -->
@@ -779,41 +645,6 @@
                     </div>
                 </div>
 
-                <!-- Detalle canales del publicador -->
-                <div class="au-table-card" id="ucDetailCard" style="display:none;">
-                    <div class="au-table-header">
-                        <div class="au-table-title">
-                            <span class="material-symbols-rounded au-table-icon">person</span>
-                            <span class="au-table-title-text" id="ucDetailTitle">Canales del Publicador</span>
-                        </div>
-                        <button class="btn btn--outline" id="btnCloseUcDetail">
-                            <span class="material-symbols-rounded">close</span>
-                            <span class="au-btn-label">Cerrar</span>
-                        </button>
-                    </div>
-                    <div class="au-detail-body">
-                        <div class="user-detail-grid">
-                            <div class="user-detail-info">
-                                <div class="profile-details">
-                                    <div class="detail-row"><span class="detail-label">Nombre</span><span
-                                            class="detail-value" id="ucDetailName">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Email</span><span
-                                            class="detail-value" id="ucDetailEmail">-</span></div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Canales asignados</span>
-                                        <div class="uc-detail-channels-list" id="ucDetailChannelsList">
-                                            <span class="au-role-badge au-role-badge--muted">—</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="user-detail-actions">
-                                <h4 class="au-actions-title">Acciones rápidas</h4>
-                                <div class="action-buttons-stack" id="ucDetailActions"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </section>
 
             <!-- ========== NOTIFICATIONS SECTION ========== -->
@@ -1100,6 +931,29 @@
         </div>
     </div>
 
+    <!-- ========== MODAL: HISTORIAL DE USUARIO ========== -->
+    <div id="historyModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--xl">
+            <div class="modal__header">
+                <div class="hm-title-wrap">
+                    <h2 class="modal__title" id="historyModalTitle">Historial de actividad</h2>
+                    <span class="hm-subtitle" id="historyModalSubtitle"></span>
+                </div>
+                <button class="modal__close" data-close-modal="historyModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div id="historyLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                </div>
+                <div id="historyEmpty" class="empty-state" style="display:none;">
+                    <p>No hay historial para este usuario</p>
+                </div>
+                <div id="historyCardsList" class="hm-cards-list" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== MODAL: CHANNEL FORM (Create/Edit) ========== -->
     <div id="channelFormModal" class="modal">
         <div class="modal__overlay"></div>
@@ -1184,6 +1038,35 @@
                 <div class="btn-group" style="margin-top:1.5rem;">
                     <button class="btn btn--primary" id="btnUcAssignSubmit">Guardar Asignación</button>
                     <button class="btn btn--outline" data-close-modal="ucAssignModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: REVOKE CHANNELS ========== -->
+    <div id="ucRevokeModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="ucRevokeTitle">Revocar Canales</h2>
+                <button class="modal__close" data-close-modal="ucRevokeModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los canales que deseas revocar. El
+                    publicador será notificado por email.</p>
+                <div id="ucRevokeLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando canales asignados...</p>
+                </div>
+                <div id="ucRevokeEmpty" class="empty-state" style="display:none;">
+                    <span class="material-symbols-rounded"
+                        style="font-size:2rem;color:var(--on-surface-variant);">link_off</span>
+                    <p>Este publicador no tiene canales asignados.</p>
+                </div>
+                <div id="ucRevokeContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;" id="ucRevokeActions">
+                    <button class="btn btn--danger" id="btnUcRevokeSubmit">Revocar Seleccionados</button>
+                    <button class="btn btn--outline" data-close-modal="ucRevokeModal">Cancelar</button>
                 </div>
             </div>
         </div>

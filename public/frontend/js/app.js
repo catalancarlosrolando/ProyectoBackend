@@ -103,8 +103,9 @@ async function initApp() {
     document.querySelectorAll('.modal__overlay').forEach(overlay => {
         overlay.addEventListener('click', () => {
             const modal = overlay.closest('.modal');
-            if (modal) modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
+            if (modal) {
+                closeModal(modal.id);
+            }
         });
     });
 
@@ -137,13 +138,6 @@ async function initApp() {
     document.getElementById('btnApplyFilters')?.addEventListener('click', () => loadAdminUsers(1));
     document.getElementById('btnClearFilters')?.addEventListener('click', clearAdminFilters);
     document.getElementById('btnRefreshUsers')?.addEventListener('click', () => loadAdminUsers(state.adminUsers.currentPage));
-    document.getElementById('btnCloseDetail')?.addEventListener('click', () => {
-        document.getElementById('userDetailCard').style.display = 'none';
-        state.adminUsers.selectedUserId = null;
-    });
-    document.getElementById('btnCloseHistory')?.addEventListener('click', () => {
-        document.getElementById('userHistoryCard').style.display = 'none';
-    });
 
     // Filters toggle (mobile collapsible)
     document.getElementById('btnFiltersToggle')?.addEventListener('click', () => {
@@ -168,20 +162,13 @@ async function initApp() {
     // ── Channels buttons ──
     document.getElementById('btnCreateChannel')?.addEventListener('click', openCreateChannelModal);
     document.getElementById('btnRefreshChannels')?.addEventListener('click', loadChannels);
-    document.getElementById('btnCloseChannelDetail')?.addEventListener('click', () => {
-        document.getElementById('channelDetailCard').style.display = 'none';
-        state.channels.selectedChannelId = null;
-    });
     document.getElementById('btnChannelFormSubmit')?.addEventListener('click', submitChannelForm);
     document.getElementById('btnMediaAssignSubmit')?.addEventListener('click', submitMediaAssign);
 
     // ── User-Channels (asignación publicadores) ──
     document.getElementById('btnRefreshUc')?.addEventListener('click', () => loadUserChannels(state.userChannels.currentPage));
-    document.getElementById('btnCloseUcDetail')?.addEventListener('click', () => {
-        document.getElementById('ucDetailCard').style.display = 'none';
-        state.userChannels.selectedUserId = null;
-    });
     document.getElementById('btnUcAssignSubmit')?.addEventListener('click', submitAssignChannels);
+    document.getElementById('btnUcRevokeSubmit')?.addEventListener('click', submitRevokeChannels);
 
     // ── Notificaciones ──
     document.getElementById('btnNotifBell')?.addEventListener('click', () => navigateTo('notifications'));

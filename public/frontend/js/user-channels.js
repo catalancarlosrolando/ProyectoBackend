@@ -17,9 +17,7 @@ async function loadUserChannels(page = 1) {
     empty.style.display = 'none';
     tableWrapper.style.display = 'none';
 
-    // Ocultar detalle anterior
-    document.getElementById('ucDetailCard').style.display = 'none';
-    state.userChannels.selectedUserId = null;
+
 
     try {
         const res = await api.get(`/admin/user-channels/publishers?page=${page}`, true);
@@ -69,12 +67,19 @@ function renderPublishersTable(publishers) {
                 <span class="uc-count-badge">${count}</span>
             </div>
             <div class="au-cell au-cell--actions">
-                <button class="au-action-btn au-action-btn--view" onclick="viewUserChannels(${pub.id})" title="Ver canales">
-                    <span class="material-symbols-rounded" style="font-size:16px;">visibility</span>
-                </button>
-                <button class="au-action-btn au-action-btn--approve" onclick="openAssignChannelsModal(${pub.id})" title="Asignar canales">
-                    <span class="material-symbols-rounded" style="font-size:16px;">add_link</span>
-                </button>
+                <div class="au-actions-dropdown">
+                    <button class="au-actions-trigger" onclick="toggleActionsMenu(event, this)" title="Acciones">
+                        <span class="material-symbols-rounded" style="font-size:20px">more_vert</span>
+                    </button>
+                    <div class="au-actions-menu">
+                        <button class="au-actions-menu__item au-actions-menu__item--success" onclick="openAssignChannelsModal(${pub.id})">
+                            <span class="material-symbols-rounded">add_link</span> Asignar canales
+                        </button>
+                        <button class="au-actions-menu__item au-actions-menu__item--danger" onclick="openRevokeChannelsModal(${pub.id})">
+                            <span class="material-symbols-rounded">link_off</span> Revocar canales
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>`;
     }).join('');
@@ -107,12 +112,19 @@ function renderPublishersTable(publishers) {
                 </div>
             </div>
             <div class="au-user-card__actions">
-                <button class="au-action-btn au-action-btn--view" onclick="viewUserChannels(${pub.id})" title="Ver canales">
-                    <span class="material-symbols-rounded" style="font-size:18px;">visibility</span>
-                </button>
-                <button class="au-action-btn au-action-btn--approve" onclick="openAssignChannelsModal(${pub.id})" title="Asignar canales">
-                    <span class="material-symbols-rounded" style="font-size:18px;">add_link</span>
-                </button>
+                <div class="au-actions-dropdown">
+                    <button class="au-actions-trigger" onclick="toggleActionsMenu(event, this)" title="Acciones">
+                        <span class="material-symbols-rounded" style="font-size:20px">more_vert</span>
+                    </button>
+                    <div class="au-actions-menu">
+                        <button class="au-actions-menu__item au-actions-menu__item--success" onclick="openAssignChannelsModal(${pub.id})">
+                            <span class="material-symbols-rounded">add_link</span> Asignar canales
+                        </button>
+                        <button class="au-actions-menu__item au-actions-menu__item--danger" onclick="openRevokeChannelsModal(${pub.id})">
+                            <span class="material-symbols-rounded">link_off</span> Revocar canales
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>`;
     }).join('');
@@ -167,59 +179,7 @@ function renderUserChannelTags(channels) {
     }).join('');
 }
 
-// ── View User Channels Detail ──
 
-async function viewUserChannels(userId) {
-    const card = document.getElementById('ucDetailCard');
-    card.style.display = '';
-
-    try {
-        const res = await api.get(`/admin/user-channels/${userId}`, true);
-        const { user, channels } = res.data;
-
-        state.userChannels.selectedUserId = userId;
-
-        const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.name;
-        document.getElementById('ucDetailTitle').textContent = `Canales de: ${fullName}`;
-        document.getElementById('ucDetailName').textContent = fullName;
-        document.getElementById('ucDetailEmail').textContent = user.email;
-
-        // Renderizar lista de canales asignados
-        const list = document.getElementById('ucDetailChannelsList');
-        if (channels.length > 0) {
-            list.innerHTML = channels.map(ch => {
-                const c = CHANNEL_TYPE_COLORS[ch.type] || { bg: '#EEEEEE', text: '#49454F', icon: 'label' };
-                const label = CHANNEL_TYPE_LABELS[ch.type] || ch.type;
-                return `
-                <div class="uc-channel-item">
-                    <div class="uc-channel-info">
-                        <span class="au-status-badge" style="background:${c.bg};color:${c.text};">
-                            <span class="material-symbols-rounded" style="font-size:14px;">${c.icon}</span>
-                            ${escapeHtml(label)}
-                        </span>
-                        <span class="uc-channel-name">${escapeHtml(ch.name)}</span>
-                    </div>
-                    <button class="btn btn--danger btn--sm" onclick="revokeChannel(${userId}, ${ch.id}, '${escapeHtml(ch.name)}', '${escapeHtml(fullName)}')">
-                        <span class="material-symbols-rounded" style="font-size:14px;">link_off</span> Revocar
-                    </button>
-                </div>`;
-            }).join('');
-        } else {
-            list.innerHTML = '<p class="text-muted" style="text-align:center;padding:1rem;">Este publicador no tiene canales asignados.</p>';
-        }
-
-        // Acciones rápidas
-        document.getElementById('ucDetailActions').innerHTML = `
-            <button class="btn btn--primary btn--sm" onclick="openAssignChannelsModal(${userId})">
-                <span class="material-symbols-rounded" style="font-size:16px;">add_link</span> Asignar Canales
-            </button>
-        `;
-
-        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (err) {
-        showToast('Error al cargar canales del publicador: ' + err.message, 'error');
-    }
-}
 
 // ── Assign Channels Modal ──
 
@@ -340,9 +300,6 @@ async function submitAssignChannels() {
         closeModal('ucAssignModal');
         loadUserChannels(state.userChannels.currentPage);
 
-        if (state.userChannels.selectedUserId === userId) {
-            viewUserChannels(userId);
-        }
     } catch (err) {
         showToast('Error al actualizar canales: ' + err.message, 'error');
     } finally {
@@ -351,29 +308,105 @@ async function submitAssignChannels() {
     }
 }
 
-// ── Revoke single channel ──
+// ── Revoke Channels Modal ──
 
-function revokeChannel(userId, channelId, channelName, userName) {
-    showConfirm(
-        'Revocar Acceso',
-        `¿Revocar acceso al canal "${channelName}" del publicador "${userName}"? Se le notificará por email.`,
-        async () => {
-            try {
-                await api.request('DELETE', `/admin/user-channels/${userId}`, {
-                    body: { channel_ids: [channelId] },
-                    auth: true,
-                });
-                showToast(`Canal "${channelName}" revocado correctamente. Se notificó al publicador.`, 'success');
-                closeModal('confirmModal');
-                loadUserChannels(state.userChannels.currentPage);
+async function openRevokeChannelsModal(userId) {
+    closeAllActionMenus();
+    state.userChannels.revokeUserId = userId;
 
-                if (state.userChannels.selectedUserId === userId) {
-                    viewUserChannels(userId);
-                }
-            } catch (err) {
-                showToast('Error al revocar canal: ' + err.message, 'error');
-                closeModal('confirmModal');
-            }
+    const loading = document.getElementById('ucRevokeLoading');
+    const empty = document.getElementById('ucRevokeEmpty');
+    const content = document.getElementById('ucRevokeContent');
+    const actions = document.getElementById('ucRevokeActions');
+
+    loading.style.display = 'flex';
+    empty.style.display = 'none';
+    content.style.display = 'none';
+    actions.style.display = 'none';
+
+    openModal('ucRevokeModal');
+
+    try {
+        const res = await api.get(`/admin/user-channels/${userId}`, true);
+        const { user, channels } = res.data;
+
+        const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.name;
+        document.getElementById('ucRevokeTitle').textContent = `Revocar Canales de: ${fullName}`;
+
+        loading.style.display = 'none';
+
+        if (!channels || channels.length === 0) {
+            empty.style.display = 'block';
+            return;
         }
-    );
+
+        actions.style.display = 'flex';
+        content.style.display = 'block';
+
+        // Agrupar canales por tipo
+        const grouped = {};
+        channels.forEach(ch => {
+            const type = ch.type || 'otro';
+            if (!grouped[type]) grouped[type] = [];
+            grouped[type].push(ch);
+        });
+
+        let html = '';
+        for (const [type, chs] of Object.entries(grouped)) {
+            const c = CHANNEL_TYPE_COLORS[type] || { bg: '#EEEEEE', text: '#49454F', icon: 'label' };
+            const label = CHANNEL_TYPE_LABELS[type] || type;
+            html += `<div class="ch-media-group">
+                <div class="ch-media-group-title">
+                    <span class="material-symbols-rounded" style="font-size:18px;color:${c.text};">${c.icon}</span>
+                    <span>${escapeHtml(label)}</span>
+                </div>
+                <div class="ch-media-group-items">`;
+            chs.forEach(ch => {
+                html += `
+                    <label class="ch-media-checkbox">
+                        <input type="checkbox" value="${ch.id}" class="uc-revoke-checkbox-input">
+                        <span class="ch-media-checkbox-label">${escapeHtml(ch.name)}</span>
+                    </label>`;
+            });
+            html += `</div></div>`;
+        }
+
+        content.innerHTML = html;
+    } catch (err) {
+        loading.style.display = 'none';
+        showToast('Error al cargar canales: ' + err.message, 'error');
+    }
+}
+
+async function submitRevokeChannels() {
+    const userId = state.userChannels.revokeUserId;
+    if (!userId) return;
+
+    const checkboxes = document.querySelectorAll('#ucRevokeContent .uc-revoke-checkbox-input:checked');
+    const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+    if (ids.length === 0) {
+        showToast('Selecciona al menos un canal para revocar.', 'warning');
+        return;
+    }
+
+    const btn = document.getElementById('btnUcRevokeSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Revocando...';
+
+    try {
+        await api.request('DELETE', `/admin/user-channels/${userId}`, {
+            body: { channel_ids: ids },
+            auth: true,
+        });
+
+        showToast(`${ids.length} canal(es) revocado(s) correctamente. Se notificó al publicador.`, 'success');
+        closeModal('ucRevokeModal');
+        loadUserChannels(state.userChannels.currentPage);
+    } catch (err) {
+        showToast('Error al revocar canales: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Revocar Seleccionados';
+    }
 }

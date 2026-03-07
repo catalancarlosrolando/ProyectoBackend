@@ -40,6 +40,10 @@ function closeModal(id) {
     if (modal) {
         modal.classList.remove('active');
         document.body.style.overflow = 'auto';
+        // Clear row highlight when history modal closes
+        if (id === 'historyModal' && typeof clearUserRowHighlight === 'function') {
+            clearUserRowHighlight();
+        }
     }
 }
 
