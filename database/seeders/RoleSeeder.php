@@ -29,6 +29,7 @@ class RoleSeeder extends Seeder
             'editar-contenido',
             'eliminar-contenido',
             'ver-reportes',
+            'ver-perfil',
             'gestionar-canales',
         ];
 
@@ -37,6 +38,10 @@ class RoleSeeder extends Seeder
         }
 
         // Crear roles y asignar permisos
+
+        // Rol: publicador (usuario básico que puede ingresar y ver su perfil)
+        $rolePublicador = Role::create(['name' => 'invitado']);
+        $rolePublicador->givePermissionTo(['ver-perfil']);
 
         // Rol: publicador (usuario básico que puede publicar contenido)
         $rolePublicador = Role::create(['name' => 'publicador']);

@@ -112,6 +112,7 @@ async function loadAdminUsers(page = 1) {
         const res = await api.get(`/admin/users?${params}`, true);
         const users = res.data?.users || [];
         const pagination = res.data?.pagination || {};
+        console.log('Usuarios cargados:', users);
 
         state.adminUsers.currentPage = pagination.current_page || 1;
         state.adminUsers.lastPage = pagination.last_page || 1;
@@ -124,6 +125,7 @@ async function loadAdminUsers(page = 1) {
         }
 
         tableWrapper.style.display = 'block';
+        
         renderUsersTable(users);
         renderPagination(pagination);
     } catch (err) {
