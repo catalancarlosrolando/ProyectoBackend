@@ -16,6 +16,8 @@ function updateAuthUI() {
     const btnLogout = document.getElementById('btnLogout');
     const guestActions = document.getElementById('guestActions');
 
+    const publisherOnlyEls = document.querySelectorAll('.publisher-only');
+
     if (state.isAuthenticated) {
         const name = state.user?.name || 'Usuario';
         welcome.textContent = name;
@@ -33,6 +35,8 @@ function updateAuthUI() {
         const hasAdminAccess = state.permissions.includes('acceder-panel-admin') ||
             state.permissions.includes('gestionar-usuarios');
         adminOnlyEls.forEach(el => el.style.display = hasAdminAccess ? '' : 'none');
+        const hasPublisherAccess = state.permissions.includes('editar-contenido');
+        publisherOnlyEls.forEach(el => el.style.display = hasPublisherAccess ? '' : 'none');
 
         // Cargar contador de notificaciones no leídas
         loadUnreadCount();
@@ -45,6 +49,7 @@ function updateAuthUI() {
 
         authOnlyEls.forEach(el => el.style.display = 'none');
         adminOnlyEls.forEach(el => el.style.display = 'none');
+        publisherOnlyEls.forEach(el => el.style.display = 'none');
     }
 }
 

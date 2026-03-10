@@ -35,6 +35,10 @@
                         <span class="material-symbols-rounded nav-icon">person</span>
                         <span>Perfil</span>
                     </a>
+                    <a href="#" class="nav-link publisher-only" data-section="posts" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">edit_note</span>
+                        <span>Publicaciones</span>
+                    </a>
                     <a href="#" class="nav-link" data-section="files">
                         <span class="material-symbols-rounded nav-icon">folder</span>
                         <span>Archivos</span>
@@ -647,6 +651,109 @@
 
             </section>
 
+            <!-- ========== POSTS SECTION ========== -->
+            <section id="sectionPosts" class="section">
+                <div class="section__header">
+                    <div
+                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h2 class="section__title">Mis Publicaciones</h2>
+                            <p class="section__subtitle">Crea y gestiona tus publicaciones en los canales autorizados.
+                            </p>
+                        </div>
+                        <button class="btn btn--primary" id="btnCreatePost">
+                            <span class="material-symbols-rounded">add</span>
+                            <span>Nueva Publicación</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats rápidas -->
+                <div class="stats-grid" id="postsStats" style="display:none;">
+                    <div class="stat-card">
+                        <div class="stat-card__top">
+                            <div class="stat-card__icon-bg stat-card__icon-bg--info">
+                                <span class="material-symbols-rounded">article</span>
+                            </div>
+                        </div>
+                        <span class="stat-card__value" id="postsTotalCount">0</span>
+                        <span class="stat-card__label">TOTAL</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card__top">
+                            <div class="stat-card__icon-bg stat-card__icon-bg--warning">
+                                <span class="material-symbols-rounded">edit_note</span>
+                            </div>
+                        </div>
+                        <span class="stat-card__value" id="postsDraftCount">0</span>
+                        <span class="stat-card__label">BORRADORES</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card__top">
+                            <div class="stat-card__icon-bg stat-card__icon-bg--success">
+                                <span class="material-symbols-rounded">check_circle</span>
+                            </div>
+                        </div>
+                        <span class="stat-card__value" id="postsApprovedCount">0</span>
+                        <span class="stat-card__label">APROBADAS</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card__top">
+                            <div class="stat-card__icon-bg stat-card__icon-bg--primary">
+                                <span class="material-symbols-rounded">schedule</span>
+                            </div>
+                        </div>
+                        <span class="stat-card__value" id="postsScheduledCount">0</span>
+                        <span class="stat-card__label">PROGRAMADAS</span>
+                    </div>
+                </div>
+
+                <!-- Tabla / Cards de publicaciones -->
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">article</span>
+                            <span class="au-table-title-text">Publicaciones</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnRefreshPosts">
+                            <span class="material-symbols-rounded">refresh</span>
+                            <span class="au-btn-label">Actualizar</span>
+                        </button>
+                    </div>
+                    <div id="postsLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando publicaciones...</p>
+                    </div>
+                    <div id="postsEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">article</span>
+                        <p>No tienes publicaciones aún</p>
+                        <button class="btn btn--primary btn--sm" onclick="openPostFormModal()"
+                            style="margin-top:0.5rem;">
+                            <span class="material-symbols-rounded">add</span> Crear primera publicación
+                        </button>
+                    </div>
+                    <div id="postsTableWrapper" style="display:none;">
+                        <!-- Desktop table -->
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col post-col--title">TÍTULO</span>
+                                <span class="au-col post-col--type">TIPO</span>
+                                <span class="au-col post-col--status">ESTADO</span>
+                                <span class="au-col post-col--channels">CANALES</span>
+                                <span class="au-col post-col--date">FECHA</span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="postsTableBody"></div>
+                        </div>
+                        <!-- Mobile cards -->
+                        <div class="au-mobile-cards" id="postsMobileCards"></div>
+                        <div class="pagination-bar" id="postsPagination"></div>
+                    </div>
+                </div>
+            </section>
+
             <!-- ========== NOTIFICATIONS SECTION ========== -->
             <section id="sectionNotifications" class="section">
                 <div class="section__header">
@@ -918,7 +1025,7 @@
                     <label for="roleSelect" class="form-label">Rol</label>
                     <select id="roleSelect" class="form-input">
                         <option value="">Seleccionar rol...</option>
-                        <option value="publicador">Invitado</option>
+                        <option value="invitado">Invitado</option>
                         <option value="publicador">Publicador</option>
                         <option value="moderador">Moderador</option>
                         <option value="admin">Admin</option>
@@ -1073,6 +1180,104 @@
         </div>
     </div>
 
+    <!-- ========== MODAL: POST FORM (Create) ========== -->
+    <div id="postFormModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="postFormTitle">Nueva Publicación</h2>
+                <button class="modal__close" data-close-modal="postFormModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="alert alert--error" id="postFormError" style="display:none;"></div>
+                <form id="postForm">
+                    <div class="form-group">
+                        <label for="postFormName" class="form-label">Título *</label>
+                        <input type="text" id="postFormName" class="form-input" placeholder="Título de la publicación"
+                            required maxlength="255">
+                    </div>
+                    <div class="form-group">
+                        <label for="postFormContent" class="form-label">Contenido *</label>
+                        <textarea id="postFormContent" class="form-input form-textarea" rows="5" maxlength="10000"
+                            placeholder="Escribe el contenido de tu publicación..." required></textarea>
+                        <small class="form-hint">Máximo 10.000 caracteres</small>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postFormType" class="form-label">Tipo *</label>
+                            <select id="postFormType" class="form-input" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="text">Texto</option>
+                                <option value="image">Imagen</option>
+                                <option value="video">Video</option>
+                                <option value="audio">Audio</option>
+                                <option value="multimedia">Multimedia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="postFormScheduledAt" class="form-label">Programar para</label>
+                            <input type="datetime-local" id="postFormScheduledAt" class="form-input">
+                            <small class="form-hint">Opcional — dejar vacío para publicación inmediata tras
+                                aprobación</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Canales y medios de publicación *</label>
+                        <p class="form-hint" style="margin-bottom:0.5rem;">Selecciona uno o más canales. Al activar un
+                            canal se mostrarán sus medios disponibles.</p>
+                        <div id="postFormChannels" class="post-channels-list">
+                            <p class="text-muted">Cargando canales...</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Archivos adjuntos</label>
+                        <div class="upload-zone upload-zone--sm" id="postUploadZone">
+                            <span class="material-symbols-rounded"
+                                style="font-size:2rem;color:var(--on-surface-variant);">attach_file</span>
+                            <p class="upload-zone__text">Arrastra archivos o haz clic para adjuntar</p>
+                            <p class="upload-zone__hint">Máx. 10 archivos, 10 MB c/u — Imágenes, videos, audios, PDF
+                            </p>
+                            <input type="file" id="postFileInput" multiple style="display:none;"
+                                accept=".jpg,.jpeg,.png,.gif,.webp,.mp4,.mov,.avi,.webm,.mp3,.wav,.pdf">
+                        </div>
+                        <div id="postSelectedFiles" class="selected-files" style="display:none;">
+                            <div class="selected-files__header">
+                                <span id="postSelectedCount">0 archivos</span>
+                                <button type="button" class="btn btn--ghost btn--sm" id="btnClearPostFiles">✕
+                                    Limpiar</button>
+                            </div>
+                            <div id="postFilePreviewList" class="file-preview-list"></div>
+                        </div>
+                    </div>
+                </form>
+                <div class="btn-group" style="margin-top:1rem;">
+                    <button class="btn btn--primary" id="btnPostFormSubmit">
+                        <span class="material-symbols-rounded">send</span>
+                        Crear Publicación
+                    </button>
+                    <button class="btn btn--outline" data-close-modal="postFormModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: POST DETAIL ========== -->
+    <div id="postDetailModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="postDetailTitle">Detalle de Publicación</h2>
+                <button class="modal__close" data-close-modal="postDetailModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div id="postDetailLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                </div>
+                <div id="postDetailContent"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== MODAL: CONFIRM ========== -->
     <div id="confirmModal" class="modal">
         <div class="modal__overlay"></div>
@@ -1102,6 +1307,7 @@
     <script src="./frontend/js/admin-users.js"></script>
     <script src="./frontend/js/channels.js"></script>
     <script src="./frontend/js/user-channels.js"></script>
+    <script src="./frontend/js/posts.js"></script>
     <script src="./frontend/js/notifications.js"></script>
     <script src="./frontend/js/app.js"></script>
 </body>

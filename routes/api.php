@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\UserAdminController;
 use App\Http\Controllers\Api\ChannelController;
 use App\Http\Controllers\Api\ChannelMediaController;
 use App\Http\Controllers\Api\UserChannelController;
+use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\NotificationController;
 
 Route::get('/ping', fn() => response()->json([
@@ -116,6 +117,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{user}', [UserChannelController::class, 'show']);
         Route::post('/{user}', [UserChannelController::class, 'store']);
         Route::delete('/{user}', [UserChannelController::class, 'destroy']);
+    });
+
+    // ── Gestión de publicaciones (Publicador) ──
+    Route::prefix('posts')->middleware('permission:editar-contenido')->group(function () {
+        Route::get('/', [PostController::class, 'index']);
+        Route::post('/', [PostController::class, 'store']);
+        Route::get('/{post}', [PostController::class, 'show']);
+        Route::get('/channels/{user}', [UserChannelController::class, 'show']);
+        Route::get('/{channel}/medias', [ChannelMediaController::class, 'index']);
     });
 
     // ── Notificaciones del usuario autenticado ──

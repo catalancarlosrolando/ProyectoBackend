@@ -170,6 +170,12 @@ async function initApp() {
     document.getElementById('btnUcAssignSubmit')?.addEventListener('click', submitAssignChannels);
     document.getElementById('btnUcRevokeSubmit')?.addEventListener('click', submitRevokeChannels);
 
+    // ── Publicaciones ──
+    document.getElementById('btnCreatePost')?.addEventListener('click', openPostFormModal);
+    document.getElementById('btnRefreshPosts')?.addEventListener('click', () => loadPosts());
+    document.getElementById('btnPostFormSubmit')?.addEventListener('click', submitPostForm);
+    setupPostFileUpload();
+
     // ── Notificaciones ──
     document.getElementById('btnNotifBell')?.addEventListener('click', () => navigateTo('notifications'));
     document.getElementById('btnRefreshNotif')?.addEventListener('click', loadNotifications);

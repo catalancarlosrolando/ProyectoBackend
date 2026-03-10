@@ -73,6 +73,7 @@ function navigateTo(sectionName) {
     if (sectionName === 'admin-users') loadAdminUsers();
     if (sectionName === 'channels') loadChannels();
     if (sectionName === 'user-channels') loadUserChannels();
+    if (sectionName === 'posts') loadPosts();
     if (sectionName === 'notifications') loadNotifications();
 }
 

@@ -87,4 +87,5 @@ const api = {
     post(ep, body, auth = false) { return this.request('POST', ep, { body, auth }); },
     del(ep, auth = false) { return this.request('DELETE', ep, { auth }); },
     upload(ep, formData) { return this.request('POST', ep, { body: formData, isFormData: true }); },
+    authUpload(ep, formData) { return this.request('POST', ep, { body: formData, auth: true, isFormData: true }); },
 };

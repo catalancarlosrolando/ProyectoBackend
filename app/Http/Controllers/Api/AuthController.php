@@ -46,7 +46,7 @@ class AuthController extends Controller
         ]);
 
         // Asignar rol por defecto
-        $user->assignRole('publicador');
+        $user->assignRole('invitado');
 
         // Intentar enviar email de verificación (sin bloquear el registro si falla)
         $this->trySendEmail(
