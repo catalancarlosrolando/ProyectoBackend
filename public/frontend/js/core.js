@@ -72,12 +72,26 @@ const api = {
         }
 
         const res = await fetch(`${API_BASE}${endpoint}`, opts);
-        const data = await res.json().catch(() => ({}));
+        const contentType = res.headers.get('content-type') || '';
+        const raw = await res.text();
+        let data = null;
+
+        if (raw) {
+            if (contentType.includes('application/json')) {
+                try {
+                    data = JSON.parse(raw);
+                } catch {
+                    data = { raw };
+                }
+            } else {
+                data = { raw };
+            }
+        }
 
         if (!res.ok) {
-            const msg = data.errors
+            const msg = data?.errors
                 ? Object.values(data.errors).flat().join(', ')
-                : data.message || `Error HTTP ${res.status}`;
+                : data?.message || data?.raw || `Error HTTP ${res.status}`;
             throw new Error(msg);
         }
         return data;

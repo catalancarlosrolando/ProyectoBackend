@@ -3104,3 +3104,40 @@ select.au-filter-input {
 .text-info {
     color: #0D47A1;
 }
+
+
+/* Clase para el input */
+.input-error {
+    border: 2px solid #dc3545 !important;
+    background-color: #fff8f8;
+}
+
+/* El mensaje pequeño debajo de cada input (opcional) */
+.error-helper {
+    color: #dc3545;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: none;
+    /* Oculto por defecto */
+}
+
+/* Animación sutil para que el usuario note el cambio */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-4px);
+    }
+
+    75% {
+        transform: translateX(4px);
+    }
+}
+
+.shake {
+    animation: shake 0.3s ease-in-out 2;
+}

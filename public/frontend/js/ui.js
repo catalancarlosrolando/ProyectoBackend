@@ -32,6 +32,9 @@ function openModal(id) {
     if (modal) {
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
+        const inputs = modal.querySelectorAll('input, select, textarea');
+        inputs.forEach(i => i.classList.remove('input-error', 'shake'));
+
     }
 }
 

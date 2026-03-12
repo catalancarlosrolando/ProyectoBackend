@@ -643,8 +643,17 @@ function removePostFile(index) {
 // ── Submit Post (Create or Update) ──
 
 async function submitPostForm() {
+    //const errorEl = document.getElementById('postFormError');
+    //errorEl.style.display = 'none';
     const errorEl = document.getElementById('postFormError');
+    const modal = document.getElementById('postFormModal');
+
+    // 1. SIEMPRE LIMPIAR AL INICIO
     errorEl.style.display = 'none';
+    if (modal) {
+        const inputs = modal.querySelectorAll('input, select, textarea');
+        inputs.forEach(i => i.classList.remove('input-error', 'shake'));
+    }
 
     const name = document.getElementById('postFormName').value.trim();
     const content = document.getElementById('postFormContent').value.trim();
@@ -654,11 +663,46 @@ async function submitPostForm() {
     const mediaIds = Array.from(document.querySelectorAll('.post-media-cb:checked')).map(cb => parseInt(cb.value));
 
     // Client-side validation
-    if (!name || !content || !type || channelIds.length === 0) {
-        errorEl.innerHTML = '<p>Completa todos los campos obligatorios (título, contenido, tipo y al menos un canal).</p>';
-        errorEl.style.display = '';
-        return;
+    if (!name || !content || !type || channelIds.length === 0 || mediaIds.length === 0) {
+        //errorEl.innerHTML = '<p>Completa todos los campos obligatorios (título, contenido, tipo y al menos un canal).</p>';
+        //errorEl.style.display = 'block';
+        // errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+
+        // 1. Limpiar errores previos
+
+
+        // 2. Validar
+        let firstError = null;
+        if (!name) {
+            const el = document.getElementById('postFormName');
+            el.classList.add('input-error', 'shake');
+            if (!firstError) firstError = el;
+        }
+        if (!content) {
+            const el = document.getElementById('postFormContent');
+            el.classList.add('input-error', 'shake');
+            if (!firstError) firstError = el;
+        }
+        if (!type) {
+            const el = document.getElementById('postFormType');
+            el.classList.add('input-error', 'shake');
+            if (!firstError) firstError = el;
+        }
+        if (channelIds.length === 0) {
+            const el = document.querySelector('.post-channel-cb');
+            el.classList.add('input-error', 'shake');
+            if (!firstError) firstError = el;
+        }
+
+        if (firstError) {
+            // En lugar de un scroll brusco al header,
+            // solo nos aseguramos que el PRIMER error sea visible
+            firstError.focus();
+
+            return;
+        }
     }
+
 
     const btn = document.getElementById('btnPostFormSubmit');
     btn.disabled = true;
@@ -741,7 +785,8 @@ function openDeletePostAction(postId, postName) {
         if (!reason) { showToast('La razón es obligatoria', 'warning'); return; }
         btn.disabled = true;
         try {
-            await api.del(`/posts/${postId}`, true, { reason });
+            const response = await api.del(`/posts/${postId}`, true, { reason: reason });
+            console.log("Respuesta de la API:", response);
             closeModal('postActionModal');
             showToast('Publicación eliminada correctamente', 'success');
             loadPosts();
@@ -972,6 +1017,8 @@ function applySavedFilter(filterId) {
 
 function confirmPostAction() {
     if (typeof postActionCallback === 'function') {
-        postActionCallback();
+        Promise.resolve(postActionCallback()).catch(err => {
+            showToast('Error: ' + err.message, 'error');
+        });
     }
 }
