@@ -17,6 +17,7 @@ function updateAuthUI() {
     const guestActions = document.getElementById('guestActions');
 
     const publisherOnlyEls = document.querySelectorAll('.publisher-only');
+    const moderatorOnlyEls = document.querySelectorAll('.moderator-only');
 
     if (state.isAuthenticated) {
         const name = state.user?.name || 'Usuario';
@@ -37,6 +38,8 @@ function updateAuthUI() {
         adminOnlyEls.forEach(el => el.style.display = hasAdminAccess ? '' : 'none');
         const hasPublisherAccess = state.permissions.includes('editar-contenido');
         publisherOnlyEls.forEach(el => el.style.display = hasPublisherAccess ? '' : 'none');
+        const hasModeratorAccess = state.roles.includes('moderador') || state.roles.includes('admin');
+        moderatorOnlyEls.forEach(el => el.style.display = hasModeratorAccess ? '' : 'none');
 
         // Cargar contador de notificaciones no leídas
         loadUnreadCount();
@@ -50,6 +53,7 @@ function updateAuthUI() {
         authOnlyEls.forEach(el => el.style.display = 'none');
         adminOnlyEls.forEach(el => el.style.display = 'none');
         publisherOnlyEls.forEach(el => el.style.display = 'none');
+        moderatorOnlyEls.forEach(el => el.style.display = 'none');
     }
 }
 

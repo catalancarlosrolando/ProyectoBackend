@@ -85,7 +85,10 @@ const api = {
 
     get(ep, auth = false) { return this.request('GET', ep, { auth }); },
     post(ep, body, auth = false) { return this.request('POST', ep, { body, auth }); },
-    del(ep, auth = false) { return this.request('DELETE', ep, { auth }); },
+    put(ep, body, auth = false) { return this.request('PUT', ep, { body, auth }); },
+    patch(ep, body, auth = false) { return this.request('PATCH', ep, { body, auth }); },
+    del(ep, auth = false, body = null) { return this.request('DELETE', ep, { auth, body }); },
     upload(ep, formData) { return this.request('POST', ep, { body: formData, isFormData: true }); },
     authUpload(ep, formData) { return this.request('POST', ep, { body: formData, auth: true, isFormData: true }); },
+    authUploadPut(ep, formData) { return this.request('POST', ep, { body: formData, auth: true, isFormData: true }); },
 };

@@ -176,6 +176,35 @@ async function initApp() {
     document.getElementById('btnPostFormSubmit')?.addEventListener('click', submitPostForm);
     setupPostFileUpload();
 
+    // Post filters
+    document.getElementById('btnApplyPostFilters')?.addEventListener('click', () => loadPosts(1));
+    document.getElementById('btnClearPostFilters')?.addEventListener('click', clearPostFilters);
+    document.getElementById('btnPostsFiltersToggle')?.addEventListener('click', () => {
+        const btn = document.getElementById('btnPostsFiltersToggle');
+        const body = document.getElementById('postsFiltersBody');
+        btn.classList.toggle('open');
+        body.classList.toggle('open');
+    });
+    document.getElementById('btnSavePostFilter')?.addEventListener('click', saveCurrentFilter);
+    document.getElementById('postSavedFilters')?.addEventListener('change', (e) => {
+        if (e.target.value) applySavedFilter(e.target.value);
+    });
+
+    // Post filter inputs: enter key triggers search
+    document.querySelectorAll('#postFilterSearch').forEach(input => {
+        input?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); loadPosts(1); }
+        });
+    });
+
+    // Post action modal confirm
+    document.getElementById('btnPostActionConfirm')?.addEventListener('click', confirmPostAction);
+
+    // ── Moderación ──
+    document.getElementById('btnRefreshModeration')?.addEventListener('click', () => loadModerationPosts(moderationCurrentPage));
+    document.getElementById('btnModerationApprove')?.addEventListener('click', approveModerationPost);
+    document.getElementById('btnModerationReject')?.addEventListener('click', rejectModerationPost);
+
     // ── Notificaciones ──
     document.getElementById('btnNotifBell')?.addEventListener('click', () => navigateTo('notifications'));
     document.getElementById('btnRefreshNotif')?.addEventListener('click', loadNotifications);

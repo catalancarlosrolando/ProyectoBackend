@@ -39,6 +39,10 @@
                         <span class="material-symbols-rounded nav-icon">edit_note</span>
                         <span>Publicaciones</span>
                     </a>
+                    <a href="#" class="nav-link moderator-only" data-section="moderation" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">gavel</span>
+                        <span>Moderación</span>
+                    </a>
                     <a href="#" class="nav-link" data-section="files">
                         <span class="material-symbols-rounded nav-icon">folder</span>
                         <span>Archivos</span>
@@ -668,43 +672,129 @@
                     </div>
                 </div>
 
+                <!-- Filtros de búsqueda (H11b) -->
+                <div class="au-filters-card" id="postsFiltersCard">
+                    <div class="au-filters-header">
+                        <div class="au-filters-title">
+                            <span class="material-symbols-rounded au-filters-icon">search</span>
+                            <span class="au-filters-title-text">Filtros</span>
+                        </div>
+                        <button class="au-filters-toggle" id="btnPostsFiltersToggle" aria-label="Expandir filtros">
+                            <span class="material-symbols-rounded">keyboard_arrow_down</span>
+                        </button>
+                        <div class="au-filters-btns">
+                            <button class="btn btn--primary" id="btnApplyPostFilters">
+                                <span class="material-symbols-rounded">search</span>
+                                <span>Buscar</span>
+                            </button>
+                            <button class="btn btn--outline" id="btnClearPostFilters">
+                                <span class="material-symbols-rounded">filter_list</span>
+                                <span>Limpiar</span>
+                            </button>
+                            <button class="btn btn--outline" id="btnSavePostFilter" title="Guardar filtro actual">
+                                <span class="material-symbols-rounded">bookmark_add</span>
+                                <span>Guardar filtro</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="au-filters-body" id="postsFiltersBody">
+                        <div class="au-filter-row">
+                            <div class="au-filter-field">
+                                <label for="postFilterSearch" class="au-filter-label">Buscar</label>
+                                <input type="text" id="postFilterSearch" class="au-filter-input"
+                                    placeholder="Título o contenido...">
+                            </div>
+                            <div class="au-filter-field">
+                                <label for="postFilterStatus" class="au-filter-label">Estado</label>
+                                <select id="postFilterStatus" class="au-filter-input">
+                                    <option value="">Todos</option>
+                                    <option value="draft">Borrador</option>
+                                    <option value="pending_review">Pendiente de revisión</option>
+                                    <option value="approved_by_moderator">Aprobada</option>
+                                    <option value="scheduled">Programada</option>
+                                    <option value="published">Publicada</option>
+                                    <option value="archived">Archivada</option>
+                                </select>
+                            </div>
+                            <div class="au-filter-field">
+                                <label for="postFilterType" class="au-filter-label">Tipo</label>
+                                <select id="postFilterType" class="au-filter-input">
+                                    <option value="">Todos</option>
+                                    <option value="text">Texto</option>
+                                    <option value="image">Imagen</option>
+                                    <option value="video">Video</option>
+                                    <option value="audio">Audio</option>
+                                    <option value="multimedia">Multimedia</option>
+                                </select>
+                            </div>
+                            <div class="au-filter-field">
+                                <label for="postFilterPerPage" class="au-filter-label">Por página</label>
+                                <select id="postFilterPerPage" class="au-filter-input">
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="au-filter-row">
+                            <div class="au-filter-field">
+                                <label for="postFilterDateFrom" class="au-filter-label">Desde</label>
+                                <input type="date" id="postFilterDateFrom" class="au-filter-input">
+                            </div>
+                            <div class="au-filter-field">
+                                <label for="postFilterDateTo" class="au-filter-label">Hasta</label>
+                                <input type="date" id="postFilterDateTo" class="au-filter-input">
+                            </div>
+                        </div>
+                        <div class="au-filters-btns au-filters-btns--mobile">
+                            <button class="btn btn--primary btn--block"
+                                onclick="document.getElementById('btnApplyPostFilters').click()">
+                                <span class="material-symbols-rounded">search</span>
+                                <span>Buscar</span>
+                            </button>
+                            <button class="btn btn--outline btn--block"
+                                onclick="document.getElementById('btnClearPostFilters').click()">
+                                <span class="material-symbols-rounded">filter_list</span>
+                                <span>Limpiar</span>
+                            </button>
+                            <button class="btn btn--outline btn--block"
+                                onclick="document.getElementById('btnSavePostFilter').click()">
+                                <span class="material-symbols-rounded">bookmark_add</span>
+                                <span>Guardar filtro</span>
+                            </button>
+                        </div>
+                        <select id="postSavedFilters" class="au-filter-input" style="max-width:200px;display:none;">
+                            <option value="">— Filtros guardados —</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Stats rápidas -->
-                <div class="stats-grid" id="postsStats" style="display:none;">
-                    <div class="stat-card">
-                        <div class="stat-card__top">
-                            <div class="stat-card__icon-bg stat-card__icon-bg--info">
-                                <span class="material-symbols-rounded">article</span>
-                            </div>
-                        </div>
-                        <span class="stat-card__value" id="postsTotalCount">0</span>
-                        <span class="stat-card__label">TOTAL</span>
+                <div class="stats-inline" id="postsStats" style="display:none;">
+                    <div class="stat-inline stat-inline--info">
+                        <span class="material-symbols-rounded stat-inline__icon">article</span>
+                        <span class="stat-inline__value" id="postsTotalCount">0</span>
+                        <span class="stat-inline__label">TOTAL</span>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-card__top">
-                            <div class="stat-card__icon-bg stat-card__icon-bg--warning">
-                                <span class="material-symbols-rounded">edit_note</span>
-                            </div>
-                        </div>
-                        <span class="stat-card__value" id="postsDraftCount">0</span>
-                        <span class="stat-card__label">BORRADORES</span>
+                    <div class="stat-inline stat-inline--warning">
+                        <span class="material-symbols-rounded stat-inline__icon">edit_note</span>
+                        <span class="stat-inline__value" id="postsDraftCount">0</span>
+                        <span class="stat-inline__label">BORRADORES</span>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-card__top">
-                            <div class="stat-card__icon-bg stat-card__icon-bg--success">
-                                <span class="material-symbols-rounded">check_circle</span>
-                            </div>
-                        </div>
-                        <span class="stat-card__value" id="postsApprovedCount">0</span>
-                        <span class="stat-card__label">APROBADAS</span>
+                    <div class="stat-inline stat-inline--orange">
+                        <span class="material-symbols-rounded stat-inline__icon">hourglass_top</span>
+                        <span class="stat-inline__value" id="postsPendingCount">0</span>
+                        <span class="stat-inline__label">EN REVISIÓN</span>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-card__top">
-                            <div class="stat-card__icon-bg stat-card__icon-bg--primary">
-                                <span class="material-symbols-rounded">schedule</span>
-                            </div>
-                        </div>
-                        <span class="stat-card__value" id="postsScheduledCount">0</span>
-                        <span class="stat-card__label">PROGRAMADAS</span>
+                    <div class="stat-inline stat-inline--success">
+                        <span class="material-symbols-rounded stat-inline__icon">public</span>
+                        <span class="stat-inline__value" id="postsPublishedCount">0</span>
+                        <span class="stat-inline__label">PUBLICADAS</span>
+                    </div>
+                    <div class="stat-inline stat-inline--primary">
+                        <span class="material-symbols-rounded stat-inline__icon">schedule</span>
+                        <span class="stat-inline__value" id="postsScheduledCount">0</span>
+                        <span class="stat-inline__label">PROGRAMADAS</span>
                     </div>
                 </div>
 
@@ -750,6 +840,55 @@
                         <!-- Mobile cards -->
                         <div class="au-mobile-cards" id="postsMobileCards"></div>
                         <div class="pagination-bar" id="postsPagination"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== MODERATION SECTION ========== -->
+            <section id="sectionModeration" class="section">
+                <div class="section__header">
+                    <div
+                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h2 class="section__title">Moderación de Publicaciones</h2>
+                            <p class="section__subtitle">Revisa, aprueba o rechaza las publicaciones pendientes.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">gavel</span>
+                            <span class="au-table-title-text">Pendientes de revisión</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnRefreshModeration">
+                            <span class="material-symbols-rounded">refresh</span>
+                            <span class="au-btn-label">Actualizar</span>
+                        </button>
+                    </div>
+                    <div id="moderationLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando publicaciones pendientes...</p>
+                    </div>
+                    <div id="moderationEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">check_circle</span>
+                        <p>No hay publicaciones pendientes de revisión</p>
+                    </div>
+                    <div id="moderationTableWrapper" style="display:none;">
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col post-col--title">TÍTULO</span>
+                                <span class="au-col post-col--type">TIPO</span>
+                                <span class="au-col post-col--channels">AUTOR</span>
+                                <span class="au-col post-col--date">FECHA</span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="moderationTableBody"></div>
+                        </div>
+                        <div class="au-mobile-cards" id="moderationMobileCards"></div>
+                        <div class="pagination-bar" id="moderationPagination"></div>
                     </div>
                 </div>
             </section>
@@ -1278,6 +1417,88 @@
         </div>
     </div>
 
+    <!-- ========== MODAL: POST HISTORY ========== -->
+    <div id="postHistoryModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--xl">
+            <div class="modal__header">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <span class="material-symbols-rounded" style="color:var(--primary);font-size:24px;">history</span>
+                    <h2 class="modal__title" id="postHistoryTitle">Historial de cambios</h2>
+                </div>
+                <button class="modal__close" data-close-modal="postHistoryModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div id="postHistoryLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando historial...</p>
+                </div>
+                <div id="postHistoryEmpty" class="empty-state" style="display:none;">
+                    <span class="material-symbols-rounded"
+                        style="font-size:2rem;color:var(--on-surface-variant);">history</span>
+                    <p>No hay historial para esta publicación</p>
+                </div>
+                <div id="postHistoryContent" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: POST ACTION (Delete/Archive/Stop with reason) ========== -->
+    <div id="postActionModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--sm">
+            <div class="modal__header">
+                <h2 class="modal__title" id="postActionTitle">Acción</h2>
+                <button class="modal__close" data-close-modal="postActionModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p id="postActionDesc" class="text-muted" style="margin-bottom:1rem;"></p>
+                <div class="form-group" id="postActionReasonGroup">
+                    <label for="postActionReason" class="form-label" id="postActionReasonLabel">Razón *</label>
+                    <textarea id="postActionReason" class="form-input form-textarea" rows="3"
+                        placeholder="Describe la razón..." maxlength="500"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn--danger" id="btnPostActionConfirm">Confirmar</button>
+                    <button class="btn btn--outline" data-close-modal="postActionModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: MODERATION REVIEW ========== -->
+    <div id="moderationReviewModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="moderationReviewTitle">Revisión de Publicación</h2>
+                <button class="modal__close" data-close-modal="moderationReviewModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div id="moderationReviewLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                </div>
+                <div id="moderationReviewContent"></div>
+                <div id="moderationReviewActions" style="margin-top:1.5rem;">
+                    <div class="form-group">
+                        <label for="moderationComments" class="form-label">Comentarios del moderador</label>
+                        <textarea id="moderationComments" class="form-input form-textarea" rows="3"
+                            placeholder="Comentarios (obligatorios para rechazar)..." maxlength="1000"></textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn--primary" id="btnModerationApprove">
+                            <span class="material-symbols-rounded">check_circle</span> Aprobar
+                        </button>
+                        <button class="btn btn--danger" id="btnModerationReject">
+                            <span class="material-symbols-rounded">cancel</span> Rechazar
+                        </button>
+                        <button class="btn btn--outline" data-close-modal="moderationReviewModal">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== MODAL: CONFIRM ========== -->
     <div id="confirmModal" class="modal">
         <div class="modal__overlay"></div>
@@ -1308,6 +1529,7 @@
     <script src="./frontend/js/channels.js"></script>
     <script src="./frontend/js/user-channels.js"></script>
     <script src="./frontend/js/posts.js"></script>
+    <script src="./frontend/js/moderation.js"></script>
     <script src="./frontend/js/notifications.js"></script>
     <script src="./frontend/js/app.js"></script>
 </body>

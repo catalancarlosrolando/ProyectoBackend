@@ -125,7 +125,7 @@ async function loadAdminUsers(page = 1) {
         }
 
         tableWrapper.style.display = 'block';
-        
+
         renderUsersTable(users);
         renderPagination(pagination);
     } catch (err) {
@@ -211,7 +211,19 @@ function toggleActionsMenu(event, btn) {
     closeAllActionMenus();
 
     if (!wasActive) {
+        const rect = btn.getBoundingClientRect();
         menu.classList.add('active');
+        // Position below the trigger, aligned to the right
+        menu.style.top = (rect.bottom + 4) + 'px';
+        menu.style.left = 'auto';
+        menu.style.right = (window.innerWidth - rect.right) + 'px';
+        // If menu goes below viewport, show above the trigger
+        requestAnimationFrame(() => {
+            const menuRect = menu.getBoundingClientRect();
+            if (menuRect.bottom > window.innerHeight) {
+                menu.style.top = (rect.top - menuRect.height - 4) + 'px';
+            }
+        });
     }
 }
 
