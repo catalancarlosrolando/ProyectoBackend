@@ -785,14 +785,18 @@ function openDeletePostAction(postId, postName) {
         if (!reason) { showToast('La razón es obligatoria', 'warning'); return; }
         btn.disabled = true;
         try {
-            const response = await api.del(`/posts/${postId}`, true, { reason: reason });
+            const query = new URLSearchParams({ reason }).toString();
+            const response = await api.del(`/posts/${postId}?${query}`, true);
             console.log("Respuesta de la API:", response);
             closeModal('postActionModal');
             showToast('Publicación eliminada correctamente', 'success');
             loadPosts();
+
         } catch (err) {
             showToast('Error: ' + err.message, 'error');
-        } finally { btn.disabled = false; }
+        } finally {
+            btn.disabled = false;
+        }
     };
     openModal('postActionModal');
 }

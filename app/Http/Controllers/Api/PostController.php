@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Controlador para la gestión de publicaciones.
@@ -34,7 +35,7 @@ class PostController extends Controller
      * GET /api/posts
      *
      * Listado de publicaciones con búsqueda y filtrado avanzado.
-     * - Publicador: ve sus propias publicaciones + las de canales asignados
+     * - Publicador: ve solo sus propias publicaciones
      * - Moderador/Admin: ve todas las publicaciones
      */
     public function index(SearchPostRequest $request): JsonResponse
@@ -44,17 +45,8 @@ class PostController extends Controller
 
         // ── Scope según rol ──
         if (!$user->hasRole(['moderador', 'admin'])) {
-            // Publicador: solo sus posts + posts en canales donde está autorizado
-            $authorizedChannelIds = $user->channels()->pluck('channels.id')->toArray();
-
-            $query->where(function ($q) use ($user, $authorizedChannelIds) {
-                $q->where('user_id', $user->id);
-                if (!empty($authorizedChannelIds)) {
-                    $q->orWhereHas('channels', function ($cq) use ($authorizedChannelIds) {
-                        $cq->whereIn('channels.id', $authorizedChannelIds);
-                    });
-                }
-            });
+            // Publicador: únicamente sus publicaciones.
+            $query->where('user_id', $user->id);
         }
 
         // ── Excluir archivadas del listado activo por defecto ──
@@ -573,10 +565,12 @@ class PostController extends Controller
      */
     public function destroy(DeletePostRequest $request, Post $post): JsonResponse
     {
+        Log::info('1. Entró al destroy', ['post_id' => $post->id, 'user_id' => $request->user()->id]);
         $user = $request->user();
 
         // Verificar propiedad o rol admin/moderador
         if ($post->user_id !== $user->id && !$user->hasRole(['moderador', 'admin'])) {
+            Log::warning('2. Error de permisos');
             return response()->json([
                 'status'  => 'error',
                 'data'    => null,
@@ -586,6 +580,7 @@ class PostController extends Controller
 
         // Verificar estado permite eliminación
         if (!$post->isDeletable()) {
+            Log::warning('3. No es eliminable', ['status' => $post->status]);
             return response()->json([
                 'status'  => 'error',
                 'data'    => null,
@@ -604,9 +599,11 @@ class PostController extends Controller
             request: $request,
         );
 
+        Log::info('6. Historial grabado, procediendo a actualizar post');
         $post->update(['deleted_by' => $user->id]);
         $post->delete(); // Soft delete
 
+        Log::info('7. envia respuesta JSON');
         return response()->json([
             'status'  => 'success',
             'data'    => null,

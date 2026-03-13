@@ -424,7 +424,15 @@ describe('Eliminación de publicaciones (H11)', function () {
         ]);
 
         $response->assertStatus(200)
-            ->assertJson(['status' => 'success']);
+            ->assertJson([
+                'status'  => 'success',
+                'data'    => null,
+                'message' => 'Publicación eliminada correctamente.',
+            ]);
+
+        expect((string) $response->headers->get('content-type'))->toContain('application/json');
+
+        expect($response->headers->get('Connection'))->toBeNull();
 
         expect(Post::find($post->id))->toBeNull();
         expect(Post::withTrashed()->find($post->id))->not->toBeNull();
@@ -462,6 +470,27 @@ describe('Eliminación de publicaciones (H11)', function () {
         $response = $this->actingAs($publisher)->deleteJson("/api/posts/{$post->id}", []);
 
         $response->assertStatus(422);
+    });
+
+    it('permite eliminar enviando razón por query string (sin body)', function () {
+        $publisher = createModerationPublisher();
+
+        $post = Post::create([
+            'user_id' => $publisher->id,
+            'name'    => 'Query reason',
+            'content' => 'C',
+            'type'    => 'text',
+            'status'  => PostStatus::DRAFT->value,
+        ]);
+
+        $response = $this->actingAs($publisher)->deleteJson(
+            "/api/posts/{$post->id}?reason=" . urlencode('Borrado desde query')
+        );
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success');
+
+        expect(Post::find($post->id))->toBeNull();
     });
 });
 

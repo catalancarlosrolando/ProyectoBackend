@@ -64,14 +64,29 @@ const api = {
     async request(method, endpoint, { body = null, auth = false, isFormData = false } = {}) {
         const headers = { 'Accept': 'application/json' };
         if (auth && state.token) headers['Authorization'] = `Bearer ${state.token}`;
-        if (!isFormData) headers['Content-Type'] = 'application/json';
+        if (!isFormData && body !== null) headers['Content-Type'] = 'application/json';
 
-        const opts = { method, headers };
+        const controller = new AbortController();
+        const timeoutMs = 15000;
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+        const opts = { method, headers, signal: controller.signal };
         if (body) {
             opts.body = isFormData ? body : JSON.stringify(body);
         }
 
-        const res = await fetch(`${API_BASE}${endpoint}`, opts);
+        let res;
+        try {
+            res = await fetch(`${API_BASE}${endpoint}`, opts);
+        } catch (error) {
+            if (error?.name === 'AbortError') {
+                throw new Error('La solicitud tardó demasiado y fue cancelada. Intente nuevamente.');
+            }
+            throw error;
+        } finally {
+            clearTimeout(timeoutId);
+        }
+
         const contentType = res.headers.get('content-type') || '';
         const raw = await res.text();
         let data = null;
