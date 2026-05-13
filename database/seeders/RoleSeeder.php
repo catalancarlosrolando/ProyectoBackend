@@ -29,6 +29,8 @@ class RoleSeeder extends Seeder
             'editar-contenido',
             'eliminar-contenido',
             'ver-reportes',
+            'ver-perfil',
+            'gestionar-canales',
         ];
 
         foreach ($permissions as $permission) {
@@ -37,18 +39,19 @@ class RoleSeeder extends Seeder
 
         // Crear roles y asignar permisos
 
-        // Rol: user (usuario básico)
-        $roleUser = Role::create(['name' => 'user']);
-        $roleUser->givePermissionTo(['editar-contenido']);
+        // Rol: publicador (usuario básico que puede ingresar y ver su perfil)
+        $rolePublicador = Role::create(['name' => 'invitado']);
+        $rolePublicador->givePermissionTo(['ver-perfil']);
 
-        // Rol: moderator
-        $roleModerator = Role::create(['name' => 'moderator']);
-        $roleModerator->givePermissionTo(['editar-contenido', 'eliminar-contenido', 'ver-reportes']);
+        // Rol: publicador (usuario básico que puede publicar contenido)
+        $rolePublicador = Role::create(['name' => 'publicador']);
+        $rolePublicador->givePermissionTo(['editar-contenido']);
 
-        $roleVerified = Role::create(['name' => 'verified']);
-        $roleVerified->givePermissionTo(['acceder-panel-admin']);
+        // Rol: moderador (modera contenido y ve reportes)
+        $roleModerador = Role::create(['name' => 'moderador']);
+        $roleModerador->givePermissionTo(['editar-contenido', 'eliminar-contenido', 'ver-reportes']);
 
-        // Rol: admin
+        // Rol: admin (acceso total)
         $roleAdmin = Role::create(['name' => 'admin']);
         $roleAdmin->givePermissionTo(Permission::all());
     }

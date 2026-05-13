@@ -21,6 +21,13 @@ async function loadLanding() {
         document.getElementById('apiTimestamp').textContent = formatDate(data.timestamp);
         document.getElementById('apiStatus').textContent = 'Conectado';
 
+        // Update date in timestamp card trend
+        const dateEl = document.getElementById('apiDate');
+        if (dateEl && data.timestamp) {
+            const d = new Date(data.timestamp);
+            dateEl.textContent = d.toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
         loading.style.display = 'none';
         content.style.display = 'block';
     } catch (err) {
@@ -33,15 +40,22 @@ async function loadLanding() {
 
 async function doPing() {
     const pre = document.querySelector('#pingResult pre');
+    const meta = document.getElementById('pingMeta');
+    const responseTime = document.getElementById('pingResponseTime');
     pre.textContent = 'Enviando ping...';
+    if (meta) meta.style.display = 'none';
 
     try {
         const start = performance.now();
         const data = await api.get('/ping');
         const ms = Math.round(performance.now() - start);
-        pre.textContent = JSON.stringify(data, null, 2) + `\n\n⏱ Tiempo de respuesta: ${ms}ms`;
+        pre.textContent = JSON.stringify(data, null, 2);
+        if (meta) {
+            meta.style.display = 'flex';
+            responseTime.textContent = `Tiempo de respuesta: ${ms}ms`;
+        }
     } catch (err) {
-        pre.textContent = `❌ Error: ${err.message}`;
+        pre.textContent = `Error: ${err.message}`;
     }
 }
 

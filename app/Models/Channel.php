@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ChannelType;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Channel extends Model
@@ -16,6 +17,8 @@ class Channel extends Model
         'description',
         'type',
         'semantic_context',
+        'last_modified_by',
+        'last_modified_at',
     ];
 
     /**
@@ -25,7 +28,18 @@ class Channel extends Model
         'type' => ChannelType::class,
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'last_modified_at' => 'datetime',
     ];
+
+    /**
+     * Relación: usuario que realizó la última modificación del canal.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function lastModifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'last_modified_by');
+    }
 
     /**
      * Relación N:M con Users.

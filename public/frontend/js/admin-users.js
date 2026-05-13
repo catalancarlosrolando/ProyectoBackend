@@ -20,6 +20,45 @@ const ACTION_LABELS = {
     disabled: 'Deshabilitado',
 };
 
+const SORT_FIELDS = ['name', 'email', 'created_at', 'last_access_at', 'status'];
+
+function toggleAdminSort(field) {
+    if (!SORT_FIELDS.includes(field)) return;
+
+    if (state.adminUsers.sortBy === field) {
+        // Cycle: asc → desc → none
+        if (state.adminUsers.sortOrder === 'asc') {
+            state.adminUsers.sortOrder = 'desc';
+        } else {
+            state.adminUsers.sortBy = null;
+            state.adminUsers.sortOrder = null;
+        }
+    } else {
+        state.adminUsers.sortBy = field;
+        state.adminUsers.sortOrder = 'asc';
+    }
+
+    updateSortIcons();
+    loadAdminUsers(1);
+}
+
+function updateSortIcons() {
+    SORT_FIELDS.forEach(f => {
+        const icon = document.getElementById('sortIcon-' + f);
+        if (!icon) return;
+
+        const col = icon.closest('.au-col--sortable');
+
+        if (state.adminUsers.sortBy === f) {
+            icon.textContent = state.adminUsers.sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward';
+            col?.classList.add('au-col--sorted');
+        } else {
+            icon.textContent = 'unfold_more';
+            col?.classList.remove('au-col--sorted');
+        }
+    });
+}
+
 function getAdminFilters() {
     const filters = {};
     const name = document.getElementById('filterName')?.value.trim();
@@ -44,6 +83,12 @@ function getAdminFilters() {
     if (lastAccessFrom) filters.last_access_from = lastAccessFrom;
     if (lastAccessTo) filters.last_access_to = lastAccessTo;
 
+    // Sort
+    if (state.adminUsers.sortBy) {
+        filters.sort_by = state.adminUsers.sortBy;
+        filters.sort_order = state.adminUsers.sortOrder || 'asc';
+    }
+
     return filters;
 }
 
@@ -67,6 +112,7 @@ async function loadAdminUsers(page = 1) {
         const res = await api.get(`/admin/users?${params}`, true);
         const users = res.data?.users || [];
         const pagination = res.data?.pagination || {};
+        console.log('Usuarios cargados:', users);
 
         state.adminUsers.currentPage = pagination.current_page || 1;
         state.adminUsers.lastPage = pagination.last_page || 1;
@@ -79,6 +125,7 @@ async function loadAdminUsers(page = 1) {
         }
 
         tableWrapper.style.display = 'block';
+
         renderUsersTable(users);
         renderPagination(pagination);
     } catch (err) {
@@ -89,43 +136,179 @@ async function loadAdminUsers(page = 1) {
     }
 }
 
+const STATUS_ICONS = {
+    registered: 'check_circle',
+    verified: 'verified',
+    approved: 'task_alt',
+    disabled: 'block',
+    deleted: 'delete',
+};
+
+const STATUS_COLORS = {
+    registered: { icon: '#388E3C', text: '#388E3C', bg: '#BBDEFB' },
+    verified: { icon: '#1E90FF', text: '#1E90FF', bg: '#D4E9FF' },
+    approved: { icon: '#388E3C', text: '#388E3C', bg: '#E8F5E9' },
+    disabled: { icon: '#fb6e4b', text: '#fb6e4b', bg: '#FFF3E0' },
+    deleted: { icon: '#922926', text: '#922926', bg: '#FFEBEE' },
+};
+
+function getUserInitials(name) {
+    if (!name) return '??';
+    const parts = name.trim().split(/\s+/);
+    return parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : name.substring(0, 2).toUpperCase();
+}
+
+function renderActionButtons(u, size = 16) {
+    let items = '';
+
+    if (u.status === 'registered') {
+        items += `<button class="au-actions-menu__item au-actions-menu__item--success" onclick="adminAction('approve', ${u.id})">
+            <span class="material-symbols-rounded">check_circle</span> Aprobar
+        </button>`;
+        items += `<button class="au-actions-menu__item au-actions-menu__item--danger" onclick="adminAction('reject', ${u.id})">
+            <span class="material-symbols-rounded">cancel</span> Rechazar
+        </button>`;
+        items += `<div class="au-actions-menu__sep"></div>`;
+    } else if (u.status === 'approved') {
+        items += `<button class="au-actions-menu__item au-actions-menu__item--warning" onclick="adminAction('disable', ${u.id})">
+            <span class="material-symbols-rounded">block</span> Deshabilitar
+        </button>`;
+        items += `<div class="au-actions-menu__sep"></div>`;
+    } else if (u.status === 'disabled') {
+        items += `<button class="au-actions-menu__item au-actions-menu__item--success" onclick="adminAction('enable', ${u.id})">
+            <span class="material-symbols-rounded">check_circle</span> Habilitar
+        </button>`;
+        items += `<div class="au-actions-menu__sep"></div>`;
+    }
+
+    items += `<button class="au-actions-menu__item au-actions-menu__item--info" onclick="openRoleModal('assign', ${u.id})">
+        <span class="material-symbols-rounded">shield_person</span> Asignar Rol
+    </button>`;
+    items += `<button class="au-actions-menu__item" onclick="openRoleModal('revoke', ${u.id})">
+        <span class="material-symbols-rounded">shield</span> Revocar Rol
+    </button>`;
+    items += `<div class="au-actions-menu__sep"></div>`;
+    items += `<button class="au-actions-menu__item" onclick="viewUserHistory(${u.id})">
+        <span class="material-symbols-rounded">history</span> Historial
+    </button>`;
+
+    return `<div class="au-actions-dropdown">
+        <button class="au-actions-trigger" onclick="toggleActionsMenu(event, this)" title="Acciones">
+            <span class="material-symbols-rounded" style="font-size:${size + 4}px;">more_vert</span>
+        </button>
+        <div class="au-actions-menu">${items}</div>
+    </div>`;
+}
+
+function toggleActionsMenu(event, btn) {
+    event.stopPropagation();
+    const menu = btn.nextElementSibling;
+    const wasActive = menu.classList.contains('active');
+
+    // Close all other open menus
+    closeAllActionMenus();
+
+    if (!wasActive) {
+        const rect = btn.getBoundingClientRect();
+        menu.classList.add('active');
+        // Position below the trigger, aligned to the right
+        menu.style.top = (rect.bottom + 4) + 'px';
+        menu.style.left = 'auto';
+        menu.style.right = (window.innerWidth - rect.right) + 'px';
+        // If menu goes below viewport, show above the trigger
+        requestAnimationFrame(() => {
+            const menuRect = menu.getBoundingClientRect();
+            if (menuRect.bottom > window.innerHeight) {
+                menu.style.top = (rect.top - menuRect.height - 4) + 'px';
+            }
+        });
+    }
+}
+
+function closeAllActionMenus() {
+    document.querySelectorAll('.au-actions-menu.active').forEach(m => m.classList.remove('active'));
+}
+
+// Close dropdown menus on outside click
+document.addEventListener('click', () => closeAllActionMenus());
+
+function renderStatusBadge(status) {
+    const colors = STATUS_COLORS[status] || { icon: '#49454F', text: '#49454F', bg: '#EEEEEE' };
+    const icon = STATUS_ICONS[status] || 'help';
+    const label = STATUS_LABELS[status] || status;
+    return `<span class="au-status-badge" style="background:${colors.bg};color:${colors.text};">
+        <span class="material-symbols-rounded" style="font-size:16px;color:${colors.icon};">${icon}</span>
+        ${escapeHtml(label.toUpperCase())}
+    </span>`;
+}
+
+function renderRoleBadge(roles) {
+    if (!roles || !roles.length) return '<span class="au-role-badge au-role-badge--muted">—</span>';
+    return roles.map(r => `<span class="au-role-badge">${escapeHtml(r)}</span>`).join('');
+}
+
 function renderUsersTable(users) {
+    // Desktop table rows
     const tbody = document.getElementById('usersTableBody');
     tbody.innerHTML = users.map(u => `
-        <tr>
-            <td><strong>${u.id}</strong></td>
-            <td>
-                <div style="font-weight:500;">${escapeHtml(u.name || '-')}</div>
-                ${u.dni ? `<small class="text-muted">${escapeHtml(u.dni)}</small>` : ''}
-            </td>
-            <td><span style="font-size:0.85rem;">${escapeHtml(u.email)}</span></td>
-            <td><span class="status-badge status-badge--${u.status}">${STATUS_LABELS[u.status] || u.status}</span></td>
-            <td>
-                <div class="tags">
-                    ${(u.roles && u.roles.length)
-            ? u.roles.map(r => `<span class="tag tag--primary">${r}</span>`).join('')
-            : '<span class="tag tag--muted">—</span>'}
-                </div>
-            </td>
-            <td><small>${formatDate(u.created_at)}</small></td>
-            <td>
-                <div class="btn-group btn-group--actions">
-                    <button class="btn btn--sm btn--outline" onclick="viewUserDetail(${u.id})" title="Ver detalle">👁</button>
-                    <button class="btn btn--sm btn--outline" onclick="viewUserHistory(${u.id})" title="Historial">📜</button>
-                    ${u.status === 'registered' ? `
-                        <button class="btn btn--sm btn--success" onclick="adminAction('approve', ${u.id})" title="Aprobar">✓</button>
-                        <button class="btn btn--sm btn--danger" onclick="adminAction('reject', ${u.id})" title="Rechazar">✗</button>
-                    ` : ''}
-                    ${u.status === 'approved' ? `
-                        <button class="btn btn--sm btn--warning" onclick="adminAction('disable', ${u.id})" title="Deshabilitar">⏸</button>
-                    ` : ''}
-                    ${u.status === 'disabled' ? `
-                        <button class="btn btn--sm btn--success" onclick="adminAction('enable', ${u.id})" title="Habilitar">▶</button>
-                    ` : ''}
-                </div>
-            </td>
-        </tr>
+        <div class="au-row" data-user-id="${u.id}">
+            <span class="au-cell au-cell--id">${u.id}</span>
+            <div class="au-cell au-cell--name">
+                <span class="au-name-text">${escapeHtml(u.name || '-')}</span>
+                ${u.dni ? `<span class="au-name-sub">${escapeHtml(u.dni)}</span>` : ''}
+            </div>
+            <span class="au-cell au-cell--email">${escapeHtml(u.email)}</span>
+            <div class="au-cell au-cell--status">${renderStatusBadge(u.status)}</div>
+            <div class="au-cell au-cell--role">${renderRoleBadge(u.roles)}</div>
+            <span class="au-cell au-cell--date">${formatDate(u.created_at)}</span>
+            <span class="au-cell au-cell--date">${u.last_access_at ? formatDate(u.last_access_at) : 'Nunca'}</span>
+            <div class="au-cell au-cell--actions">${renderActionButtons(u)}</div>
+        </div>
     `).join('');
+
+    // Mobile cards
+    const mobileContainer = document.getElementById('usersMobileCards');
+    mobileContainer.innerHTML = users.map(u => {
+        const initials = getUserInitials(u.name);
+        return `
+        <div class="au-user-card" data-user-id="${u.id}">
+            <div class="au-user-card__top">
+                <div class="au-user-card__left">
+                    <div class="au-user-card__avatar">${initials}</div>
+                    <div class="au-user-card__name-col">
+                        <span class="au-user-card__name">${escapeHtml(u.name || '-')}</span>
+                        <span class="au-user-card__id">ID: ${u.id}</span>
+                    </div>
+                </div>
+                ${renderStatusBadge(u.status)}
+            </div>
+            <div class="au-user-card__divider"></div>
+            <div class="au-user-card__info">
+                <div class="au-user-card__info-row">
+                    <span class="material-symbols-rounded au-user-card__info-icon">mail</span>
+                    <span>${escapeHtml(u.email)}</span>
+                </div>
+                <div class="au-user-card__info-row">
+                    <span class="material-symbols-rounded au-user-card__info-icon">calendar_today</span>
+                    <span>${formatDate(u.created_at)}</span>
+                </div>
+                <div class="au-user-card__info-row">
+                    <span class="material-symbols-rounded au-user-card__info-icon">schedule</span>
+                    <span>Últ. acceso: ${u.last_access_at ? formatDate(u.last_access_at) : 'Nunca'}</span>
+                </div>
+                <div class="au-user-card__info-row au-user-card__info-row--between">
+                    <div class="au-user-card__rol-label">
+                        <span class="material-symbols-rounded au-user-card__info-icon">shield_person</span>
+                        <span>Rol:</span>
+                    </div>
+                    ${renderRoleBadge(u.roles)}
+                </div>
+            </div>
+            <div class="au-user-card__actions">${renderActionButtons(u, 18)}</div>
+        </div>`;
+    }).join('');
 }
 
 function renderPagination(pagination) {
@@ -164,64 +347,8 @@ function renderPagination(pagination) {
     container.innerHTML = html;
 }
 
-async function viewUserDetail(userId) {
-    const card = document.getElementById('userDetailCard');
-    card.style.display = '';
-
-    try {
-        const res = await api.get(`/admin/users/${userId}`, true);
-        const u = res.data?.user;
-        if (!u) throw new Error('Usuario no encontrado');
-
-        state.adminUsers.selectedUserId = u.id;
-
-        document.getElementById('userDetailTitle').textContent = `Detalle: ${u.name}`;
-        document.getElementById('userDetailAvatar').textContent = (u.name || '?')[0].toUpperCase();
-        document.getElementById('udId').textContent = u.id;
-        document.getElementById('udName').textContent = u.name || '-';
-        document.getElementById('udEmail').textContent = u.email;
-        document.getElementById('udDni').textContent = u.dni || '-';
-        document.getElementById('udMobile').textContent = u.mobile || '-';
-        document.getElementById('udStatus').innerHTML = `<span class="status-badge status-badge--${u.status}">${u.status_label || u.status}</span>`;
-        document.getElementById('udVerified').textContent = u.email_verified_at ? '✅ ' + formatDate(u.email_verified_at) : '❌ No';
-        document.getElementById('udLastAccess').textContent = u.last_access_at ? formatDate(u.last_access_at) : 'Nunca';
-        document.getElementById('udCreatedAt').textContent = formatDate(u.created_at);
-        document.getElementById('udRejection').textContent = u.rejection_reason || '-';
-
-        document.getElementById('udRoles').innerHTML = (u.roles?.length)
-            ? u.roles.map(r => `<span class="tag tag--primary">${r}</span>`).join('')
-            : '<span class="tag tag--muted">Sin roles</span>';
-
-        document.getElementById('udPermissions').innerHTML = (u.permissions?.length)
-            ? u.permissions.map(p => `<span class="tag tag--info">${p}</span>`).join('')
-            : '<span class="tag tag--muted">Sin permisos</span>';
-
-        // Build action buttons
-        let actions = '';
-        if (u.status === 'registered') {
-            actions += `<button class="btn btn--success btn--sm" onclick="adminAction('approve', ${u.id})">✓ Aprobar</button>`;
-            actions += `<button class="btn btn--danger btn--sm" onclick="adminAction('reject', ${u.id})">✗ Rechazar</button>`;
-        }
-        if (u.status === 'approved') {
-            actions += `<button class="btn btn--warning btn--sm" onclick="adminAction('disable', ${u.id})">⏸ Deshabilitar</button>`;
-        }
-        if (u.status === 'disabled') {
-            actions += `<button class="btn btn--success btn--sm" onclick="adminAction('enable', ${u.id})">▶ Habilitar</button>`;
-        }
-        actions += `<button class="btn btn--info btn--sm" onclick="openRoleModal('assign', ${u.id})">🏷 Asignar Rol</button>`;
-        actions += `<button class="btn btn--outline btn--sm" onclick="openRoleModal('revoke', ${u.id})">🏷 Revocar Rol</button>`;
-        actions += `<button class="btn btn--outline btn--sm" onclick="viewUserHistory(${u.id})">📜 Ver Historial</button>`;
-
-        document.getElementById('udActions').innerHTML = actions;
-
-        // Scroll to card
-        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (err) {
-        showToast('Error al cargar detalle: ' + err.message, 'error');
-    }
-}
-
 function adminAction(action, userId) {
+    closeAllActionMenus();
     state.adminUsers.statusChangeAction = action;
     state.adminUsers.statusChangeUserId = userId;
 
@@ -263,9 +390,6 @@ async function confirmStatusChange() {
 
         // Refresh data
         loadAdminUsers(state.adminUsers.currentPage);
-        if (state.adminUsers.selectedUserId === userId) {
-            viewUserDetail(userId);
-        }
     } catch (err) {
         showToast(err.message, 'error');
     } finally {
@@ -275,6 +399,7 @@ async function confirmStatusChange() {
 }
 
 function openRoleModal(action, userId) {
+    closeAllActionMenus();
     state.adminUsers.roleAction = action;
     state.adminUsers.roleUserId = userId;
 
@@ -293,10 +418,10 @@ async function confirmRoleChange() {
     const role = document.getElementById('roleSelect').value;
     const btn = document.getElementById('btnRoleConfirm');
 
-    if (!role) {
-        showToast('Selecciona un rol', 'warning');
-        return;
-    }
+    //if (!role) {
+    //    showToast('Selecciona un rol', 'warning');
+    //    return;
+    //}
 
     const endpoint = action === 'assign' ? 'assign-role' : 'revoke-role';
     btn.disabled = true;
@@ -308,9 +433,6 @@ async function confirmRoleChange() {
         showToast(res.message || 'Operación exitosa', 'success');
 
         loadAdminUsers(state.adminUsers.currentPage);
-        if (state.adminUsers.selectedUserId === userId) {
-            viewUserDetail(userId);
-        }
     } catch (err) {
         showToast(err.message, 'error');
     } finally {
@@ -319,50 +441,124 @@ async function confirmRoleChange() {
     }
 }
 
+const HISTORY_ACTION_STYLES = {
+    role_revoked: { icon: 'person_remove', label: 'Rol revocado', color: 'error' },
+    role_assigned: { icon: 'person_add', label: 'Rol asignado', color: 'success' },
+    status_change: { icon: 'swap_horiz', label: 'Cambio de estado', color: 'info' },
+    enabled: { icon: 'check_circle', label: 'Habilitado', color: 'success' },
+    disabled: { icon: 'block', label: 'Deshabilitado', color: 'warning' },
+};
+
+function renderHistoryValueBadge(value) {
+    if (!value) return '<span class="hm-value-dash">—</span>';
+    const statusLabel = STATUS_LABELS[value];
+    if (statusLabel) {
+        const colors = STATUS_COLORS[value];
+        return `<span class="hm-value-badge" style="background:${colors?.bg || 'var(--surface-variant)'};color:${colors?.text || 'var(--on-surface)'}">${escapeHtml(statusLabel.toUpperCase())}</span>`;
+    }
+    return `<span class="hm-value-badge hm-value-badge--role">${escapeHtml(value.toUpperCase())}</span>`;
+}
+
+function renderHistoryCard(h) {
+    const style = HISTORY_ACTION_STYLES[h.action] || { icon: 'info', label: h.action, color: 'info' };
+    const colorVar = `var(--${style.color})`;
+    const containerVar = `var(--${style.color}-container)`;
+
+    let reasonHtml = '';
+    if (h.reason) {
+        reasonHtml = `
+            <div class="hm-card__motivo">
+                <span class="hm-card__motivo-label">Motivo</span>
+                <div class="hm-card__motivo-box">${escapeHtml(h.reason)}</div>
+            </div>`;
+    }
+
+    return `
+    <div class="hm-card">
+        <div class="hm-card__accent" style="background:${colorVar}"></div>
+        <div class="hm-card__body">
+            <div class="hm-card__top-row">
+                <span class="hm-card__action-badge" style="background:${containerVar};color:${colorVar}">
+                    <span class="material-symbols-rounded" style="font-size:14px">${style.icon}</span>
+                    ${escapeHtml(style.label)}
+                </span>
+                <span class="hm-card__date">${formatDate(h.created_at)}</span>
+            </div>
+            <div class="hm-card__details">
+                <div class="hm-card__col">
+                    <span class="hm-card__col-label">Anterior</span>
+                    ${renderHistoryValueBadge(h.old_value)}
+                </div>
+                <div class="hm-card__col">
+                    <span class="hm-card__col-label">Nuevo</span>
+                    ${renderHistoryValueBadge(h.new_value)}
+                </div>
+            </div>
+            ${reasonHtml}
+            <div class="hm-card__footer">
+                <span class="material-symbols-rounded" style="font-size:16px">admin_panel_settings</span>
+                <span>${escapeHtml(h.changed_by?.name || '—')}</span>
+            </div>
+        </div>
+    </div>`;
+}
+
 async function viewUserHistory(userId) {
-    const card = document.getElementById('userHistoryCard');
+    closeAllActionMenus();
+    highlightUserRow(userId);
+
     const loading = document.getElementById('historyLoading');
     const empty = document.getElementById('historyEmpty');
-    const tableWrapper = document.getElementById('historyTableWrapper');
+    const cardsList = document.getElementById('historyCardsList');
 
-    card.style.display = '';
     loading.style.display = 'flex';
     empty.style.display = 'none';
-    tableWrapper.style.display = 'none';
+    cardsList.style.display = 'none';
+
+    openModal('historyModal');
 
     try {
         const res = await api.get(`/admin/users/${userId}/history`, true);
         const history = res.data?.history || [];
+        const userName = res.data?.user_name || 'Usuario #' + userId;
 
-        document.getElementById('userHistoryTitle').textContent =
-            `📜 Historial: ${res.data?.user_name || 'Usuario #' + userId}`;
+        document.getElementById('historyModalTitle').textContent = 'Historial de actividad';
+        document.getElementById('historyModalSubtitle').textContent = userName;
 
         loading.style.display = 'none';
 
         if (history.length === 0) {
             empty.style.display = 'block';
-            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
             return;
         }
 
-        tableWrapper.style.display = 'block';
-        const tbody = document.getElementById('historyTableBody');
-        tbody.innerHTML = history.map(h => `
-            <tr>
-                <td><span class="tag tag--info">${ACTION_LABELS[h.action] || h.action}</span></td>
-                <td>${h.old_value ? `<span class="status-badge status-badge--${h.old_value}">${STATUS_LABELS[h.old_value] || h.old_value}</span>` : '—'}</td>
-                <td>${h.new_value ? `<span class="status-badge status-badge--${h.new_value}">${STATUS_LABELS[h.new_value] || h.new_value}</span>` : '—'}</td>
-                <td><small>${h.reason ? escapeHtml(h.reason) : '—'}</small></td>
-                <td><small>${h.changed_by?.name || '—'}</small></td>
-                <td><small>${formatDate(h.created_at)}</small></td>
-            </tr>
-        `).join('');
-
-        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        cardsList.style.display = 'flex';
+        cardsList.innerHTML = history.map(renderHistoryCard).join('');
     } catch (err) {
         loading.style.display = 'none';
         showToast('Error al cargar historial: ' + err.message, 'error');
     }
+}
+
+function highlightUserRow(userId) {
+    // Remove previous highlights
+    document.querySelectorAll('.au-row--highlighted').forEach(el => el.classList.remove('au-row--highlighted'));
+    document.querySelectorAll('.au-user-card--highlighted').forEach(el => el.classList.remove('au-user-card--highlighted'));
+
+    // Highlight current
+    const row = document.querySelector(`.au-row[data-user-id="${userId}"]`);
+    if (row) row.classList.add('au-row--highlighted');
+
+    const card = document.querySelector(`.au-user-card[data-user-id="${userId}"]`);
+    if (card) card.classList.add('au-user-card--highlighted');
+
+    state.adminUsers.selectedUserId = userId;
+}
+
+function clearUserRowHighlight() {
+    document.querySelectorAll('.au-row--highlighted').forEach(el => el.classList.remove('au-row--highlighted'));
+    document.querySelectorAll('.au-user-card--highlighted').forEach(el => el.classList.remove('au-user-card--highlighted'));
+    state.adminUsers.selectedUserId = null;
 }
 
 function clearAdminFilters() {
@@ -376,5 +572,9 @@ function clearAdminFilters() {
     document.getElementById('filterRegisteredTo').value = '';
     document.getElementById('filterLastAccessFrom').value = '';
     document.getElementById('filterLastAccessTo').value = '';
+    // Reset sort
+    state.adminUsers.sortBy = null;
+    state.adminUsers.sortOrder = null;
+    updateSortIcons();
     loadAdminUsers(1);
 }

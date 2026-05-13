@@ -5,6 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Difexa - Frontend</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
     <link rel="stylesheet" href="./frontend/css/styles.css">
 </head>
 
@@ -12,37 +20,72 @@
     <div class="app">
         <!-- Header / Navbar -->
         <header class="navbar">
-            <div class="navbar__brand">
-                <span class="navbar__logo">◆</span>
-                <h1 class="navbar__title">Difexa</h1>
-                <span class="navbar__badge">API v1.0</span>
+            <div class="navbar__left">
+                <div class="navbar__brand">
+                    <span class="navbar__logo-dot"></span>
+                    <h1 class="navbar__title">Difexa</h1>
+                    <span class="navbar__badge">API v1.0</span>
+                </div>
+                <nav class="navbar__nav" id="mainNav">
+                    <a href="#" class="nav-link active" data-section="home">
+                        <span class="material-symbols-rounded nav-icon">home</span>
+                        <span>Inicio</span>
+                    </a>
+                    <a href="#" class="nav-link auth-only" data-section="profile" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">person</span>
+                        <span>Perfil</span>
+                    </a>
+                    <a href="#" class="nav-link publisher-only" data-section="posts" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">edit_note</span>
+                        <span>Publicaciones</span>
+                    </a>
+                    <a href="#" class="nav-link moderator-only" data-section="moderation" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">gavel</span>
+                        <span>Moderación</span>
+                    </a>
+                    <a href="#" class="nav-link" data-section="files">
+                        <span class="material-symbols-rounded nav-icon">folder</span>
+                        <span>Archivos</span>
+                    </a>
+                    <a href="#" class="nav-link admin-only" data-section="admin-users" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">group</span>
+                        <span>Usuarios</span>
+                    </a>
+                    <a href="#" class="nav-link admin-only" data-section="channels" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">podcasts</span>
+                        <span>Canales</span>
+                    </a>
+                    <a href="#" class="nav-link admin-only" data-section="user-channels" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">group_add</span>
+                        <span>Asignar Canales</span>
+                    </a>
+                    <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">dashboard</span>
+                        <span>Dashboard</span>
+                    </a>
+                </nav>
             </div>
-            <nav class="navbar__nav" id="mainNav">
-                <a href="#" class="nav-link active" data-section="home">
-                    <span class="nav-icon">🏠</span> Inicio
-                </a>
-                <a href="#" class="nav-link auth-only" data-section="profile" style="display:none;">
-                    <span class="nav-icon">👤</span> Perfil
-                </a>
-                <a href="#" class="nav-link" data-section="files">
-                    <span class="nav-icon">📁</span> Archivos
-                </a>
-                <a href="#" class="nav-link admin-only" data-section="admin-users" style="display:none;">
-                    <span class="nav-icon">👥</span> Usuarios
-                </a>
-                <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
-                    <span class="nav-icon">📊</span> Dashboard
-                </a>
-            </nav>
             <div class="navbar__actions">
-                <span id="userWelcome" class="user-badge" style="display:none;"></span>
+                <!-- Campana de notificaciones -->
+                <button id="btnNotifBell" class="btn btn--icon btn--ghost-nav auth-only notif-bell"
+                    style="display:none;" title="Notificaciones">
+                    <span class="material-symbols-rounded">notifications</span>
+                    <span id="notifBadge" class="notif-badge" style="display:none;">0</span>
+                </button>
+                <div id="userWelcomeGroup" class="navbar__user-group" style="display:none;">
+                    <div class="navbar__avatar" id="userAvatar">NA</div>
+                    <span id="userWelcome" class="navbar__user-name"></span>
+                </div>
                 <button id="btnLogin" class="btn btn--outline">Iniciar Sesión</button>
                 <button id="btnRegister" class="btn btn--primary btn--sm">Registrarse</button>
-                <button id="btnLogout" class="btn btn--ghost" style="display:none;">
-                    Cerrar Sesión
+                <button id="btnLogout" class="btn btn--ghost-nav" style="display:none;">
+                    <span class="material-symbols-rounded">logout</span>
+                    <span>Cerrar Sesión</span>
                 </button>
             </div>
-            <button class="navbar__toggle" id="navToggle">☰</button>
+            <button class="navbar__toggle" id="navToggle">
+                <span class="material-symbols-rounded">menu</span>
+            </button>
         </header>
 
         <!-- Toast notifications -->
@@ -65,45 +108,78 @@
 
                 <div id="homeContent" style="display:none;">
                     <div class="stats-grid">
-                        <div class="stat-card stat-card--success">
-                            <div class="stat-card__icon">✅</div>
-                            <div class="stat-card__info">
-                                <span class="stat-card__label">Estado</span>
-                                <span class="stat-card__value" id="apiStatus">Conectado</span>
-                            </div>
-                        </div>
+                        <!-- Card 1: Estado -->
                         <div class="stat-card">
-                            <div class="stat-card__icon">💬</div>
-                            <div class="stat-card__info">
-                                <span class="stat-card__label">Mensaje</span>
-                                <span class="stat-card__value" id="apiMessage">-</span>
+                            <div class="stat-card__top">
+                                <div class="stat-card__icon-bg stat-card__icon-bg--success">
+                                    <span class="material-symbols-rounded">check_circle</span>
+                                </div>
+                                <div class="stat-card__trend stat-card__trend--success">
+                                    <span class="material-symbols-rounded">wifi</span>
+                                    <span>Online</span>
+                                </div>
                             </div>
+                            <span class="stat-card__value" id="apiStatus">Conectado</span>
+                            <span class="stat-card__label">ESTADO</span>
                         </div>
+                        <!-- Card 2: Mensaje -->
                         <div class="stat-card">
-                            <div class="stat-card__icon">🏷️</div>
-                            <div class="stat-card__info">
-                                <span class="stat-card__label">Versión</span>
-                                <span class="stat-card__value" id="apiVersion">-</span>
+                            <div class="stat-card__top">
+                                <div class="stat-card__icon-bg stat-card__icon-bg--info">
+                                    <span class="material-symbols-rounded">chat_bubble</span>
+                                </div>
+                                <div class="stat-card__trend stat-card__trend--success">
+                                    <span class="material-symbols-rounded">check</span>
+                                    <span>OK</span>
+                                </div>
                             </div>
+                            <span class="stat-card__value" id="apiMessage">-</span>
+                            <span class="stat-card__label">MENSAJE</span>
                         </div>
+                        <!-- Card 3: Versión -->
                         <div class="stat-card">
-                            <div class="stat-card__icon">🕐</div>
-                            <div class="stat-card__info">
-                                <span class="stat-card__label">Timestamp</span>
-                                <span class="stat-card__value" id="apiTimestamp">-</span>
+                            <div class="stat-card__top">
+                                <div class="stat-card__icon-bg stat-card__icon-bg--warning">
+                                    <span class="material-symbols-rounded">update</span>
+                                </div>
+                                <div class="stat-card__trend stat-card__trend--success">
+                                    <span class="material-symbols-rounded">verified</span>
+                                    <span>Stable</span>
+                                </div>
                             </div>
+                            <span class="stat-card__value" id="apiVersion">-</span>
+                            <span class="stat-card__label">VERSIÓN</span>
+                        </div>
+                        <!-- Card 4: Timestamp -->
+                        <div class="stat-card">
+                            <div class="stat-card__top">
+                                <div class="stat-card__icon-bg stat-card__icon-bg--primary">
+                                    <span class="material-symbols-rounded">schedule</span>
+                                </div>
+                                <div class="stat-card__trend stat-card__trend--primary">
+                                    <span class="material-symbols-rounded">today</span>
+                                    <span id="apiDate">-</span>
+                                </div>
+                            </div>
+                            <span class="stat-card__value" id="apiTimestamp">-</span>
+                            <span class="stat-card__label">TIMESTAMP</span>
                         </div>
                     </div>
 
-                    <!-- Ping test -->
-                    <div class="card">
+                    <!-- Health Check -->
+                    <div class="card card--health">
                         <div class="card__header">
                             <h3 class="card__title">Health Check</h3>
-                            <button class="btn btn--sm btn--outline" id="btnPing">🔄 Ping</button>
+                            <button class="btn btn--primary" id="btnPing">
+                                <span class="material-symbols-rounded">play_arrow</span>
+                                Ping
+                            </button>
                         </div>
-                        <div class="card__body">
-                            <div id="pingResult" class="code-block">
-                                <pre>Haz clic en "Ping" para verificar el estado de la API</pre>
+                        <div id="pingResult" class="code-block">
+                            <pre>Haz clic en "Ping" para verificar el estado de la API</pre>
+                            <div class="code-block__meta" id="pingMeta" style="display:none;">
+                                <span class="material-symbols-rounded">timer</span>
+                                <span id="pingResponseTime">Tiempo de respuesta: -</span>
                             </div>
                         </div>
                     </div>
@@ -125,7 +201,9 @@
                 </div>
 
                 <div id="homeError" class="error-state" style="display:none;">
-                    <div class="error-state__icon">⚠️</div>
+                    <div class="error-state__icon">
+                        <span class="material-symbols-rounded">warning</span>
+                    </div>
                     <h3>Error al conectar con la API</h3>
                     <p id="homeErrorMessage">No se pudo conectar con el servidor.</p>
                     <button class="btn btn--primary" id="btnRetry">Reintentar</button>
@@ -289,38 +367,50 @@
             <section id="sectionAdmin-users" class="section">
                 <div class="section__header">
                     <h2 class="section__title">Gestión de Usuarios</h2>
-                    <p class="section__subtitle">Administra usuarios, aprueba registros, asigna roles y revisa historial
-                    </p>
+                    <p class="section__subtitle">Administra usuarios, aprueba registros, asigna roles y revisa
+                        historial.</p>
                 </div>
 
                 <!-- Filtros -->
-                <div class="card">
-                    <div class="card__header">
-                        <h3 class="card__title">🔍 Filtros</h3>
-                        <div class="btn-group">
-                            <button class="btn btn--sm btn--primary" id="btnApplyFilters">Buscar</button>
-                            <button class="btn btn--sm btn--outline" id="btnClearFilters">Limpiar</button>
+                <div class="au-filters-card">
+                    <div class="au-filters-header">
+                        <div class="au-filters-title">
+                            <span class="material-symbols-rounded au-filters-icon">search</span>
+                            <span class="au-filters-title-text">Filtros</span>
+                        </div>
+                        <button class="au-filters-toggle" id="btnFiltersToggle" aria-label="Expandir filtros">
+                            <span class="material-symbols-rounded">keyboard_arrow_down</span>
+                        </button>
+                        <div class="au-filters-btns">
+                            <button class="btn btn--primary" id="btnApplyFilters">
+                                <span class="material-symbols-rounded">search</span>
+                                <span>Buscar</span>
+                            </button>
+                            <button class="btn btn--outline" id="btnClearFilters">
+                                <span class="material-symbols-rounded">filter_list</span>
+                                <span>Limpiar</span>
+                            </button>
                         </div>
                     </div>
-                    <div class="card__body">
-                        <div class="filters-grid">
-                            <div class="form-group">
-                                <label for="filterName" class="form-label">Nombre</label>
-                                <input type="text" id="filterName" class="form-input"
+                    <div class="au-filters-body" id="filtersBody">
+                        <div class="au-filter-row">
+                            <div class="au-filter-field">
+                                <label for="filterName" class="au-filter-label">Nombre</label>
+                                <input type="text" id="filterName" class="au-filter-input"
                                     placeholder="Buscar por nombre...">
                             </div>
-                            <div class="form-group">
-                                <label for="filterEmail" class="form-label">Email</label>
-                                <input type="text" id="filterEmail" class="form-input"
+                            <div class="au-filter-field">
+                                <label for="filterEmail" class="au-filter-label">Email</label>
+                                <input type="text" id="filterEmail" class="au-filter-input"
                                     placeholder="Buscar por email...">
                             </div>
-                            <div class="form-group">
-                                <label for="filterDni" class="form-label">DNI</label>
-                                <input type="text" id="filterDni" class="form-input" placeholder="12345678A">
+                            <div class="au-filter-field">
+                                <label for="filterDni" class="au-filter-label">DNI</label>
+                                <input type="text" id="filterDni" class="au-filter-input" placeholder="12345678A">
                             </div>
-                            <div class="form-group">
-                                <label for="filterStatus" class="form-label">Estado</label>
-                                <select id="filterStatus" class="form-input">
+                            <div class="au-filter-field">
+                                <label for="filterStatus" class="au-filter-label">Estado</label>
+                                <select id="filterStatus" class="au-filter-input">
                                     <option value="">Todos</option>
                                     <option value="registered">Registrado</option>
                                     <option value="verified">Verificado</option>
@@ -329,156 +419,505 @@
                                     <option value="deleted">Eliminado</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label for="filterRole" class="form-label">Rol</label>
-                                <select id="filterRole" class="form-input">
+                            <div class="au-filter-field">
+                                <label for="filterRole" class="au-filter-label">Rol</label>
+                                <select id="filterRole" class="au-filter-input">
                                     <option value="">Todos</option>
-                                    <option value="user">User</option>
-                                    <option value="moderator">Moderator</option>
-                                    <option value="verified">Verified</option>
+                                    <option value="publicador">Publicador</option>
+                                    <option value="moderador">Moderador</option>
                                     <option value="admin">Admin</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label for="filterPerPage" class="form-label">Por página</label>
-                                <select id="filterPerPage" class="form-input">
+                            <div class="au-filter-field">
+                                <label for="filterPerPage" class="au-filter-label">Por página</label>
+                                <select id="filterPerPage" class="au-filter-input">
                                     <option value="20">20</option>
                                     <option value="50">50</option>
                                     <option value="100">100</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label for="filterRegisteredFrom" class="form-label">Registro desde</label>
-                                <input type="date" id="filterRegisteredFrom" class="form-input">
+                        </div>
+                        <div class="au-filter-row">
+                            <div class="au-filter-field">
+                                <label for="filterRegisteredFrom" class="au-filter-label">Registro desde</label>
+                                <input type="date" id="filterRegisteredFrom" class="au-filter-input">
                             </div>
-                            <div class="form-group">
-                                <label for="filterRegisteredTo" class="form-label">Registro hasta</label>
-                                <input type="date" id="filterRegisteredTo" class="form-input">
+                            <div class="au-filter-field">
+                                <label for="filterRegisteredTo" class="au-filter-label">Registro hasta</label>
+                                <input type="date" id="filterRegisteredTo" class="au-filter-input">
                             </div>
-                            <div class="form-group">
-                                <label for="filterLastAccessFrom" class="form-label">Último acceso desde</label>
-                                <input type="date" id="filterLastAccessFrom" class="form-input">
+                            <div class="au-filter-field">
+                                <label for="filterLastAccessFrom" class="au-filter-label">Último acceso desde</label>
+                                <input type="date" id="filterLastAccessFrom" class="au-filter-input">
                             </div>
-                            <div class="form-group">
-                                <label for="filterLastAccessTo" class="form-label">Último acceso hasta</label>
-                                <input type="date" id="filterLastAccessTo" class="form-input">
+                            <div class="au-filter-field">
+                                <label for="filterLastAccessTo" class="au-filter-label">Último acceso hasta</label>
+                                <input type="date" id="filterLastAccessTo" class="au-filter-input">
                             </div>
+                        </div>
+                        <div class="au-filters-btns au-filters-btns--mobile">
+                            <button class="btn btn--primary btn--block"
+                                onclick="document.getElementById('btnApplyFilters').click()">
+                                <span class="material-symbols-rounded">search</span>
+                                <span>Buscar</span>
+                            </button>
+                            <button class="btn btn--outline btn--block"
+                                onclick="document.getElementById('btnClearFilters').click()">
+                                <span class="material-symbols-rounded">filter_list</span>
+                                <span>Limpiar</span>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tabla de usuarios -->
+                <!-- Tabla / Cards de usuarios -->
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">group</span>
+                            <span class="au-table-title-text">Usuarios</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnRefreshUsers">
+                            <span class="material-symbols-rounded">refresh</span>
+                            <span class="au-btn-label">Actualizar</span>
+                        </button>
+                    </div>
+                    <div id="usersLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando usuarios...</p>
+                    </div>
+                    <div id="usersEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">group</span>
+                        <p>No se encontraron usuarios con los filtros aplicados</p>
+                    </div>
+                    <div id="usersTableWrapper" style="display:none;">
+                        <!-- Desktop table -->
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col au-col--name au-col--sortable" data-sort="name"
+                                    onclick="toggleAdminSort('name')">
+                                    NOMBRE
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-name">unfold_more</span>
+                                </span>
+                                <span class="au-col au-col--email au-col--sortable" data-sort="email"
+                                    onclick="toggleAdminSort('email')">
+                                    EMAIL
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-email">unfold_more</span>
+                                </span>
+                                <span class="au-col au-col--status au-col--sortable" data-sort="status"
+                                    onclick="toggleAdminSort('status')">
+                                    ESTADO
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-status">unfold_more</span>
+                                </span>
+                                <span class="au-col au-col--role">ROLES</span>
+                                <span class="au-col au-col--date au-col--sortable" data-sort="created_at"
+                                    onclick="toggleAdminSort('created_at')">
+                                    REGISTRO
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-created_at">unfold_more</span>
+                                </span>
+                                <span class="au-col au-col--date au-col--sortable" data-sort="last_access_at"
+                                    onclick="toggleAdminSort('last_access_at')">
+                                    ÚLT. ACCESO
+                                    <span class="material-symbols-rounded au-sort-icon"
+                                        id="sortIcon-last_access_at">unfold_more</span>
+                                </span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="usersTableBody"></div>
+                        </div>
+                        <!-- Mobile cards -->
+                        <div class="au-mobile-cards" id="usersMobileCards"></div>
+                        <div class="pagination-bar" id="usersPagination"></div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ========== CHANNELS SECTION ========== -->
+            <section id="sectionChannels" class="section">
+                <div class="section__header">
+                    <div
+                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h2 class="section__title">Gestión de Canales</h2>
+                            <p class="section__subtitle">Crea canales temáticos, asocia medios de publicación y
+                                configura el contexto para IA.</p>
+                        </div>
+                        <button class="btn btn--primary" id="btnCreateChannel">
+                            <span class="material-symbols-rounded">add</span>
+                            <span>Nuevo Canal</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla / Cards de canales -->
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">podcasts</span>
+                            <span class="au-table-title-text">Canales</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnRefreshChannels">
+                            <span class="material-symbols-rounded">refresh</span>
+                            <span class="au-btn-label">Actualizar</span>
+                        </button>
+                    </div>
+                    <div id="channelsLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando canales...</p>
+                    </div>
+                    <div id="channelsEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">podcasts</span>
+                        <p>No hay canales creados aún</p>
+                        <button class="btn btn--primary btn--sm" onclick="openCreateChannelModal()"
+                            style="margin-top:0.5rem;">
+                            <span class="material-symbols-rounded">add</span> Crear primer canal
+                        </button>
+                    </div>
+                    <div id="channelsTableWrapper" style="display:none;">
+                        <!-- Desktop table -->
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col ch-col--name">NOMBRE</span>
+                                <span class="au-col ch-col--type">TIPO</span>
+                                <span class="au-col ch-col--desc">DESCRIPCIÓN</span>
+                                <span class="au-col ch-col--medias">MEDIOS</span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="channelsTableBody"></div>
+                        </div>
+                        <!-- Mobile cards -->
+                        <div class="au-mobile-cards" id="channelsMobileCards"></div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ========== USER-CHANNELS SECTION ========== -->
+            <section id="sectionUser-channels" class="section">
+                <div class="section__header">
+                    <div
+                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h2 class="section__title">Asignación de Canales a Publicadores</h2>
+                            <p class="section__subtitle">Gestiona qué canales puede administrar cada publicador. Los
+                                cambios se aplican inmediatamente.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla / Cards de publicadores -->
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">group_add</span>
+                            <span class="au-table-title-text">Publicadores</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnRefreshUc">
+                            <span class="material-symbols-rounded">refresh</span>
+                            <span class="au-btn-label">Actualizar</span>
+                        </button>
+                    </div>
+                    <div id="ucLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando publicadores...</p>
+                    </div>
+                    <div id="ucEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">group_off</span>
+                        <p>No hay usuarios con rol publicador</p>
+                    </div>
+                    <div id="ucTableWrapper" style="display:none;">
+                        <!-- Desktop table -->
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col uc-col--name">PUBLICADOR</span>
+                                <span class="au-col uc-col--channels">CANALES ASIGNADOS</span>
+                                <span class="au-col uc-col--count">TOTAL</span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="ucTableBody"></div>
+                        </div>
+                        <!-- Mobile cards -->
+                        <div class="au-mobile-cards" id="ucMobileCards"></div>
+                        <div class="pagination-bar" id="ucPagination"></div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ========== POSTS SECTION ========== -->
+            <section id="sectionPosts" class="section">
+                <div class="section__header">
+                    <div
+                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h2 class="section__title">Mis Publicaciones</h2>
+                            <p class="section__subtitle">Crea y gestiona tus publicaciones en los canales autorizados.
+                            </p>
+                        </div>
+                        <button class="btn btn--primary" id="btnCreatePost">
+                            <span class="material-symbols-rounded">add</span>
+                            <span>Nueva Publicación</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filtros de búsqueda (H11b) -->
+                <div class="au-filters-card" id="postsFiltersCard">
+                    <div class="au-filters-header">
+                        <div class="au-filters-title">
+                            <span class="material-symbols-rounded au-filters-icon">search</span>
+                            <span class="au-filters-title-text">Filtros</span>
+                        </div>
+                        <button class="au-filters-toggle" id="btnPostsFiltersToggle" aria-label="Expandir filtros">
+                            <span class="material-symbols-rounded">keyboard_arrow_down</span>
+                        </button>
+                        <div class="au-filters-btns">
+                            <button class="btn btn--primary" id="btnApplyPostFilters">
+                                <span class="material-symbols-rounded">search</span>
+                                <span>Buscar</span>
+                            </button>
+                            <button class="btn btn--outline" id="btnClearPostFilters">
+                                <span class="material-symbols-rounded">filter_list</span>
+                                <span>Limpiar</span>
+                            </button>
+                            <button class="btn btn--outline" id="btnSavePostFilter" title="Guardar filtro actual">
+                                <span class="material-symbols-rounded">bookmark_add</span>
+                                <span>Guardar filtro</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="au-filters-body" id="postsFiltersBody">
+                        <div class="au-filter-row">
+                            <div class="au-filter-field">
+                                <label for="postFilterSearch" class="au-filter-label">Buscar</label>
+                                <input type="text" id="postFilterSearch" class="au-filter-input"
+                                    placeholder="Título o contenido...">
+                            </div>
+                            <div class="au-filter-field">
+                                <label for="postFilterStatus" class="au-filter-label">Estado</label>
+                                <select id="postFilterStatus" class="au-filter-input">
+                                    <option value="">Todos</option>
+                                    <option value="draft">Borrador</option>
+                                    <option value="pending_review">Pendiente de revisión</option>
+                                    <option value="approved_by_moderator">Aprobada</option>
+                                    <option value="scheduled">Programada</option>
+                                    <option value="published">Publicada</option>
+                                    <option value="archived">Archivada</option>
+                                </select>
+                            </div>
+                            <div class="au-filter-field">
+                                <label for="postFilterType" class="au-filter-label">Tipo</label>
+                                <select id="postFilterType" class="au-filter-input">
+                                    <option value="">Todos</option>
+                                    <option value="text">Texto</option>
+                                    <option value="image">Imagen</option>
+                                    <option value="video">Video</option>
+                                    <option value="audio">Audio</option>
+                                    <option value="multimedia">Multimedia</option>
+                                </select>
+                            </div>
+                            <div class="au-filter-field">
+                                <label for="postFilterPerPage" class="au-filter-label">Por página</label>
+                                <select id="postFilterPerPage" class="au-filter-input">
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="au-filter-row">
+                            <div class="au-filter-field">
+                                <label for="postFilterDateFrom" class="au-filter-label">Desde</label>
+                                <input type="date" id="postFilterDateFrom" class="au-filter-input">
+                            </div>
+                            <div class="au-filter-field">
+                                <label for="postFilterDateTo" class="au-filter-label">Hasta</label>
+                                <input type="date" id="postFilterDateTo" class="au-filter-input">
+                            </div>
+                        </div>
+                        <div class="au-filters-btns au-filters-btns--mobile">
+                            <button class="btn btn--primary btn--block"
+                                onclick="document.getElementById('btnApplyPostFilters').click()">
+                                <span class="material-symbols-rounded">search</span>
+                                <span>Buscar</span>
+                            </button>
+                            <button class="btn btn--outline btn--block"
+                                onclick="document.getElementById('btnClearPostFilters').click()">
+                                <span class="material-symbols-rounded">filter_list</span>
+                                <span>Limpiar</span>
+                            </button>
+                            <button class="btn btn--outline btn--block"
+                                onclick="document.getElementById('btnSavePostFilter').click()">
+                                <span class="material-symbols-rounded">bookmark_add</span>
+                                <span>Guardar filtro</span>
+                            </button>
+                        </div>
+                        <select id="postSavedFilters" class="au-filter-input" style="max-width:200px;display:none;">
+                            <option value="">— Filtros guardados —</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Stats rápidas -->
+                <div class="stats-inline" id="postsStats" style="display:none;">
+                    <div class="stat-inline stat-inline--info">
+                        <span class="material-symbols-rounded stat-inline__icon">article</span>
+                        <span class="stat-inline__value" id="postsTotalCount">0</span>
+                        <span class="stat-inline__label">TOTAL</span>
+                    </div>
+                    <div class="stat-inline stat-inline--warning">
+                        <span class="material-symbols-rounded stat-inline__icon">edit_note</span>
+                        <span class="stat-inline__value" id="postsDraftCount">0</span>
+                        <span class="stat-inline__label">BORRADORES</span>
+                    </div>
+                    <div class="stat-inline stat-inline--orange">
+                        <span class="material-symbols-rounded stat-inline__icon">hourglass_top</span>
+                        <span class="stat-inline__value" id="postsPendingCount">0</span>
+                        <span class="stat-inline__label">EN REVISIÓN</span>
+                    </div>
+                    <div class="stat-inline stat-inline--success">
+                        <span class="material-symbols-rounded stat-inline__icon">public</span>
+                        <span class="stat-inline__value" id="postsPublishedCount">0</span>
+                        <span class="stat-inline__label">PUBLICADAS</span>
+                    </div>
+                    <div class="stat-inline stat-inline--primary">
+                        <span class="material-symbols-rounded stat-inline__icon">schedule</span>
+                        <span class="stat-inline__value" id="postsScheduledCount">0</span>
+                        <span class="stat-inline__label">PROGRAMADAS</span>
+                    </div>
+                </div>
+
+                <!-- Tabla / Cards de publicaciones -->
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">article</span>
+                            <span class="au-table-title-text">Publicaciones</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnRefreshPosts">
+                            <span class="material-symbols-rounded">refresh</span>
+                            <span class="au-btn-label">Actualizar</span>
+                        </button>
+                    </div>
+                    <div id="postsLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando publicaciones...</p>
+                    </div>
+                    <div id="postsEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">article</span>
+                        <p>No tienes publicaciones aún</p>
+                        <button class="btn btn--primary btn--sm" onclick="openPostFormModal()"
+                            style="margin-top:0.5rem;">
+                            <span class="material-symbols-rounded">add</span> Crear primera publicación
+                        </button>
+                    </div>
+                    <div id="postsTableWrapper" style="display:none;">
+                        <!-- Desktop table -->
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col post-col--title">TÍTULO</span>
+                                <span class="au-col post-col--type">TIPO</span>
+                                <span class="au-col post-col--status">ESTADO</span>
+                                <span class="au-col post-col--channels">CANALES</span>
+                                <span class="au-col post-col--date">FECHA</span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="postsTableBody"></div>
+                        </div>
+                        <!-- Mobile cards -->
+                        <div class="au-mobile-cards" id="postsMobileCards"></div>
+                        <div class="pagination-bar" id="postsPagination"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== MODERATION SECTION ========== -->
+            <section id="sectionModeration" class="section">
+                <div class="section__header">
+                    <div
+                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h2 class="section__title">Moderación de Publicaciones</h2>
+                            <p class="section__subtitle">Revisa, aprueba o rechaza las publicaciones pendientes.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">gavel</span>
+                            <span class="au-table-title-text">Pendientes de revisión</span>
+                        </div>
+                        <button class="btn btn--outline" id="btnRefreshModeration">
+                            <span class="material-symbols-rounded">refresh</span>
+                            <span class="au-btn-label">Actualizar</span>
+                        </button>
+                    </div>
+                    <div id="moderationLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando publicaciones pendientes...</p>
+                    </div>
+                    <div id="moderationEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">check_circle</span>
+                        <p>No hay publicaciones pendientes de revisión</p>
+                    </div>
+                    <div id="moderationTableWrapper" style="display:none;">
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col post-col--title">TÍTULO</span>
+                                <span class="au-col post-col--type">TIPO</span>
+                                <span class="au-col post-col--channels">AUTOR</span>
+                                <span class="au-col post-col--date">FECHA</span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="moderationTableBody"></div>
+                        </div>
+                        <div class="au-mobile-cards" id="moderationMobileCards"></div>
+                        <div class="pagination-bar" id="moderationPagination"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== NOTIFICATIONS SECTION ========== -->
+            <section id="sectionNotifications" class="section">
+                <div class="section__header">
+                    <h2 class="section__title">
+                        <span class="material-symbols-rounded">notifications</span>
+                        Centro de Notificaciones
+                    </h2>
+                    <p class="section__subtitle">Revisa los eventos importantes de tu cuenta</p>
+                </div>
+
                 <div class="card">
                     <div class="card__header">
-                        <h3 class="card__title">📋 Usuarios</h3>
-                        <button class="btn btn--sm btn--outline" id="btnRefreshUsers">🔄 Actualizar</button>
-                    </div>
-                    <div class="card__body" style="padding:0;">
-                        <div id="usersLoading" class="loading" style="display:none;">
-                            <div class="spinner spinner--sm"></div>
-                            <p>Cargando usuarios...</p>
+                        <h3 class="card__title">Notificaciones recientes</h3>
+                        <div class="btn-group">
+                            <button class="btn btn--sm btn--outline" id="btnMarkAllRead">
+                                <span class="material-symbols-rounded">done_all</span> Marcar todas leídas
+                            </button>
+                            <button class="btn btn--sm btn--outline" id="btnRefreshNotif">
+                                <span class="material-symbols-rounded">refresh</span> Actualizar
+                            </button>
                         </div>
-                        <div id="usersEmpty" class="empty-state" style="display:none;">
-                            <p>👥 No se encontraron usuarios con los filtros aplicados</p>
-                        </div>
-                        <div id="usersTableWrapper" style="display:none;">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Nombre</th>
-                                            <th>Email</th>
-                                            <th>Estado</th>
-                                            <th>Roles</th>
-                                            <th>Registro</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="usersTableBody"></tbody>
-                                </table>
-                            </div>
-                            <div class="pagination-bar" id="usersPagination"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Detalle de usuario -->
-                <div class="card" id="userDetailCard" style="display:none;">
-                    <div class="card__header">
-                        <h3 class="card__title" id="userDetailTitle">Detalle del Usuario</h3>
-                        <button class="btn btn--sm btn--outline" id="btnCloseDetail">✕ Cerrar</button>
                     </div>
                     <div class="card__body">
-                        <div class="user-detail-grid">
-                            <div class="user-detail-info">
-                                <div class="profile-avatar" id="userDetailAvatar">?</div>
-                                <div class="profile-details">
-                                    <div class="detail-row"><span class="detail-label">ID</span><span
-                                            class="detail-value" id="udId">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Nombre</span><span
-                                            class="detail-value" id="udName">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Email</span><span
-                                            class="detail-value" id="udEmail">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">DNI</span><span
-                                            class="detail-value" id="udDni">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Móvil</span><span
-                                            class="detail-value" id="udMobile">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Estado</span><span
-                                            class="detail-value" id="udStatus">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Email verificado</span><span
-                                            class="detail-value" id="udVerified">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Último acceso</span><span
-                                            class="detail-value" id="udLastAccess">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Registrado</span><span
-                                            class="detail-value" id="udCreatedAt">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Motivo rechazo</span><span
-                                            class="detail-value" id="udRejection">-</span></div>
-                                    <div class="detail-row"><span class="detail-label">Roles</span>
-                                        <div class="tags" id="udRoles"><span class="tag tag--muted">-</span></div>
-                                    </div>
-                                    <div class="detail-row"><span class="detail-label">Permisos</span>
-                                        <div class="tags" id="udPermissions"><span class="tag tag--muted">-</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="user-detail-actions">
-                                <h4 style="margin-bottom:0.75rem;font-size:0.9rem;">Acciones rápidas</h4>
-                                <div class="action-buttons-stack" id="udActions"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Historial -->
-                <div class="card" id="userHistoryCard" style="display:none;">
-                    <div class="card__header">
-                        <h3 class="card__title" id="userHistoryTitle">📜 Historial de Cambios</h3>
-                        <button class="btn btn--sm btn--outline" id="btnCloseHistory">✕ Cerrar</button>
-                    </div>
-                    <div class="card__body" style="padding:0;">
-                        <div id="historyLoading" class="loading" style="display:none;">
-                            <div class="spinner spinner--sm"></div>
-                        </div>
-                        <div id="historyEmpty" class="empty-state" style="display:none;">
-                            <p>No hay historial para este usuario</p>
-                        </div>
-                        <div id="historyTableWrapper" style="display:none;">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Acción</th>
-                                            <th>Anterior</th>
-                                            <th>Nuevo</th>
-                                            <th>Motivo</th>
-                                            <th>Admin</th>
-                                            <th>Fecha</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="historyTableBody"></tbody>
-                                </table>
-                            </div>
+                        <div id="notifList" class="notif-list">
+                            <p class="notif-loading">Cargando notificaciones...</p>
                         </div>
                     </div>
                 </div>
@@ -543,8 +982,14 @@
         <footer class="footer">
             <p>&copy; 2026 Difexa — Microservicios API. Todos los derechos reservados.</p>
             <div class="footer__links">
-                <a href="/docs" class="footer__link">📚 Documentación</a>
-                <a href="/" class="footer__link">🔧 API Client</a>
+                <a href="/docs" class="footer__link">
+                    <span class="material-symbols-rounded">description</span>
+                    Documentación
+                </a>
+                <a href="/" class="footer__link">
+                    <span class="material-symbols-rounded">terminal</span>
+                    API Client
+                </a>
             </div>
         </footer>
     </div>
@@ -719,15 +1164,336 @@
                     <label for="roleSelect" class="form-label">Rol</label>
                     <select id="roleSelect" class="form-input">
                         <option value="">Seleccionar rol...</option>
-                        <option value="user">User</option>
-                        <option value="moderator">Moderator</option>
-                        <option value="verified">Verified</option>
+                        <option value="invitado">Invitado</option>
+                        <option value="publicador">Publicador</option>
+                        <option value="moderador">Moderador</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn--primary" id="btnRoleConfirm">Confirmar</button>
                     <button class="btn btn--outline" data-close-modal="roleModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: HISTORIAL DE USUARIO ========== -->
+    <div id="historyModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--xl">
+            <div class="modal__header">
+                <div class="hm-title-wrap">
+                    <h2 class="modal__title" id="historyModalTitle">Historial de actividad</h2>
+                    <span class="hm-subtitle" id="historyModalSubtitle"></span>
+                </div>
+                <button class="modal__close" data-close-modal="historyModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div id="historyLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                </div>
+                <div id="historyEmpty" class="empty-state" style="display:none;">
+                    <p>No hay historial para este usuario</p>
+                </div>
+                <div id="historyCardsList" class="hm-cards-list" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: CHANNEL FORM (Create/Edit) ========== -->
+    <div id="channelFormModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title" id="channelFormTitle">Crear Canal</h2>
+                <button class="modal__close" data-close-modal="channelFormModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="alert alert--error" id="channelFormError" style="display:none;"></div>
+                <div class="form-group">
+                    <label for="channelFormName" class="form-label">Nombre del Canal *</label>
+                    <input type="text" id="channelFormName" class="form-input" placeholder="Ej: Canal Deportes" required
+                        maxlength="255">
+                    <small class="form-hint">Debe ser único en el sistema</small>
+                </div>
+                <div class="form-group">
+                    <label for="channelFormType" class="form-label">Tipo *</label>
+                    <select id="channelFormType" class="form-input">
+                        <option value="">Seleccionar tipo...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="channelFormDesc" class="form-label">Descripción</label>
+                    <textarea id="channelFormDesc" class="form-input form-textarea" rows="2" maxlength="1000"
+                        placeholder="Descripción del canal..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="channelFormContext" class="form-label">Contexto para IA</label>
+                    <textarea id="channelFormContext" class="form-input form-textarea" rows="3" maxlength="2000"
+                        placeholder="Texto que guiará al modelo de IA en la generación de contenido para este canal..."></textarea>
+                    <small class="form-hint">Este texto guía al modelo de IA para generar contenido adecuado</small>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn--primary" id="btnChannelFormSubmit">Crear Canal</button>
+                    <button class="btn btn--outline" data-close-modal="channelFormModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: MEDIA ASSIGN ========== -->
+    <div id="mediaAssignModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title">Gestionar Medios del Canal</h2>
+                <button class="modal__close" data-close-modal="mediaAssignModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los medios de publicación que deseas
+                    asociar a este canal.</p>
+                <div id="mediaAssignLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando medios...</p>
+                </div>
+                <div id="mediaAssignContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;">
+                    <button class="btn btn--primary" id="btnMediaAssignSubmit">Guardar Medios</button>
+                    <button class="btn btn--outline" data-close-modal="mediaAssignModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: USER-CHANNEL ASSIGN ========== -->
+    <div id="ucAssignModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="ucAssignTitle">Asignar Canales al Publicador</h2>
+                <button class="modal__close" data-close-modal="ucAssignModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los canales que deseas asignar. Los cambios
+                    se aplican inmediatamente y el publicador será notificado por email.</p>
+                <div id="ucAssignLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando canales...</p>
+                </div>
+                <div id="ucAssignContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;">
+                    <button class="btn btn--primary" id="btnUcAssignSubmit">Guardar Asignación</button>
+                    <button class="btn btn--outline" data-close-modal="ucAssignModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: REVOKE CHANNELS ========== -->
+    <div id="ucRevokeModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="ucRevokeTitle">Revocar Canales</h2>
+                <button class="modal__close" data-close-modal="ucRevokeModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los canales que deseas revocar. El
+                    publicador será notificado por email.</p>
+                <div id="ucRevokeLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando canales asignados...</p>
+                </div>
+                <div id="ucRevokeEmpty" class="empty-state" style="display:none;">
+                    <span class="material-symbols-rounded"
+                        style="font-size:2rem;color:var(--on-surface-variant);">link_off</span>
+                    <p>Este publicador no tiene canales asignados.</p>
+                </div>
+                <div id="ucRevokeContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;" id="ucRevokeActions">
+                    <button class="btn btn--danger" id="btnUcRevokeSubmit">Revocar Seleccionados</button>
+                    <button class="btn btn--outline" data-close-modal="ucRevokeModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: POST FORM (Create) ========== -->
+    <div id="postFormModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="postFormTitle">Nueva Publicación</h2>
+                <button class="modal__close" data-close-modal="postFormModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="alert alert--error" id="postFormError" style="display:none;"></div>
+                <form id="postForm">
+                    <div class="form-group">
+                        <label for="postFormName" class="form-label">Título *</label>
+                        <input type="text" id="postFormName" class="form-input" placeholder="Título de la publicación"
+                            required maxlength="255">
+                    </div>
+                    <div class="form-group">
+                        <label for="postFormContent" class="form-label">Contenido *</label>
+                        <textarea id="postFormContent" class="form-input form-textarea" rows="5" maxlength="10000"
+                            placeholder="Escribe el contenido de tu publicación..." required></textarea>
+                        <small class="form-hint">Máximo 10.000 caracteres</small>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postFormType" class="form-label">Tipo *</label>
+                            <select id="postFormType" class="form-input" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="text">Texto</option>
+                                <option value="image">Imagen</option>
+                                <option value="video">Video</option>
+                                <option value="audio">Audio</option>
+                                <option value="multimedia">Multimedia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="postFormScheduledAt" class="form-label">Programar para</label>
+                            <input type="datetime-local" id="postFormScheduledAt" class="form-input">
+                            <small class="form-hint">Opcional — dejar vacío para publicación inmediata tras
+                                aprobación</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Canales y medios de publicación *</label>
+                        <p class="form-hint" style="margin-bottom:0.5rem;">Selecciona uno o más canales. Al activar un
+                            canal se mostrarán sus medios disponibles.</p>
+                        <div id="postFormChannels" class="post-channels-list">
+                            <p class="text-muted">Cargando canales...</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Archivos adjuntos</label>
+                        <div class="upload-zone upload-zone--sm" id="postUploadZone">
+                            <span class="material-symbols-rounded"
+                                style="font-size:2rem;color:var(--on-surface-variant);">attach_file</span>
+                            <p class="upload-zone__text">Arrastra archivos o haz clic para adjuntar</p>
+                            <p class="upload-zone__hint">Máx. 10 archivos, 10 MB c/u — Imágenes, videos, audios, PDF
+                            </p>
+                            <input type="file" id="postFileInput" multiple style="display:none;"
+                                accept=".jpg,.jpeg,.png,.gif,.webp,.mp4,.mov,.avi,.webm,.mp3,.wav,.pdf">
+                        </div>
+                        <div id="postSelectedFiles" class="selected-files" style="display:none;">
+                            <div class="selected-files__header">
+                                <span id="postSelectedCount">0 archivos</span>
+                                <button type="button" class="btn btn--ghost btn--sm" id="btnClearPostFiles">✕
+                                    Limpiar</button>
+                            </div>
+                            <div id="postFilePreviewList" class="file-preview-list"></div>
+                        </div>
+                    </div>
+                </form>
+                <div class="btn-group" style="margin-top:1rem;">
+                    <button class="btn btn--primary" id="btnPostFormSubmit">
+                        <span class="material-symbols-rounded">send</span>
+                        Crear Publicación
+                    </button>
+                    <button class="btn btn--outline" data-close-modal="postFormModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: POST DETAIL ========== -->
+    <div id="postDetailModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="postDetailTitle">Detalle de Publicación</h2>
+                <button class="modal__close" data-close-modal="postDetailModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div id="postDetailLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                </div>
+                <div id="postDetailContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: POST HISTORY ========== -->
+    <div id="postHistoryModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--xl">
+            <div class="modal__header">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <span class="material-symbols-rounded" style="color:var(--primary);font-size:24px;">history</span>
+                    <h2 class="modal__title" id="postHistoryTitle">Historial de cambios</h2>
+                </div>
+                <button class="modal__close" data-close-modal="postHistoryModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div id="postHistoryLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando historial...</p>
+                </div>
+                <div id="postHistoryEmpty" class="empty-state" style="display:none;">
+                    <span class="material-symbols-rounded"
+                        style="font-size:2rem;color:var(--on-surface-variant);">history</span>
+                    <p>No hay historial para esta publicación</p>
+                </div>
+                <div id="postHistoryContent" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: POST ACTION (Delete/Archive/Stop with reason) ========== -->
+    <div id="postActionModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--sm">
+            <div class="modal__header">
+                <h2 class="modal__title" id="postActionTitle">Acción</h2>
+                <button class="modal__close" data-close-modal="postActionModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p id="postActionDesc" class="text-muted" style="margin-bottom:1rem;"></p>
+                <div class="form-group" id="postActionReasonGroup">
+                    <label for="postActionReason" class="form-label" id="postActionReasonLabel">Razón *</label>
+                    <textarea id="postActionReason" class="form-input form-textarea" rows="3"
+                        placeholder="Describe la razón..." maxlength="500"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn--danger" id="btnPostActionConfirm">Confirmar</button>
+                    <button class="btn btn--outline" data-close-modal="postActionModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: MODERATION REVIEW ========== -->
+    <div id="moderationReviewModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="moderationReviewTitle">Revisión de Publicación</h2>
+                <button class="modal__close" data-close-modal="moderationReviewModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div id="moderationReviewLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                </div>
+                <div id="moderationReviewContent"></div>
+                <div id="moderationReviewActions" style="margin-top:1.5rem;">
+                    <div class="form-group">
+                        <label for="moderationComments" class="form-label">Comentarios del moderador</label>
+                        <textarea id="moderationComments" class="form-input form-textarea" rows="3"
+                            placeholder="Comentarios (obligatorios para rechazar)..." maxlength="1000"></textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn--primary" id="btnModerationApprove">
+                            <span class="material-symbols-rounded">check_circle</span> Aprobar
+                        </button>
+                        <button class="btn btn--danger" id="btnModerationReject">
+                            <span class="material-symbols-rounded">cancel</span> Rechazar
+                        </button>
+                        <button class="btn btn--outline" data-close-modal="moderationReviewModal">Cancelar</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -744,7 +1510,7 @@
             <div class="modal__body">
                 <p id="confirmMessage">¿Estás seguro?</p>
                 <div class="btn-group" style="margin-top: 1.5rem;">
-                    <button class="btn btn--danger" id="btnConfirmYes">Sí, eliminar</button>
+                    <button class="btn btn--primary" id="btnConfirmYes">Sí, enviar</button>
                     <button class="btn btn--outline" data-close-modal="confirmModal">Cancelar</button>
                 </div>
             </div>
@@ -760,6 +1526,11 @@
     <script src="./frontend/js/home.js"></script>
     <script src="./frontend/js/files.js"></script>
     <script src="./frontend/js/admin-users.js"></script>
+    <script src="./frontend/js/channels.js"></script>
+    <script src="./frontend/js/user-channels.js"></script>
+    <script src="./frontend/js/posts.js"></script>
+    <script src="./frontend/js/moderation.js"></script>
+    <script src="./frontend/js/notifications.js"></script>
     <script src="./frontend/js/app.js"></script>
 </body>
 

@@ -313,6 +313,8 @@ class UserAdminController extends Controller
     {
         $roleName = $request->input('role');
 
+        //Consulta:¿puede tener uno o mas roles?.
+        
         if ($user->hasRole($roleName)) {
             return response()->json([
                 'status' => 'error',

@@ -103,8 +103,9 @@ async function initApp() {
     document.querySelectorAll('.modal__overlay').forEach(overlay => {
         overlay.addEventListener('click', () => {
             const modal = overlay.closest('.modal');
-            if (modal) modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
+            if (modal) {
+                closeModal(modal.id);
+            }
         });
     });
 
@@ -137,12 +138,13 @@ async function initApp() {
     document.getElementById('btnApplyFilters')?.addEventListener('click', () => loadAdminUsers(1));
     document.getElementById('btnClearFilters')?.addEventListener('click', clearAdminFilters);
     document.getElementById('btnRefreshUsers')?.addEventListener('click', () => loadAdminUsers(state.adminUsers.currentPage));
-    document.getElementById('btnCloseDetail')?.addEventListener('click', () => {
-        document.getElementById('userDetailCard').style.display = 'none';
-        state.adminUsers.selectedUserId = null;
-    });
-    document.getElementById('btnCloseHistory')?.addEventListener('click', () => {
-        document.getElementById('userHistoryCard').style.display = 'none';
+
+    // Filters toggle (mobile collapsible)
+    document.getElementById('btnFiltersToggle')?.addEventListener('click', () => {
+        const btn = document.getElementById('btnFiltersToggle');
+        const body = document.getElementById('filtersBody');
+        btn.classList.toggle('open');
+        body.classList.toggle('open');
     });
     document.getElementById('btnStatusChangeConfirm')?.addEventListener('click', confirmStatusChange);
     document.getElementById('btnRoleConfirm')?.addEventListener('click', confirmRoleChange);
@@ -156,6 +158,57 @@ async function initApp() {
             }
         });
     });
+
+    // ── Channels buttons ──
+    document.getElementById('btnCreateChannel')?.addEventListener('click', openCreateChannelModal);
+    document.getElementById('btnRefreshChannels')?.addEventListener('click', loadChannels);
+    document.getElementById('btnChannelFormSubmit')?.addEventListener('click', submitChannelForm);
+    document.getElementById('btnMediaAssignSubmit')?.addEventListener('click', submitMediaAssign);
+
+    // ── User-Channels (asignación publicadores) ──
+    document.getElementById('btnRefreshUc')?.addEventListener('click', () => loadUserChannels(state.userChannels.currentPage));
+    document.getElementById('btnUcAssignSubmit')?.addEventListener('click', submitAssignChannels);
+    document.getElementById('btnUcRevokeSubmit')?.addEventListener('click', submitRevokeChannels);
+
+    // ── Publicaciones ──
+    document.getElementById('btnCreatePost')?.addEventListener('click', openPostFormModal);
+    document.getElementById('btnRefreshPosts')?.addEventListener('click', () => loadPosts());
+    document.getElementById('btnPostFormSubmit')?.addEventListener('click', submitPostForm);
+    setupPostFileUpload();
+
+    // Post filters
+    document.getElementById('btnApplyPostFilters')?.addEventListener('click', () => loadPosts(1));
+    document.getElementById('btnClearPostFilters')?.addEventListener('click', clearPostFilters);
+    document.getElementById('btnPostsFiltersToggle')?.addEventListener('click', () => {
+        const btn = document.getElementById('btnPostsFiltersToggle');
+        const body = document.getElementById('postsFiltersBody');
+        btn.classList.toggle('open');
+        body.classList.toggle('open');
+    });
+    document.getElementById('btnSavePostFilter')?.addEventListener('click', saveCurrentFilter);
+    document.getElementById('postSavedFilters')?.addEventListener('change', (e) => {
+        if (e.target.value) applySavedFilter(e.target.value);
+    });
+
+    // Post filter inputs: enter key triggers search
+    document.querySelectorAll('#postFilterSearch').forEach(input => {
+        input?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); loadPosts(1); }
+        });
+    });
+
+    // Post action modal confirm
+    document.getElementById('btnPostActionConfirm')?.addEventListener('click', confirmPostAction);
+
+    // ── Moderación ──
+    document.getElementById('btnRefreshModeration')?.addEventListener('click', () => loadModerationPosts(moderationCurrentPage));
+    document.getElementById('btnModerationApprove')?.addEventListener('click', approveModerationPost);
+    document.getElementById('btnModerationReject')?.addEventListener('click', rejectModerationPost);
+
+    // ── Notificaciones ──
+    document.getElementById('btnNotifBell')?.addEventListener('click', () => navigateTo('notifications'));
+    document.getElementById('btnRefreshNotif')?.addEventListener('click', loadNotifications);
+    document.getElementById('btnMarkAllRead')?.addEventListener('click', markAllNotificationsRead);
 
     console.log('✅ Difexa Frontend inicializado');
 }

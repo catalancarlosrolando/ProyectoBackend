@@ -32,6 +32,9 @@ function openModal(id) {
     if (modal) {
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
+        const inputs = modal.querySelectorAll('input, select, textarea');
+        inputs.forEach(i => i.classList.remove('input-error', 'shake'));
+
     }
 }
 
@@ -40,6 +43,10 @@ function closeModal(id) {
     if (modal) {
         modal.classList.remove('active');
         document.body.style.overflow = 'auto';
+        // Clear row highlight when history modal closes
+        if (id === 'historyModal' && typeof clearUserRowHighlight === 'function') {
+            clearUserRowHighlight();
+        }
     }
 }
 
@@ -67,6 +74,11 @@ function navigateTo(sectionName) {
     if (sectionName === 'profile') loadProfile();
     if (sectionName === 'dashboard') loadDashboard();
     if (sectionName === 'admin-users') loadAdminUsers();
+    if (sectionName === 'channels') loadChannels();
+    if (sectionName === 'user-channels') loadUserChannels();
+    if (sectionName === 'posts') { loadPosts(); loadSavedFilters(); }
+    if (sectionName === 'moderation') loadModerationPosts();
+    if (sectionName === 'notifications') loadNotifications();
 }
 
 function capitalize(str) {

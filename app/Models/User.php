@@ -81,6 +81,14 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         return $this->hasMany(UserStatusHistory::class)->orderByDesc('created_at');
     }
 
+    /**
+     * Filtros guardados del usuario.
+     */
+    public function savedFilters(): HasMany
+    {
+        return $this->hasMany(SavedFilter::class);
+    }
+
     // ── Helpers de estado ──
 
     /**

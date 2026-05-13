@@ -27,6 +27,26 @@ const state = {
         statusChangeUserId: null,
         roleAction: null,
         roleUserId: null,
+        sortBy: null,
+        sortOrder: null,
+    },
+    // Channels
+    channels: {
+        selectedChannelId: null,
+        editingChannelId: null,
+        mediaAssignChannelId: null,
+    },
+    // User-Channels (asignación publicadores)
+    userChannels: {
+        selectedUserId: null,
+        assignUserId: null,
+        currentPage: 1,
+        lastPage: 1,
+    },
+    // Notificaciones
+    notifications: {
+        items: [],
+        unreadCount: 0,
     },
 };
 
@@ -44,20 +64,49 @@ const api = {
     async request(method, endpoint, { body = null, auth = false, isFormData = false } = {}) {
         const headers = { 'Accept': 'application/json' };
         if (auth && state.token) headers['Authorization'] = `Bearer ${state.token}`;
-        if (!isFormData) headers['Content-Type'] = 'application/json';
+        if (!isFormData && body !== null) headers['Content-Type'] = 'application/json';
 
-        const opts = { method, headers };
+        const controller = new AbortController();
+        const timeoutMs = 15000;
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+        const opts = { method, headers, signal: controller.signal };
         if (body) {
             opts.body = isFormData ? body : JSON.stringify(body);
         }
 
-        const res = await fetch(`${API_BASE}${endpoint}`, opts);
-        const data = await res.json().catch(() => ({}));
+        let res;
+        try {
+            res = await fetch(`${API_BASE}${endpoint}`, opts);
+        } catch (error) {
+            if (error?.name === 'AbortError') {
+                throw new Error('La solicitud tardó demasiado y fue cancelada. Intente nuevamente.');
+            }
+            throw error;
+        } finally {
+            clearTimeout(timeoutId);
+        }
+
+        const contentType = res.headers.get('content-type') || '';
+        const raw = await res.text();
+        let data = null;
+
+        if (raw) {
+            if (contentType.includes('application/json')) {
+                try {
+                    data = JSON.parse(raw);
+                } catch {
+                    data = { raw };
+                }
+            } else {
+                data = { raw };
+            }
+        }
 
         if (!res.ok) {
-            const msg = data.errors
+            const msg = data?.errors
                 ? Object.values(data.errors).flat().join(', ')
-                : data.message || `Error HTTP ${res.status}`;
+                : data?.message || data?.raw || `Error HTTP ${res.status}`;
             throw new Error(msg);
         }
         return data;
@@ -65,6 +114,10 @@ const api = {
 
     get(ep, auth = false) { return this.request('GET', ep, { auth }); },
     post(ep, body, auth = false) { return this.request('POST', ep, { body, auth }); },
-    del(ep, auth = false) { return this.request('DELETE', ep, { auth }); },
+    put(ep, body, auth = false) { return this.request('PUT', ep, { body, auth }); },
+    patch(ep, body, auth = false) { return this.request('PATCH', ep, { body, auth }); },
+    del(ep, auth = false, body = null) { return this.request('DELETE', ep, { auth, body }); },
     upload(ep, formData) { return this.request('POST', ep, { body: formData, isFormData: true }); },
+    authUpload(ep, formData) { return this.request('POST', ep, { body: formData, auth: true, isFormData: true }); },
+    authUploadPut(ep, formData) { return this.request('POST', ep, { body: formData, auth: true, isFormData: true }); },
 };
