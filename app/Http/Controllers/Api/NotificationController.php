@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class NotificationController extends Controller
 {
     /**
-     * Listar las últimas 50 notificaciones del usuario autenticado.
+     * Listar las últimas 10 notificaciones del usuario autenticado.
      */
     public function index(Request $request): JsonResponse
     {

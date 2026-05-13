@@ -363,7 +363,7 @@ class PostController extends Controller
                         $oldValue = $oldValue->value;
                     }
                     if ($oldValue instanceof \DateTimeInterface) {
-                        $oldValue = $oldValue->toISOString();
+                        $oldValue = $oldValue->format('c'); // ISO 8601 format
                     }
 
                     if ((string) $oldValue !== (string) $newValue) {

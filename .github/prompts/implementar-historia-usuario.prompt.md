@@ -96,3 +96,34 @@ enum NombreEnum: string
 4. **No modifiques** archivos existentes que no sean estrictamente necesarios.
 5. **Genera un test Feature** con Pest que cubra el flujo principal y los criterios de aceptación.
 6. **Resume** al final qué archivos creaste/modificaste y qué endpoints están disponibles.
+
+## Uso de skills recomendados
+
+Para mantener consistencia, usa los siguientes skills del repositorio segun la tarea:
+
+1. Analisis y plan de endpoint:
+    - `.github/skills/routes/SKILL.md`
+2. Validacion de entradas:
+    - `.github/skills/form-requests/SKILL.md`
+3. Logica de negocio en API:
+    - `.github/skills/controllers/SKILL.md`
+4. Dominio y persistencia:
+    - `.github/skills/models/SKILL.md`
+5. Estados y tipos cerrados:
+    - `.github/skills/enums/SKILL.md`
+6. Cambios de esquema/datos base:
+    - `.github/skills/migrations-seeders/SKILL.md`
+7. Cobertura automatizada:
+    - `.github/skills/testing/SKILL.md`
+8. Si la historia toca interfaz:
+    - `.github/skills/frontend-pattern/SKILL.md`
+
+## Orden sugerido por historia
+
+1. Rutas y contrato de endpoint.
+2. FormRequest y validaciones.
+3. Controller y autorizacion.
+4. Modelo/Enum (si aplica).
+5. Migracion/Seeder (si aplica).
+6. Tests feature.
+7. Frontend (solo si el criterio lo exige).

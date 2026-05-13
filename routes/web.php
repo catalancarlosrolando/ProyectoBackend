@@ -3,7 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DocumentationController;
 
-Route::get('/apiClient', fn() => view('api-client'));
+Route::get('/demo', function () {
+    $reset = request()->query('reset', false);
+    return view('demo', [
+        'demo' => 'landing-demo',
+        'reset' => $reset
+    ]);
+});
+
+
+Route::get('/api-client', fn() => view('demo'));
 
 Route::get('/', function () {
     return redirect('/frontend');
