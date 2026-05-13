@@ -79,6 +79,7 @@ function navigateTo(sectionName) {
     if (sectionName === 'posts') { loadPosts(); loadSavedFilters(); }
     if (sectionName === 'moderation') loadModerationPosts();
     if (sectionName === 'notifications') loadNotifications();
+    if (sectionName === 'device') loadDevicePosts();
 }
 
 function capitalize(str) {

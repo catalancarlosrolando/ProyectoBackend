@@ -36,8 +36,19 @@ async function initApp() {
         }
     }
 
+    const deviceToken = storage.getDeviceToken();
+    const device = storage.getDevice();
+    if (deviceToken && device) {
+        state.isDeviceAuthenticated = true;
+        state.deviceToken = deviceToken;
+        state.device = device;
+    }
+
     // Update UI
     updateAuthUI();
+    if (typeof updateDeviceUI === 'function') {
+        updateDeviceUI();
+    }
 
     // Load landing data
     await loadLanding();
@@ -71,6 +82,7 @@ async function initApp() {
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     document.getElementById('registerForm').addEventListener('submit', handleRegister);
     document.getElementById('forgotForm').addEventListener('submit', handleForgotPassword);
+    document.getElementById('deviceLoginForm')?.addEventListener('submit', handleDeviceLogin);
 
     // Modal switches
     document.getElementById('switchToRegister').addEventListener('click', (e) => {
@@ -148,6 +160,9 @@ async function initApp() {
     });
     document.getElementById('btnStatusChangeConfirm')?.addEventListener('click', confirmStatusChange);
     document.getElementById('btnRoleConfirm')?.addEventListener('click', confirmRoleChange);
+    document.getElementById('btnDeviceAssignConfirm')?.addEventListener('click', confirmDeviceAssign);
+    document.getElementById('btnDeviceUpdateConfirm')?.addEventListener('click', confirmDeviceUpdate);
+    document.getElementById('btnDeviceRevokeConfirm')?.addEventListener('click', confirmDeviceRevoke);
 
     // Enter key in filters triggers search
     document.querySelectorAll('#filterName, #filterEmail, #filterDni').forEach(input => {
@@ -175,6 +190,10 @@ async function initApp() {
     document.getElementById('btnRefreshPosts')?.addEventListener('click', () => loadPosts());
     document.getElementById('btnPostFormSubmit')?.addEventListener('click', submitPostForm);
     setupPostFileUpload();
+
+    // ── Dispositivo cliente ──
+    document.getElementById('btnDeviceRefresh')?.addEventListener('click', loadDevicePosts);
+    document.getElementById('btnDeviceLogout')?.addEventListener('click', handleDeviceLogout);
 
     // Post filters
     document.getElementById('btnApplyPostFilters')?.addEventListener('click', () => loadPosts(1));

@@ -31,6 +31,10 @@
                         <span class="material-symbols-rounded nav-icon">home</span>
                         <span>Inicio</span>
                     </a>
+                    <a href="#" class="nav-link" data-section="device">
+                        <span class="material-symbols-rounded nav-icon">tv</span>
+                        <span>Dispositivo</span>
+                    </a>
                     <a href="#" class="nav-link auth-only" data-section="profile" style="display:none;">
                         <span class="material-symbols-rounded nav-icon">person</span>
                         <span>Perfil</span>
@@ -207,6 +211,86 @@
                     <h3>Error al conectar con la API</h3>
                     <p id="homeErrorMessage">No se pudo conectar con el servidor.</p>
                     <button class="btn btn--primary" id="btnRetry">Reintentar</button>
+                </div>
+            </section>
+
+            <!-- ========== DEVICE CLIENT SECTION ========== -->
+            <section id="sectionDevice" class="section">
+                <div class="section__header">
+                    <h2 class="section__title">Dispositivo Cliente</h2>
+                    <p class="section__subtitle">Autentica el dispositivo con UID y reproduce publicaciones publicadas
+                    </p>
+                </div>
+
+                <div class="device-grid">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">Acceso por UID</h3>
+                            <div class="btn-group">
+                                <button class="btn btn--outline btn--sm" id="btnDeviceRefresh" disabled>
+                                    <span class="material-symbols-rounded">refresh</span>
+                                    Actualizar
+                                </button>
+                                <button class="btn btn--danger btn--sm" id="btnDeviceLogout" style="display:none;">
+                                    <span class="material-symbols-rounded">logout</span>
+                                    Desconectar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card__body">
+                            <div class="device-status">
+                                <span class="device-status__label">Estado</span>
+                                <span id="deviceStatus" class="device-status__value">Desconectado</span>
+                                <span class="device-status__uid">UID: <strong id="deviceUidValue">-</strong></span>
+                            </div>
+
+                            <div class="alert alert--error" id="deviceLoginError" style="display:none;"></div>
+
+                            <form id="deviceLoginForm" class="device-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="deviceUidInput">UID del dispositivo</label>
+                                    <input type="text" id="deviceUidInput" class="form-input" placeholder="DC400"
+                                        maxlength="50" required>
+                                </div>
+                                <button class="btn btn--primary btn--block" id="btnDeviceLogin" type="submit">
+                                    Conectar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">Publicaciones publicadas</h3>
+                            <span class="chip" id="devicePostsCount">0</span>
+                        </div>
+                        <div class="card__body">
+                            <div id="devicePostsLoading" class="loading" style="display:none;">
+                                <div class="spinner spinner--sm"></div>
+                                <p>Cargando publicaciones...</p>
+                            </div>
+                            <div id="devicePostsEmpty" class="empty-state" style="display:none;">
+                                <span class="material-symbols-rounded"
+                                    style="font-size:2rem;color:var(--on-surface-variant);">playlist_remove</span>
+                                <p>No hay publicaciones publicadas disponibles</p>
+                            </div>
+                            <div id="devicePostsList" class="device-posts" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card device-player-card">
+                    <div class="card__header">
+                        <h3 class="card__title">Reproductor</h3>
+                        <span id="devicePlayerStatus" class="text-muted">Selecciona una publicacion para
+                            reproducir.</span>
+                    </div>
+                    <div class="card__body">
+                        <div id="devicePlayerEmpty" class="device-player-empty">
+                            <span class="material-symbols-rounded">play_circle</span>
+                        </div>
+                        <div id="devicePlayerContent" class="device-player-content"></div>
+                    </div>
                 </div>
             </section>
 
@@ -1178,6 +1262,58 @@
         </div>
     </div>
 
+    <!-- ========== MODAL: USER DEVICE ASSIGN ========== -->
+    <div id="deviceModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--sm">
+            <div class="modal__header">
+                <h2 class="modal__title">Dispositivo del Usuario</h2>
+                <button class="modal__close" data-close-modal="deviceModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="alert alert--error" id="deviceModalError" style="display:none;"></div>
+                <div id="deviceModalLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando dispositivo...</p>
+                </div>
+                <div id="deviceModalContent" style="display:none;">
+                    <div class="device-modal-summary">
+                        <div class="device-summary__item">
+                            <span class="device-summary__label">Usuario</span>
+                            <span class="device-summary__value" id="deviceModalUserName">-</span>
+                        </div>
+                        <div class="device-summary__item">
+                            <span class="device-summary__label">Email</span>
+                            <span class="device-summary__value" id="deviceModalUserEmail">-</span>
+                        </div>
+                        <div class="device-summary__item">
+                            <span class="device-summary__label">UID</span>
+                            <span class="device-summary__value" id="deviceModalUid">-</span>
+                        </div>
+                        <div class="device-summary__item">
+                            <span class="device-summary__label">Estado</span>
+                            <span class="device-status-pill" id="deviceModalStatus">-</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top:1rem;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="deviceModalIsActive" class="checkbox-input" checked>
+                            <span>Dispositivo activo</span>
+                        </label>
+                    </div>
+
+                    <div class="btn-group" style="margin-top:1rem;">
+                        <button class="btn btn--primary" id="btnDeviceAssignConfirm">Asignar dispositivo</button>
+                        <button class="btn btn--outline" id="btnDeviceUpdateConfirm">Actualizar estado</button>
+                        <button class="btn btn--danger" id="btnDeviceRevokeConfirm">Revocar dispositivo</button>
+                        <button class="btn btn--outline" data-close-modal="deviceModal">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== MODAL: HISTORIAL DE USUARIO ========== -->
     <div id="historyModal" class="modal">
         <div class="modal__overlay"></div>
@@ -1531,6 +1667,7 @@
     <script src="./frontend/js/posts.js"></script>
     <script src="./frontend/js/moderation.js"></script>
     <script src="./frontend/js/notifications.js"></script>
+    <script src="./frontend/js/device.js"></script>
     <script src="./frontend/js/app.js"></script>
 </body>
 

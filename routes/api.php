@@ -2,11 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DeviceAuthController;
+use App\Http\Controllers\Api\DevicePostController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\UserAdminController;
 use App\Http\Controllers\Api\ChannelController;
 use App\Http\Controllers\Api\ChannelMediaController;
 use App\Http\Controllers\Api\UserChannelController;
+use App\Http\Controllers\Api\UserDeviceController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\PostHistoryController;
 use App\Http\Controllers\Api\PostModerationController;
@@ -32,6 +35,7 @@ Route::get('/landing', function () {
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/device/login', [DeviceAuthController::class, 'login']);
 
 // Rutas para reset de contraseña
 Route::post('/password/forgot', [AuthController::class, 'forgotPassword']);
@@ -122,6 +126,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{user}', [UserChannelController::class, 'destroy']);
     });
 
+    // ── Asignación de dispositivo cliente ──
+    Route::prefix('admin/user-devices')->middleware('permission:gestionar-usuarios')->group(function () {
+        Route::get('/', [UserDeviceController::class, 'index']);
+        Route::get('/{user}', [UserDeviceController::class, 'show']);
+        Route::post('/{user}', [UserDeviceController::class, 'store']);
+        Route::delete('/{user}', [UserDeviceController::class, 'destroy']);
+    });
+
     // ── Gestión de publicaciones (Publicador) ──
     Route::prefix('posts')->middleware('permission:editar-contenido')->group(function () {
         // Filtros guardados (debe ir ANTES de {post} para evitar conflicto de ruta)
@@ -169,6 +181,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::post('/read-all', [NotificationController::class, 'markAllRead']);
         Route::delete('/{id}', [NotificationController::class, 'destroy']);
+    });
+
+    // ── Dispositivo cliente ──
+    Route::prefix('device')->group(function () {
+        Route::get('/posts', [DevicePostController::class, 'index']);
+        Route::get('/posts/{post}', [DevicePostController::class, 'show']);
+        Route::get('/posts/{postid}', [DevicePostController::class, 'showById']);
     });
 });
 

@@ -8,6 +8,8 @@
 const API_BASE = '/api';
 const TOKEN_KEY = 'difexa_token';
 const USER_KEY = 'difexa_user';
+const DEVICE_TOKEN_KEY = 'difexa_device_token';
+const DEVICE_KEY = 'difexa_device';
 
 // ── Estado global ──
 const state = {
@@ -16,6 +18,9 @@ const state = {
     token: null,
     roles: [],
     permissions: [],
+    isDeviceAuthenticated: false,
+    device: null,
+    deviceToken: null,
     selectedFiles: [],
     confirmCallback: null,
     // Admin users
@@ -56,14 +61,20 @@ const storage = {
     getToken() { return localStorage.getItem(TOKEN_KEY); },
     setUser(u) { localStorage.setItem(USER_KEY, JSON.stringify(u)); },
     getUser() { try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch { return null; } },
+    setDeviceToken(t) { localStorage.setItem(DEVICE_TOKEN_KEY, t); },
+    getDeviceToken() { return localStorage.getItem(DEVICE_TOKEN_KEY); },
+    setDevice(d) { localStorage.setItem(DEVICE_KEY, JSON.stringify(d)); },
+    getDevice() { try { return JSON.parse(localStorage.getItem(DEVICE_KEY)); } catch { return null; } },
     clear() { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); },
+    clearDevice() { localStorage.removeItem(DEVICE_TOKEN_KEY); localStorage.removeItem(DEVICE_KEY); },
 };
 
 // ── API Client ──
 const api = {
-    async request(method, endpoint, { body = null, auth = false, isFormData = false } = {}) {
+    async request(method, endpoint, { body = null, auth = false, isFormData = false, token = null } = {}) {
         const headers = { 'Accept': 'application/json' };
-        if (auth && state.token) headers['Authorization'] = `Bearer ${state.token}`;
+        const authToken = token || (auth && state.token ? state.token : null);
+        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
         if (!isFormData && body !== null) headers['Content-Type'] = 'application/json';
 
         const controller = new AbortController();
@@ -120,4 +131,6 @@ const api = {
     upload(ep, formData) { return this.request('POST', ep, { body: formData, isFormData: true }); },
     authUpload(ep, formData) { return this.request('POST', ep, { body: formData, auth: true, isFormData: true }); },
     authUploadPut(ep, formData) { return this.request('POST', ep, { body: formData, auth: true, isFormData: true }); },
+    deviceGet(ep) { return this.request('GET', ep, { token: state.deviceToken }); },
+    devicePost(ep, body) { return this.request('POST', ep, { body, token: state.deviceToken }); },
 };

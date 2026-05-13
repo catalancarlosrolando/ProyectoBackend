@@ -22,6 +22,9 @@ const ACTION_LABELS = {
 
 const SORT_FIELDS = ['name', 'email', 'created_at', 'last_access_at', 'status'];
 
+let deviceModalUserId = null;
+let deviceModalDevice = null;
+
 function toggleAdminSort(field) {
     if (!SORT_FIELDS.includes(field)) return;
 
@@ -188,6 +191,9 @@ function renderActionButtons(u, size = 16) {
     </button>`;
     items += `<button class="au-actions-menu__item" onclick="openRoleModal('revoke', ${u.id})">
         <span class="material-symbols-rounded">shield</span> Revocar Rol
+    </button>`;
+    items += `<button class="au-actions-menu__item" onclick="openDeviceModal(${u.id})">
+        <span class="material-symbols-rounded">devices</span> Dispositivo
     </button>`;
     items += `<div class="au-actions-menu__sep"></div>`;
     items += `<button class="au-actions-menu__item" onclick="viewUserHistory(${u.id})">
@@ -577,4 +583,169 @@ function clearAdminFilters() {
     state.adminUsers.sortOrder = null;
     updateSortIcons();
     loadAdminUsers(1);
+}
+
+function updateDeviceModalState(device) {
+    const uid = document.getElementById('deviceModalUid');
+    const status = document.getElementById('deviceModalStatus');
+    const isActiveInput = document.getElementById('deviceModalIsActive');
+    const assignBtn = document.getElementById('btnDeviceAssignConfirm');
+    const updateBtn = document.getElementById('btnDeviceUpdateConfirm');
+    const revokeBtn = document.getElementById('btnDeviceRevokeConfirm');
+
+    if (!uid || !status || !isActiveInput || !assignBtn || !updateBtn || !revokeBtn) return;
+
+    if (device) {
+        uid.textContent = device.uid || '-';
+        status.textContent = device.is_active ? 'Activo' : 'Inactivo';
+        status.classList.toggle('device-status-pill--active', !!device.is_active);
+        isActiveInput.checked = !!device.is_active;
+        assignBtn.style.display = 'none';
+        updateBtn.style.display = 'inline-flex';
+        revokeBtn.style.display = 'inline-flex';
+    } else {
+        uid.textContent = 'Sin asignar';
+        status.textContent = 'Sin dispositivo';
+        status.classList.remove('device-status-pill--active');
+        isActiveInput.checked = true;
+        assignBtn.style.display = 'inline-flex';
+        updateBtn.style.display = 'none';
+        revokeBtn.style.display = 'none';
+    }
+}
+
+async function openDeviceModal(userId) {
+    closeAllActionMenus();
+    highlightUserRow(userId);
+    deviceModalUserId = userId;
+    deviceModalDevice = null;
+
+    const error = document.getElementById('deviceModalError');
+    const loading = document.getElementById('deviceModalLoading');
+    const content = document.getElementById('deviceModalContent');
+    const nameEl = document.getElementById('deviceModalUserName');
+    const emailEl = document.getElementById('deviceModalUserEmail');
+
+    if (error) error.style.display = 'none';
+    if (loading) loading.style.display = 'flex';
+    if (content) content.style.display = 'none';
+
+    openModal('deviceModal');
+
+    try {
+        const res = await api.get(`/admin/user-devices/${userId}`, true);
+        const user = res.data?.user || {};
+        const device = res.data?.device || null;
+
+        if (nameEl) nameEl.textContent = user.name || '-';
+        if (emailEl) emailEl.textContent = user.email || '-';
+
+        deviceModalDevice = device;
+        updateDeviceModalState(device);
+
+        if (loading) loading.style.display = 'none';
+        if (content) content.style.display = 'block';
+    } catch (err) {
+        if (loading) loading.style.display = 'none';
+        if (error) {
+            error.textContent = err.message;
+            error.style.display = 'block';
+        }
+    }
+}
+
+async function confirmDeviceAssign() {
+    if (!deviceModalUserId) return;
+
+    const btn = document.getElementById('btnDeviceAssignConfirm');
+    const isActiveInput = document.getElementById('deviceModalIsActive');
+    const error = document.getElementById('deviceModalError');
+
+    if (error) error.style.display = 'none';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Asignando...';
+    }
+
+    try {
+        const res = await api.post(`/admin/user-devices/${deviceModalUserId}`, {
+            is_active: isActiveInput?.checked ?? true,
+        }, true);
+        deviceModalDevice = res.data || deviceModalDevice;
+        updateDeviceModalState(deviceModalDevice);
+        showToast(res.message || 'Dispositivo asignado correctamente.', 'success');
+    } catch (err) {
+        if (error) {
+            error.textContent = err.message;
+            error.style.display = 'block';
+        }
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Asignar dispositivo';
+        }
+    }
+}
+
+async function confirmDeviceUpdate() {
+    if (!deviceModalUserId) return;
+
+    const btn = document.getElementById('btnDeviceUpdateConfirm');
+    const isActiveInput = document.getElementById('deviceModalIsActive');
+    const error = document.getElementById('deviceModalError');
+
+    if (error) error.style.display = 'none';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Actualizando...';
+    }
+
+    try {
+        const res = await api.post(`/admin/user-devices/${deviceModalUserId}`, {
+            is_active: isActiveInput?.checked ?? true,
+        }, true);
+        deviceModalDevice = res.data || deviceModalDevice;
+        updateDeviceModalState(deviceModalDevice);
+        showToast(res.message || 'Estado del dispositivo actualizado.', 'success');
+    } catch (err) {
+        if (error) {
+            error.textContent = err.message;
+            error.style.display = 'block';
+        }
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Actualizar estado';
+        }
+    }
+}
+
+async function confirmDeviceRevoke() {
+    if (!deviceModalUserId) return;
+
+    const btn = document.getElementById('btnDeviceRevokeConfirm');
+    const error = document.getElementById('deviceModalError');
+
+    if (error) error.style.display = 'none';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Revocando...';
+    }
+
+    try {
+        const res = await api.del(`/admin/user-devices/${deviceModalUserId}`, true);
+        deviceModalDevice = null;
+        updateDeviceModalState(null);
+        showToast(res.message || 'Dispositivo revocado.', 'success');
+    } catch (err) {
+        if (error) {
+            error.textContent = err.message;
+            error.style.display = 'block';
+        }
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Revocar dispositivo';
+        }
+    }
 }
