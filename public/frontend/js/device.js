@@ -6,6 +6,15 @@
 
 let devicePostsCache = [];
 let deviceSelectedPostId = null;
+let devicePlaybackState = {
+    items: [],
+    currentIndex: 0,
+    timerId: null,
+    postTitle: null,
+};
+
+const DEVICE_IMAGE_DURATION_MS = 8000;
+const DEVICE_VIDEO_FALLBACK_MS = 30000;
 
 function setDeviceAuthState(data) {
     state.isDeviceAuthenticated = true;
@@ -90,6 +99,7 @@ async function handleDeviceLogin(e) {
 }
 
 function handleDeviceLogout() {
+    stopDevicePlayback();
     clearDeviceAuthState();
     updateDeviceUI();
     showToast('Dispositivo desconectado.', 'info');
@@ -193,6 +203,7 @@ function renderDevicePlayer(post, errorMessage = null) {
     if (!wrapper || !empty || !status) return;
 
     if (!post) {
+        stopDevicePlayback();
         wrapper.innerHTML = '';
         empty.style.display = 'block';
         status.textContent = errorMessage || 'Selecciona una publicacion para reproducir.';
@@ -200,49 +211,151 @@ function renderDevicePlayer(post, errorMessage = null) {
     }
 
     empty.style.display = 'none';
-    status.textContent = post.name || 'Reproduciendo';
 
-    const mediaUrl = resolvePostMediaUrl(post);
-    const type = post.type || '';
+    const items = buildDeviceMediaItems(post);
 
-    if (mediaUrl && type === 'image') {
-        wrapper.innerHTML = `<img src="${mediaUrl}" alt="${escapeHtml(post.name || 'Imagen')}" class="device-media">`;
+    if (items.length === 0) {
+        stopDevicePlayback();
+        status.textContent = post.name || 'Reproduciendo';
+        wrapper.innerHTML = `
+            <div class="device-fallback">
+                <h4>${escapeHtml(post.name || 'Publicacion')}</h4>
+                <p class="text-muted">${escapeHtml(post.content || 'Sin contenido multimedia disponible.')}</p>
+            </div>
+        `;
         return;
     }
 
-    if (mediaUrl && type === 'video') {
+    startDevicePlayback(items, post.name || 'Reproduciendo');
+}
+
+function startDevicePlayback(items, postTitle) {
+    stopDevicePlayback();
+    devicePlaybackState.items = items;
+    devicePlaybackState.currentIndex = 0;
+    devicePlaybackState.postTitle = postTitle;
+    renderDevicePlaybackItem();
+}
+
+function stopDevicePlayback() {
+    if (devicePlaybackState.timerId) {
+        clearTimeout(devicePlaybackState.timerId);
+    }
+    devicePlaybackState.timerId = null;
+    devicePlaybackState.items = [];
+    devicePlaybackState.currentIndex = 0;
+    devicePlaybackState.postTitle = null;
+}
+
+function renderDevicePlaybackItem() {
+    const wrapper = document.getElementById('devicePlayerContent');
+    const status = document.getElementById('devicePlayerStatus');
+    if (!wrapper || !status) return;
+
+    const items = devicePlaybackState.items;
+    if (!items.length) return;
+
+    const item = items[devicePlaybackState.currentIndex];
+    const indexLabel = `${devicePlaybackState.currentIndex + 1}/${items.length}`;
+    status.textContent = `Reproduccion: ${devicePlaybackState.postTitle} (${indexLabel})`;
+
+    if (item.type === 'image') {
+        wrapper.innerHTML = `<img src="${item.url}" alt="${escapeHtml(item.label)}" class="device-media">`;
+        devicePlaybackState.timerId = setTimeout(() => advanceDevicePlayback(), item.durationMs);
+        return;
+    }
+
+    if (item.type === 'video') {
         wrapper.innerHTML = `
-            <video class="device-media" controls autoplay muted loop>
-                <source src="${mediaUrl}" type="video/mp4">
+            <video class="device-media" autoplay muted>
+                <source src="${item.url}" type="${escapeHtml(item.mime || 'video/mp4')}">
                 Tu navegador no soporta video.
             </video>
         `;
+
+        const videoEl = wrapper.querySelector('video');
+        if (!videoEl) return;
+
+        const fallbackMs = item.durationMs || DEVICE_VIDEO_FALLBACK_MS;
+        let handled = false;
+
+        const onAdvance = () => {
+            if (handled) return;
+            handled = true;
+            advanceDevicePlayback();
+        };
+
+        videoEl.addEventListener('ended', onAdvance);
+        devicePlaybackState.timerId = setTimeout(onAdvance, fallbackMs);
         return;
     }
 
     wrapper.innerHTML = `
         <div class="device-fallback">
-            <h4>${escapeHtml(post.name || 'Publicacion')}</h4>
-            <p class="text-muted">${escapeHtml(post.content || 'Sin contenido multimedia disponible.')}</p>
+            <h4>${escapeHtml(devicePlaybackState.postTitle || 'Publicacion')}</h4>
+            <p class="text-muted">Contenido no soportado.</p>
         </div>
     `;
+    devicePlaybackState.timerId = setTimeout(() => advanceDevicePlayback(), DEVICE_IMAGE_DURATION_MS);
 }
 
-function resolvePostMediaUrl(post) {
-    if (!post) return '';
+function advanceDevicePlayback() {
+    if (!devicePlaybackState.items.length) return;
+    devicePlaybackState.currentIndex = (devicePlaybackState.currentIndex + 1) % devicePlaybackState.items.length;
+    renderDevicePlaybackItem();
+}
+
+function buildDeviceMediaItems(post) {
+    const items = [];
+    const postType = (post.type || '').toLowerCase();
 
     if (post.content && isMediaUrl(post.content)) {
-        return post.content;
+        items.push(buildDeviceItemFromUrl(post.content, postType, post.name));
     }
 
     if (post.attachments && post.attachments.length > 0) {
-        const attachment = post.attachments[0];
-        if (attachment?.path) {
-            return `/storage/${attachment.path}`;
-        }
+        post.attachments.forEach((attachment) => {
+            if (!attachment?.path) return;
+            const url = `/storage/${attachment.path}`;
+            const item = buildDeviceItemFromAttachment(url, attachment);
+            if (item) items.push(item);
+        });
     }
 
-    return '';
+    return items.filter(Boolean);
+}
+
+function buildDeviceItemFromUrl(url, typeHint, label) {
+    const type = detectMediaType(url, typeHint);
+    if (!type) return null;
+    return {
+        type,
+        url,
+        label: label || url,
+        durationMs: type === 'image' ? DEVICE_IMAGE_DURATION_MS : DEVICE_VIDEO_FALLBACK_MS,
+    };
+}
+
+function buildDeviceItemFromAttachment(url, attachment) {
+    const mime = (attachment.mime_type || '').toLowerCase();
+    const typeHint = mime.startsWith('image/') ? 'image' : mime.startsWith('video/') ? 'video' : '';
+    const type = detectMediaType(url, typeHint);
+    if (!type) return null;
+    return {
+        type,
+        url,
+        label: attachment.original_name || attachment.path || url,
+        mime,
+        durationMs: type === 'image' ? DEVICE_IMAGE_DURATION_MS : DEVICE_VIDEO_FALLBACK_MS,
+    };
+}
+
+function detectMediaType(url, typeHint) {
+    if (typeHint === 'image' || typeHint === 'video') return typeHint;
+    const lower = (url || '').toLowerCase();
+    if (lower.match(/\.(png|jpg|jpeg|gif|webp)$/)) return 'image';
+    if (lower.match(/\.(mp4|mov|webm|avi)$/)) return 'video';
+    return null;
 }
 
 function isMediaUrl(value) {
