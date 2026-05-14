@@ -11,7 +11,13 @@ let devicePlaybackState = {
     currentIndex: 0,
     timerId: null,
     postTitle: null,
+    currentPostId: null,
 };
+
+let devicePlaylist = [];
+const devicePostDetailsCache = new Map();
+
+const deviceMediaCache = new Map();
 
 const DEVICE_IMAGE_DURATION_MS = 8000;
 const DEVICE_VIDEO_FALLBACK_MS = 30000;
@@ -56,6 +62,7 @@ function updateDeviceUI() {
         refreshBtn.disabled = true;
         renderDevicePosts([]);
         renderDevicePlayer(null);
+        updateDevicePlaylistUI();
     }
 }
 
@@ -168,9 +175,14 @@ function renderDevicePosts(posts) {
                 </div>
                 <div class="device-post__footer">
                     <span class="device-post__date">${escapeHtml(publishedAt)}</span>
-                    <button class="btn btn--outline btn--sm" onclick="selectDevicePost(${post.id})">
-                        Reproducir
-                    </button>
+                    <div class="btn-group btn-group--sm">
+                        <button class="btn btn--outline btn--sm" onclick="selectDevicePost(${post.id})">
+                            Reproducir
+                        </button>
+                        <button class="btn btn--outline btn--sm" onclick="addPostToPlaylist(${post.id})">
+                            Agregar
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -187,6 +199,9 @@ async function selectDevicePost(postId) {
     try {
         const res = await api.deviceGet(`/device/posts/${postId}`);
         const post = res.data;
+        if (post) {
+            devicePostDetailsCache.set(post.id, post);
+        }
         console.log('Publicacion seleccionada:', res);
         renderDevicePlayer(post);
     } catch (err) {
@@ -195,7 +210,7 @@ async function selectDevicePost(postId) {
     }
 }
 
-function renderDevicePlayer(post, errorMessage = null) {
+function renderDevicePlayer(post, errorMessage = null, options = {}) {
     const wrapper = document.getElementById('devicePlayerContent');
     const empty = document.getElementById('devicePlayerEmpty');
     const status = document.getElementById('devicePlayerStatus');
@@ -226,18 +241,22 @@ function renderDevicePlayer(post, errorMessage = null) {
         return;
     }
 
-    startDevicePlayback(items, post.name || 'Reproduciendo');
+    startDevicePlayback(items, post.name || 'Reproduciendo', post.id, { preserveCache: options.preserveCache });
+    if (options.addToPlaylist !== false) {
+        addPostToPlaylist(post.id, { silent: true });
+    }
 }
 
-function startDevicePlayback(items, postTitle) {
-    stopDevicePlayback();
+function startDevicePlayback(items, postTitle, postId, options = {}) {
+    stopDevicePlayback({ clearCache: !options.preserveCache });
     devicePlaybackState.items = items;
     devicePlaybackState.currentIndex = 0;
     devicePlaybackState.postTitle = postTitle;
+    devicePlaybackState.currentPostId = postId || null;
     renderDevicePlaybackItem();
 }
 
-function stopDevicePlayback() {
+function stopDevicePlayback(options = {}) {
     if (devicePlaybackState.timerId) {
         clearTimeout(devicePlaybackState.timerId);
     }
@@ -245,6 +264,11 @@ function stopDevicePlayback() {
     devicePlaybackState.items = [];
     devicePlaybackState.currentIndex = 0;
     devicePlaybackState.postTitle = null;
+    devicePlaybackState.currentPostId = null;
+    if (options.clearCache !== false) {
+        clearDeviceMediaCache();
+    }
+    stopActiveVideo();
 }
 
 function renderDevicePlaybackItem() {
@@ -259,8 +283,10 @@ function renderDevicePlaybackItem() {
     const indexLabel = `${devicePlaybackState.currentIndex + 1}/${items.length}`;
     status.textContent = `Reproduccion: ${devicePlaybackState.postTitle} (${indexLabel})`;
 
+    const renderUrl = item.objectUrl || item.url;
+
     if (item.type === 'image') {
-        wrapper.innerHTML = `<img src="${item.url}" alt="${escapeHtml(item.label)}" class="device-media">`;
+        wrapper.innerHTML = `<img src="${renderUrl}" alt="${escapeHtml(item.label)}" class="device-media">`;
         devicePlaybackState.timerId = setTimeout(() => advanceDevicePlayback(), item.durationMs);
         return;
     }
@@ -268,7 +294,7 @@ function renderDevicePlaybackItem() {
     if (item.type === 'video') {
         wrapper.innerHTML = `
             <video class="device-media" autoplay muted>
-                <source src="${item.url}" type="${escapeHtml(item.mime || 'video/mp4')}">
+                <source src="${renderUrl}" type="${escapeHtml(item.mime || 'video/mp4')}">
                 Tu navegador no soporta video.
             </video>
         `;
@@ -299,10 +325,146 @@ function renderDevicePlaybackItem() {
     devicePlaybackState.timerId = setTimeout(() => advanceDevicePlayback(), DEVICE_IMAGE_DURATION_MS);
 }
 
+function stopActiveVideo() {
+    const video = document.querySelector('#devicePlayerContent video');
+    if (video) {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+    }
+}
+
+function toggleDeviceFullscreen() {
+    const container = document.getElementById('devicePlayerCard');
+    if (!container) return;
+
+    if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => { });
+        return;
+    }
+
+    container.requestFullscreen?.().catch(() => { });
+}
+
+function stopDevicePlaybackUI() {
+    stopDevicePlayback();
+    renderDevicePlayer(null, 'Reproduccion detenida.');
+}
+
+function addPostToPlaylist(postId, options = {}) {
+    const post = devicePostsCache.find(p => p.id === postId);
+    if (!post) return;
+
+    if (!devicePlaylist.includes(postId)) {
+        devicePlaylist.push(postId);
+        updateDevicePlaylistUI();
+        if (!options.silent) showToast('Publicacion agregada a la lista.', 'success');
+    }
+}
+
+function removePostFromPlaylist(postId) {
+    devicePlaylist = devicePlaylist.filter(id => id !== postId);
+    updateDevicePlaylistUI();
+}
+
+function updateDevicePlaylistUI() {
+    const list = document.getElementById('devicePlaylistItems');
+    const empty = document.getElementById('devicePlaylistEmpty');
+    const count = document.getElementById('devicePlaylistCount');
+
+    if (!list || !empty || !count) return;
+
+    count.textContent = String(devicePlaylist.length);
+
+    if (devicePlaylist.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
+
+    empty.style.display = 'none';
+    list.innerHTML = devicePlaylist.map(id => {
+        const post = devicePostsCache.find(p => p.id === id);
+        if (!post) return '';
+        const isActive = deviceSelectedPostId === id;
+        return `
+            <div class="device-playlist__item ${isActive ? 'is-active' : ''}">
+                <div class="device-playlist__meta">
+                    <span class="device-playlist__title">${escapeHtml(post.name || 'Sin titulo')}</span>
+                    <span class="device-playlist__type">${escapeHtml(getDeviceTypeLabel(post.type))}</span>
+                </div>
+                <div class="btn-group btn-group--sm">
+                    <button class="btn btn--outline btn--sm" onclick="selectDevicePost(${id})">Reproducir</button>
+                    <button class="btn btn--danger btn--sm" onclick="removePostFromPlaylist(${id})">Quitar</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 function advanceDevicePlayback() {
     if (!devicePlaybackState.items.length) return;
-    devicePlaybackState.currentIndex = (devicePlaybackState.currentIndex + 1) % devicePlaybackState.items.length;
+
+    if (devicePlaybackState.currentIndex < devicePlaybackState.items.length - 1) {
+        devicePlaybackState.currentIndex += 1;
+        renderDevicePlaybackItem();
+        return;
+    }
+
+    if (devicePlaylist.length > 0) {
+        const nextId = getNextPlaylistPostId();
+        if (!nextId) {
+            devicePlaybackState.currentIndex = 0;
+            renderDevicePlaybackItem();
+            return;
+        }
+
+        if (nextId === devicePlaybackState.currentPostId && devicePlaylist.length === 1) {
+            devicePlaybackState.currentIndex = 0;
+            renderDevicePlaybackItem();
+            return;
+        }
+
+        loadPostForPlayback(nextId);
+        return;
+    }
+
+    devicePlaybackState.currentIndex = 0;
     renderDevicePlaybackItem();
+}
+
+function getNextPlaylistPostId() {
+    if (!devicePlaylist.length) return null;
+    const currentId = devicePlaybackState.currentPostId || deviceSelectedPostId;
+    const currentIndex = devicePlaylist.indexOf(currentId);
+    if (currentIndex === -1) return devicePlaylist[0];
+    const nextIndex = (currentIndex + 1) % devicePlaylist.length;
+    return devicePlaylist[nextIndex];
+}
+
+async function loadPostForPlayback(postId) {
+    deviceSelectedPostId = postId;
+    renderDevicePosts(devicePostsCache);
+    updateDevicePlaylistUI();
+
+    const cached = devicePostDetailsCache.get(postId);
+    if (cached) {
+        renderDevicePlayer(cached, null, { preserveCache: true, addToPlaylist: false });
+        return;
+    }
+
+    try {
+        const res = await api.deviceGet(`/device/posts/${postId}`);
+        const post = res.data;
+        if (post) {
+            devicePostDetailsCache.set(post.id, post);
+        }
+        renderDevicePlayer(post, null, { preserveCache: true, addToPlaylist: false });
+    } catch {
+        // Si falla, reintentamos desde el inicio.
+        devicePlaybackState.currentIndex = 0;
+        renderDevicePlaybackItem();
+    }
 }
 
 function buildDeviceMediaItems(post) {
@@ -322,7 +484,9 @@ function buildDeviceMediaItems(post) {
         });
     }
 
-    return items.filter(Boolean);
+    const filtered = items.filter(Boolean);
+    preloadDeviceMedia(filtered);
+    return filtered;
 }
 
 function buildDeviceItemFromUrl(url, typeHint, label) {
@@ -348,6 +512,35 @@ function buildDeviceItemFromAttachment(url, attachment) {
         mime,
         durationMs: type === 'image' ? DEVICE_IMAGE_DURATION_MS : DEVICE_VIDEO_FALLBACK_MS,
     };
+}
+
+async function preloadDeviceMedia(items) {
+    for (const item of items) {
+        if (!item?.url || item.objectUrl) continue;
+        try {
+            const cached = deviceMediaCache.get(item.url);
+            if (cached) {
+                item.objectUrl = cached;
+                continue;
+            }
+
+            const res = await fetch(item.url, { cache: 'force-cache' });
+            if (!res.ok) continue;
+            const blob = await res.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            deviceMediaCache.set(item.url, objectUrl);
+            item.objectUrl = objectUrl;
+        } catch {
+            // Si falla el prefetch, seguimos con la URL original.
+        }
+    }
+}
+
+function clearDeviceMediaCache() {
+    deviceMediaCache.forEach((objectUrl) => {
+        URL.revokeObjectURL(objectUrl);
+    });
+    deviceMediaCache.clear();
 }
 
 function detectMediaType(url, typeHint) {

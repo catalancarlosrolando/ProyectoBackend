@@ -28,7 +28,8 @@ class DeviceAuthController extends Controller
 
         $device->update(['last_seen_at' => now()]);
 
-        $token = $device->createToken('device_token')->plainTextToken;
+        $token = $device->createToken('device_token',
+        ['device'])->plainTextToken;
 
         return response()->json([
             'status' => 'success',

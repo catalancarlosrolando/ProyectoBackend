@@ -183,13 +183,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [NotificationController::class, 'destroy']);
     });
 
-    // ── Dispositivo cliente ──
-    Route::prefix('device')->group(function () {
-        Route::get('/posts', [DevicePostController::class, 'index']);
+
+
+});
+
+
+    Route::middleware(['auth:sanctum', 'abilities:device'])->group(function () {
+        Route::get('/device/posts', [DevicePostController::class, 'index']);
         Route::get('/posts/{post}', [DevicePostController::class, 'show']);
         Route::get('/posts/{postid}', [DevicePostController::class, 'showById']);
     });
-});
 
 
 

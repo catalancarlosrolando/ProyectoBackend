@@ -279,17 +279,37 @@
                     </div>
                 </div>
 
-                <div class="card device-player-card">
+                <div class="card device-player-card" id="devicePlayerCard">
                     <div class="card__header">
-                        <h3 class="card__title">Reproductor</h3>
-                        <span id="devicePlayerStatus" class="text-muted">Selecciona una publicacion para
-                            reproducir.</span>
+                        <div>
+                            <h3 class="card__title">Reproductor</h3>
+                            <span id="devicePlayerStatus" class="text-muted">Selecciona una publicacion para
+                                reproducir.</span>
+                        </div>
+                        <div class="device-controls">
+                            <button class="btn btn--outline btn--sm" id="btnDeviceFullscreen">
+                                <span class="material-symbols-rounded">fullscreen</span>
+                                Pantalla completa
+                            </button>
+                            <button class="btn btn--danger btn--sm" id="btnDeviceStop">
+                                <span class="material-symbols-rounded">stop_circle</span>
+                                Detener
+                            </button>
+                        </div>
                     </div>
                     <div class="card__body">
                         <div id="devicePlayerEmpty" class="device-player-empty">
                             <span class="material-symbols-rounded">play_circle</span>
                         </div>
                         <div id="devicePlayerContent" class="device-player-content"></div>
+                        <div class="device-playlist" id="devicePlaylist">
+                            <div class="device-playlist__header">
+                                <h4>Lista de reproduccion</h4>
+                                <span class="chip" id="devicePlaylistCount">0</span>
+                            </div>
+                            <div id="devicePlaylistEmpty" class="text-muted">No hay publicaciones en la lista.</div>
+                            <div id="devicePlaylistItems" class="device-playlist__items"></div>
+                        </div>
                     </div>
                 </div>
             </section>

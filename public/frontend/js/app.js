@@ -194,6 +194,8 @@ async function initApp() {
     // ── Dispositivo cliente ──
     document.getElementById('btnDeviceRefresh')?.addEventListener('click', loadDevicePosts);
     document.getElementById('btnDeviceLogout')?.addEventListener('click', handleDeviceLogout);
+    document.getElementById('btnDeviceFullscreen')?.addEventListener('click', toggleDeviceFullscreen);
+    document.getElementById('btnDeviceStop')?.addEventListener('click', stopDevicePlaybackUI);
 
     // Post filters
     document.getElementById('btnApplyPostFilters')?.addEventListener('click', () => loadPosts(1));
