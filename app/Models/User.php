@@ -12,7 +12,6 @@ use App\Notifications\ResetPasswordNotification;
 use App\Notifications\CustomVerifyEmailNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -62,14 +61,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
-    }
-
-    /**
-     * Relación 1:1 con Device.
-     */
-    public function device(): HasOne
-    {
-        return $this->hasOne(Device::class);
     }
 
     /**

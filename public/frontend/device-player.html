@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Difexa - Display</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,200..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/frontend/css/styles.css">
+</head>
+
+<body class="display-page">
+    <div class="display-shell">
+        <header class="display-header">
+            <div class="display-brand">
+                <span class="display-dot"></span>
+                <span class="display-title">Difexa Display</span>
+                <span class="display-uid" id="displayUid">UID: -</span>
+            </div>
+            <div class="display-status" id="displayStatus">Conectando...</div>
+        </header>
+
+        <main class="display-main">
+            <div class="display-player" id="displayPlayer">
+                <div class="display-empty" id="displayEmpty">
+                    <span class="material-symbols-rounded">tv</span>
+                    <p>Esperando contenido...</p>
+                </div>
+                <div class="display-media" id="displayMedia"></div>
+            </div>
+            <aside class="display-sidebar">
+                <div class="display-card">
+                    <h3>Ahora</h3>
+                    <p id="displayNow">Sin contenido</p>
+                </div>
+                <div class="display-card">
+                    <h3>Canales</h3>
+                    <div class="display-channels" id="displayChannels">-</div>
+                </div>
+                <div class="display-card">
+                    <h3>Playlist</h3>
+                    <div class="display-playlist" id="displayPlaylist"></div>
+                </div>
+            </aside>
+        </main>
+
+        <footer class="display-footer">
+            <span id="displaySync">Ultima sincronizacion: -</span>
+            <span id="displayError" class="display-error"></span>
+        </footer>
+    </div>
+
+    <script src="/frontend/js/core.js"></script>
+    <script src="/frontend/js/utils.js"></script>
+    <script src="/frontend/js/device-display.js"></script>
+</body>
+
+</html>

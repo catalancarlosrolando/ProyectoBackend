@@ -3,13 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DeviceAuthController;
+use App\Http\Controllers\Api\DeviceChannelController;
+use App\Http\Controllers\Api\DeviceFeedController;
 use App\Http\Controllers\Api\DevicePostController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\UserAdminController;
 use App\Http\Controllers\Api\ChannelController;
 use App\Http\Controllers\Api\ChannelMediaController;
 use App\Http\Controllers\Api\UserChannelController;
-use App\Http\Controllers\Api\UserDeviceController;
+use App\Http\Controllers\Api\DeviceAdminController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\PostHistoryController;
 use App\Http\Controllers\Api\PostModerationController;
@@ -36,6 +38,7 @@ Route::get('/landing', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/device/login', [DeviceAuthController::class, 'login']);
+Route::get('/device/feed/{uid}', [DeviceFeedController::class, 'feed']);
 
 // Rutas para reset de contraseña
 Route::post('/password/forgot', [AuthController::class, 'forgotPassword']);
@@ -126,12 +129,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{user}', [UserChannelController::class, 'destroy']);
     });
 
-    // ── Asignación de dispositivo cliente ──
-    Route::prefix('admin/user-devices')->middleware('permission:gestionar-usuarios')->group(function () {
-        Route::get('/', [UserDeviceController::class, 'index']);
-        Route::get('/{user}', [UserDeviceController::class, 'show']);
-        Route::post('/{user}', [UserDeviceController::class, 'store']);
-        Route::delete('/{user}', [UserDeviceController::class, 'destroy']);
+    // ── Asignación de canales a dispositivos ──
+    Route::prefix('admin/device-channels')->middleware('permission:gestionar-canales')->group(function () {
+        Route::get('/', [DeviceChannelController::class, 'index']);
+        Route::get('/{device}', [DeviceChannelController::class, 'show']);
+        Route::post('/{device}', [DeviceChannelController::class, 'store']);
+        Route::delete('/{device}', [DeviceChannelController::class, 'destroy']);
+    });
+
+    // ── Gestión de dispositivos ──
+    Route::prefix('admin/devices')->middleware('permission:gestionar-canales')->group(function () {
+        Route::get('/', [DeviceAdminController::class, 'index']);
+        Route::post('/', [DeviceAdminController::class, 'store']);
+        Route::delete('/{device}', [DeviceAdminController::class, 'destroy']);
     });
 
     // ── Gestión de publicaciones (Publicador) ──
@@ -183,19 +193,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [NotificationController::class, 'destroy']);
     });
 
-
-
 });
 
-
-    Route::middleware(['auth:sanctum', 'abilities:device'])->group(function () {
-        Route::get('/device/posts', [DevicePostController::class, 'index']);
-        Route::get('/posts/{post}', [DevicePostController::class, 'show']);
-        Route::get('/posts/{postid}', [DevicePostController::class, 'showById']);
-    });
-
-
-
+// ── Publicacion de device por usuario ──
+Route::middleware(['auth:sanctum', 'abilities:device'])->prefix('device')->group(function () {
+    Route::get('/posts', [DevicePostController::class, 'index']);
+    Route::get('/posts/{post}', [DevicePostController::class, 'show']);
+});
 
 
 

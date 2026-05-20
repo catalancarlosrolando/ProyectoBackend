@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 
 class Device extends Authenticatable
@@ -12,7 +12,6 @@ class Device extends Authenticatable
     use HasApiTokens, HasFactory;
 
     protected $fillable = [
-        'user_id',
         'uid',
         'is_active',
         'last_seen_at',
@@ -25,9 +24,9 @@ class Device extends Authenticatable
         'last_sync_at' => 'datetime',
     ];
 
-    public function user(): BelongsTo
+    public function channels(): BelongsToMany
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(Channel::class, 'device_channels');
     }
 
     protected static function booted(): void

@@ -14,7 +14,7 @@ class DevicePostController extends Controller
     /**
      * GET /api/device/posts
      *
-     * Lista publicaciones en estado published del usuario asociado al dispositivo.
+    * Lista publicaciones published asociadas a canales del dispositivo.
      */
     public function index(Request $request): JsonResponse
     {
@@ -28,9 +28,23 @@ class DevicePostController extends Controller
             ], 403);
         }
 
+        $channelIds = $device->channels()->pluck('channels.id')->toArray();
+
+        if (empty($channelIds)) {
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'data' => [],
+                    'total' => 0,
+                ],
+                'total' => 0,
+                'message' => 'No hay canales asignados al dispositivo.',
+            ]);
+        }
+
         $query = Post::query()
-            ->where('user_id', $device->user_id)
             ->where('status', PostStatus::PUBLISHED->value)
+            ->whereHas('channels', fn($c) => $c->whereIn('channels.id', $channelIds))
             ->orderByDesc('published_at');
 
         $perPage = (int) $request->input('per_page', 20);
@@ -47,7 +61,7 @@ class DevicePostController extends Controller
     /**
      * GET /api/device/posts/{post}
      *
-     * Muestra el detalle de una publicacion publicada asociada al dispositivo.
+    * Muestra el detalle de una publicacion publicada asociada a canales del dispositivo.
      */
     public function show(Request $request, Post $post): JsonResponse
     {
@@ -61,7 +75,12 @@ class DevicePostController extends Controller
             ], 403);
         }
 
-        if ($post->user_id !== $device->user_id || $post->status !== PostStatus::PUBLISHED) {
+        $channelIds = $device->channels()->pluck('channels.id')->toArray();
+        $hasChannel = empty($channelIds)
+            ? false
+            : $post->channels()->whereIn('channels.id', $channelIds)->exists();
+
+        if (!$hasChannel || $post->status !== PostStatus::PUBLISHED) {
             return response()->json([
                 'status' => 'error',
                 'data' => null,
@@ -91,9 +110,19 @@ class DevicePostController extends Controller
             ], 403);
         }
 
+        $channelIds = $device->channels()->pluck('channels.id')->toArray();
+
+        if (empty($channelIds)) {
+            return response()->json([
+                'status' => 'error',
+                'data' => null,
+                'message' => 'No tiene canales asignados.',
+            ], 403);
+        }
+
         $post = Post::where('id', $postid)
-            ->where('user_id', $device->user_id)
             ->where('status', PostStatus::PUBLISHED->value)
+            ->whereHas('channels', fn($c) => $c->whereIn('channels.id', $channelIds))
             ->first();
 
         if (!$post) {

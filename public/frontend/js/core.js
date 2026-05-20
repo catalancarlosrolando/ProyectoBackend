@@ -48,6 +48,13 @@ const state = {
         currentPage: 1,
         lastPage: 1,
     },
+    // Device-Channels (asignación dispositivos)
+    deviceChannels: {
+        selectedDeviceId: null,
+        assignDeviceId: null,
+        currentPage: 1,
+        lastPage: 1,
+    },
     // Notificaciones
     notifications: {
         items: [],

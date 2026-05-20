@@ -37,7 +37,6 @@ class DeviceAuthController extends Controller
                 'device' => [
                     'id' => $device->id,
                     'uid' => $device->uid,
-                    'user_id' => $device->user_id,
                     'is_active' => $device->is_active,
                     'last_seen_at' => $device->last_seen_at,
                 ],

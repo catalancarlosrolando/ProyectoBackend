@@ -63,6 +63,10 @@
                         <span class="material-symbols-rounded nav-icon">group_add</span>
                         <span>Asignar Canales</span>
                     </a>
+                    <a href="#" class="nav-link admin-only" data-section="device-channels" style="display:none;">
+                        <span class="material-symbols-rounded nav-icon">tv</span>
+                        <span>Canales Dispositivos</span>
+                    </a>
                     <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
                         <span class="material-symbols-rounded nav-icon">dashboard</span>
                         <span>Dashboard</span>
@@ -759,6 +763,61 @@
 
             </section>
 
+            <!-- ========== DEVICE-CHANNELS SECTION ========== -->
+            <section id="sectionDevice-channels" class="section">
+                <div class="section__header">
+                    <div
+                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <h2 class="section__title">Asignación de Canales a Dispositivos</h2>
+                            <p class="section__subtitle">Gestiona qué canales consume cada dispositivo en pantalla.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="au-table-card">
+                    <div class="au-table-header">
+                        <div class="au-table-title">
+                            <span class="material-symbols-rounded au-table-icon">tv</span>
+                            <span class="au-table-title-text">Dispositivos</span>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn--primary" id="btnCreateDevice">
+                                <span class="material-symbols-rounded">add</span>
+                                <span>Crear dispositivo</span>
+                            </button>
+                            <button class="btn btn--outline" id="btnRefreshDc">
+                                <span class="material-symbols-rounded">refresh</span>
+                                <span class="au-btn-label">Actualizar</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="dcLoading" class="loading" style="display:none;">
+                        <div class="spinner spinner--sm"></div>
+                        <p>Cargando dispositivos...</p>
+                    </div>
+                    <div id="dcEmpty" class="empty-state" style="display:none;">
+                        <span class="material-symbols-rounded"
+                            style="font-size:2.5rem;color:var(--on-surface-variant);">tv_off</span>
+                        <p>No hay dispositivos asignados</p>
+                    </div>
+                    <div id="dcTableWrapper" style="display:none;">
+                        <div class="au-desktop-table">
+                            <div class="au-col-headers">
+                                <span class="au-col au-col--id">ID</span>
+                                <span class="au-col dc-col--device">DISPOSITIVO</span>
+                                <span class="au-col dc-col--channels">CANALES ASIGNADOS</span>
+                                <span class="au-col dc-col--count">TOTAL</span>
+                                <span class="au-col au-col--actions">ACCIONES</span>
+                            </div>
+                            <div id="dcTableBody"></div>
+                        </div>
+                        <div class="au-mobile-cards" id="dcMobileCards"></div>
+                        <div class="pagination-bar" id="dcPagination"></div>
+                    </div>
+                </div>
+            </section>
+
             <!-- ========== POSTS SECTION ========== -->
             <section id="sectionPosts" class="section">
                 <div class="section__header">
@@ -1282,58 +1341,6 @@
         </div>
     </div>
 
-    <!-- ========== MODAL: USER DEVICE ASSIGN ========== -->
-    <div id="deviceModal" class="modal">
-        <div class="modal__overlay"></div>
-        <div class="modal__content modal__content--sm">
-            <div class="modal__header">
-                <h2 class="modal__title">Dispositivo del Usuario</h2>
-                <button class="modal__close" data-close-modal="deviceModal">&times;</button>
-            </div>
-            <div class="modal__body">
-                <div class="alert alert--error" id="deviceModalError" style="display:none;"></div>
-                <div id="deviceModalLoading" class="loading" style="display:none;">
-                    <div class="spinner spinner--sm"></div>
-                    <p>Cargando dispositivo...</p>
-                </div>
-                <div id="deviceModalContent" style="display:none;">
-                    <div class="device-modal-summary">
-                        <div class="device-summary__item">
-                            <span class="device-summary__label">Usuario</span>
-                            <span class="device-summary__value" id="deviceModalUserName">-</span>
-                        </div>
-                        <div class="device-summary__item">
-                            <span class="device-summary__label">Email</span>
-                            <span class="device-summary__value" id="deviceModalUserEmail">-</span>
-                        </div>
-                        <div class="device-summary__item">
-                            <span class="device-summary__label">UID</span>
-                            <span class="device-summary__value" id="deviceModalUid">-</span>
-                        </div>
-                        <div class="device-summary__item">
-                            <span class="device-summary__label">Estado</span>
-                            <span class="device-status-pill" id="deviceModalStatus">-</span>
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="margin-top:1rem;">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="deviceModalIsActive" class="checkbox-input" checked>
-                            <span>Dispositivo activo</span>
-                        </label>
-                    </div>
-
-                    <div class="btn-group" style="margin-top:1rem;">
-                        <button class="btn btn--primary" id="btnDeviceAssignConfirm">Asignar dispositivo</button>
-                        <button class="btn btn--outline" id="btnDeviceUpdateConfirm">Actualizar estado</button>
-                        <button class="btn btn--danger" id="btnDeviceRevokeConfirm">Revocar dispositivo</button>
-                        <button class="btn btn--outline" data-close-modal="deviceModal">Cancelar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ========== MODAL: HISTORIAL DE USUARIO ========== -->
     <div id="historyModal" class="modal">
         <div class="modal__overlay"></div>
@@ -1470,6 +1477,83 @@
                 <div class="btn-group" style="margin-top:1.5rem;" id="ucRevokeActions">
                     <button class="btn btn--danger" id="btnUcRevokeSubmit">Revocar Seleccionados</button>
                     <button class="btn btn--outline" data-close-modal="ucRevokeModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: DEVICE-CHANNEL ASSIGN ========== -->
+    <div id="dcAssignModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="dcAssignTitle">Asignar Canales al Dispositivo</h2>
+                <button class="modal__close" data-close-modal="dcAssignModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los canales que deseas asignar. Los
+                    cambios se aplican inmediatamente.</p>
+                <div id="dcAssignLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando canales...</p>
+                </div>
+                <div id="dcAssignContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;">
+                    <button class="btn btn--primary" id="btnDcAssignSubmit">Guardar Asignación</button>
+                    <button class="btn btn--outline" data-close-modal="dcAssignModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: DEVICE-CHANNEL REVOKE ========== -->
+    <div id="dcRevokeModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="dcRevokeTitle">Revocar Canales</h2>
+                <button class="modal__close" data-close-modal="dcRevokeModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los canales que deseas revocar.</p>
+                <div id="dcRevokeLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando canales asignados...</p>
+                </div>
+                <div id="dcRevokeEmpty" class="empty-state" style="display:none;">
+                    <span class="material-symbols-rounded"
+                        style="font-size:2rem;color:var(--on-surface-variant);">link_off</span>
+                    <p>Este dispositivo no tiene canales asignados.</p>
+                </div>
+                <div id="dcRevokeContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;" id="dcRevokeActions">
+                    <button class="btn btn--danger" id="btnDcRevokeSubmit">Revocar Seleccionados</button>
+                    <button class="btn btn--outline" data-close-modal="dcRevokeModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: CREATE DEVICE ========== -->
+    <div id="deviceCreateModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--sm">
+            <div class="modal__header">
+                <h2 class="modal__title">Crear Dispositivo</h2>
+                <button class="modal__close" data-close-modal="deviceCreateModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Se generara un UID automaticamente.</p>
+                <div class="alert alert--error" id="deviceCreateError" style="display:none;"></div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="deviceCreateIsActive" class="checkbox-input" checked>
+                        <span>Dispositivo activo</span>
+                    </label>
+                </div>
+                <div class="btn-group" style="margin-top:1rem;">
+                    <button class="btn btn--primary" id="btnDeviceCreateConfirm">Crear</button>
+                    <button class="btn btn--outline" data-close-modal="deviceCreateModal">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -1684,6 +1768,7 @@
     <script src="./frontend/js/admin-users.js"></script>
     <script src="./frontend/js/channels.js"></script>
     <script src="./frontend/js/user-channels.js"></script>
+    <script src="./frontend/js/device-channels.js"></script>
     <script src="./frontend/js/posts.js"></script>
     <script src="./frontend/js/moderation.js"></script>
     <script src="./frontend/js/notifications.js"></script>

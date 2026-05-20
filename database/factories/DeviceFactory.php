@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Device;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,7 +15,6 @@ class DeviceFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
             'uid' => 'DC' . $this->faker->unique()->numerify('######'),
             'is_active' => true,
             'last_seen_at' => now(),

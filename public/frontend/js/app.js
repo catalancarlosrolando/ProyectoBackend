@@ -160,9 +160,6 @@ async function initApp() {
     });
     document.getElementById('btnStatusChangeConfirm')?.addEventListener('click', confirmStatusChange);
     document.getElementById('btnRoleConfirm')?.addEventListener('click', confirmRoleChange);
-    document.getElementById('btnDeviceAssignConfirm')?.addEventListener('click', confirmDeviceAssign);
-    document.getElementById('btnDeviceUpdateConfirm')?.addEventListener('click', confirmDeviceUpdate);
-    document.getElementById('btnDeviceRevokeConfirm')?.addEventListener('click', confirmDeviceRevoke);
 
     // Enter key in filters triggers search
     document.querySelectorAll('#filterName, #filterEmail, #filterDni').forEach(input => {
@@ -184,6 +181,13 @@ async function initApp() {
     document.getElementById('btnRefreshUc')?.addEventListener('click', () => loadUserChannels(state.userChannels.currentPage));
     document.getElementById('btnUcAssignSubmit')?.addEventListener('click', submitAssignChannels);
     document.getElementById('btnUcRevokeSubmit')?.addEventListener('click', submitRevokeChannels);
+
+    // ── Device-Channels (asignación dispositivos) ──
+    document.getElementById('btnRefreshDc')?.addEventListener('click', () => loadDeviceChannels(state.deviceChannels.currentPage));
+    document.getElementById('btnDcAssignSubmit')?.addEventListener('click', submitAssignDeviceChannels);
+    document.getElementById('btnDcRevokeSubmit')?.addEventListener('click', submitRevokeDeviceChannels);
+    document.getElementById('btnCreateDevice')?.addEventListener('click', openCreateDeviceModal);
+    document.getElementById('btnDeviceCreateConfirm')?.addEventListener('click', submitCreateDevice);
 
     // ── Publicaciones ──
     document.getElementById('btnCreatePost')?.addEventListener('click', openPostFormModal);
