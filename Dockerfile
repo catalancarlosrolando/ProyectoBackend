@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git unzip libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev \
-        sqlite3 libsqlite3-dev pkg-config \
+        libcurl4-openssl-dev sqlite3 libsqlite3-dev pkg-config \
     && docker-php-ext-install \
         pdo pdo_mysql pdo_sqlite mbstring xml bcmath curl zip gd intl \
     && rm -rf /var/lib/apt/lists/*
