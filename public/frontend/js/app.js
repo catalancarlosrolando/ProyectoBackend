@@ -57,19 +57,49 @@ async function initApp() {
     setupFileUpload();
 
     // ── Event Listeners ──
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const navToggle = document.getElementById('navToggle');
+
     // Navigation
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const section = link.dataset.section;
             if (section) navigateTo(section);
+            if (window.innerWidth < 769) {
+                sidebar?.classList.remove('is-open');
+                sidebarOverlay?.classList.remove('is-visible');
+                document.body.classList.remove('sidebar-open');
+            }
         });
     });
 
-    // Mobile nav toggle
-    document.getElementById('navToggle').addEventListener('click', () => {
-        document.getElementById('mainNav').classList.toggle('open');
+    // Sidebar / mobile nav toggle
+    const closeSidebar = () => {
+        sidebar?.classList.remove('is-open');
+        sidebarOverlay?.classList.remove('is-visible');
+        document.body.classList.remove('sidebar-open');
+    };
+
+    const openSidebar = () => {
+        sidebar?.classList.add('is-open');
+        sidebarOverlay?.classList.add('is-visible');
+        document.body.classList.add('sidebar-open');
+    };
+
+    navToggle?.addEventListener('click', () => {
+        if (!sidebar) return;
+        if (sidebar.classList.contains('is-open')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
     });
+
+    sidebarOverlay?.addEventListener('click', closeSidebar);
+    sidebarClose?.addEventListener('click', closeSidebar);
 
     // Auth buttons
     document.getElementById('btnLogin').addEventListener('click', () => openModal('loginModal'));

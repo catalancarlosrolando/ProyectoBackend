@@ -321,6 +321,17 @@ function initDisplay() {
     setDisplayStatus('Conectando...', 'info');
     pollDisplayFeed();
     startDisplayPolling();
+
+    const fullscreenBtn = document.getElementById('displayFullscreen');
+    const player = document.getElementById('displayPlayer');
+    fullscreenBtn?.addEventListener('click', () => {
+        if (!player) return;
+        if (document.fullscreenElement) {
+            document.exitFullscreen?.();
+            return;
+        }
+        player.requestFullscreen?.();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', initDisplay);
