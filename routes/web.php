@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DeviceDisplayController;
 use App\Http\Controllers\DocumentationController;
 
 Route::get('/demo', function () {
@@ -17,6 +18,8 @@ Route::get('/api-client', fn() => view('demo'));
 Route::get('/', function () {
     return redirect('/frontend');
 });
+
+Route::get('/device/{uid}', [DeviceDisplayController::class, 'show']);
 
 // Ruta para el frontend SPA
 Route::get('/frontend', function () {

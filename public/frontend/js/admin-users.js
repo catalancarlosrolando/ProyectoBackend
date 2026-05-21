@@ -189,7 +189,6 @@ function renderActionButtons(u, size = 16) {
     items += `<button class="au-actions-menu__item" onclick="openRoleModal('revoke', ${u.id})">
         <span class="material-symbols-rounded">shield</span> Revocar Rol
     </button>`;
-    items += `<div class="au-actions-menu__sep"></div>`;
     items += `<button class="au-actions-menu__item" onclick="viewUserHistory(${u.id})">
         <span class="material-symbols-rounded">history</span> Historial
     </button>`;

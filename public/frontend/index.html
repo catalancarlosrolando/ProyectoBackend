@@ -17,981 +17,1250 @@
 </head>
 
 <body>
-    <div class="app">
-        <!-- Header / Navbar -->
-        <header class="navbar">
-            <div class="navbar__left">
-                <div class="navbar__brand">
-                    <span class="navbar__logo-dot"></span>
-                    <h1 class="navbar__title">Difexa</h1>
-                    <span class="navbar__badge">API v1.0</span>
+    <div class="app app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar__header">
+                <div class="sidebar__brand">
+                    <span class="sidebar__logo-dot"></span>
+                    <div class="sidebar__brand-text">
+                        <h1 class="sidebar__title">Difexa</h1>
+                        <span class="sidebar__badge">Administración</span>
+                    </div>
                 </div>
-                <nav class="navbar__nav" id="mainNav">
-                    <a href="#" class="nav-link active" data-section="home">
-                        <span class="material-symbols-rounded nav-icon">home</span>
-                        <span>Inicio</span>
-                    </a>
-                    <a href="#" class="nav-link auth-only" data-section="profile" style="display:none;">
-                        <span class="material-symbols-rounded nav-icon">person</span>
-                        <span>Perfil</span>
-                    </a>
-                    <a href="#" class="nav-link publisher-only" data-section="posts" style="display:none;">
-                        <span class="material-symbols-rounded nav-icon">edit_note</span>
-                        <span>Publicaciones</span>
-                    </a>
-                    <a href="#" class="nav-link moderator-only" data-section="moderation" style="display:none;">
-                        <span class="material-symbols-rounded nav-icon">gavel</span>
-                        <span>Moderación</span>
-                    </a>
-                    <a href="#" class="nav-link" data-section="files">
-                        <span class="material-symbols-rounded nav-icon">folder</span>
-                        <span>Archivos</span>
-                    </a>
-                    <a href="#" class="nav-link admin-only" data-section="admin-users" style="display:none;">
-                        <span class="material-symbols-rounded nav-icon">group</span>
-                        <span>Usuarios</span>
-                    </a>
-                    <a href="#" class="nav-link admin-only" data-section="channels" style="display:none;">
-                        <span class="material-symbols-rounded nav-icon">podcasts</span>
-                        <span>Canales</span>
-                    </a>
-                    <a href="#" class="nav-link admin-only" data-section="user-channels" style="display:none;">
-                        <span class="material-symbols-rounded nav-icon">group_add</span>
-                        <span>Asignar Canales</span>
-                    </a>
-                    <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
-                        <span class="material-symbols-rounded nav-icon">dashboard</span>
-                        <span>Dashboard</span>
-                    </a>
-                </nav>
+                <button class="sidebar__close" id="sidebarClose" aria-label="Cerrar menú">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
             </div>
-            <div class="navbar__actions">
-                <!-- Campana de notificaciones -->
+            <nav class="sidebar__nav" id="mainNav">
+                <a href="#" class="nav-link active" data-section="home">
+                    <span class="material-symbols-rounded nav-icon">home</span>
+                    <span>Inicio</span>
+                </a>
+                <a href="#" class="nav-link" data-section="device">
+                    <span class="material-symbols-rounded nav-icon">tv</span>
+                    <span>Dispositivo</span>
+                </a>
+                <a href="#" class="nav-link auth-only" data-section="profile" style="display:none;">
+                    <span class="material-symbols-rounded nav-icon">person</span>
+                    <span>Perfil</span>
+                </a>
+                <a href="#" class="nav-link publisher-only" data-section="posts" style="display:none;">
+                    <span class="material-symbols-rounded nav-icon">edit_note</span>
+                    <span>Publicaciones</span>
+                </a>
+                <a href="#" class="nav-link moderator-only" data-section="moderation" style="display:none;">
+                    <span class="material-symbols-rounded nav-icon">gavel</span>
+                    <span>Moderación</span>
+                </a>
+                <a href="#" class="nav-link" data-section="files">
+                    <span class="material-symbols-rounded nav-icon">folder</span>
+                    <span>Archivos</span>
+                </a>
+                <a href="#" class="nav-link admin-only" data-section="admin-users" style="display:none;">
+                    <span class="material-symbols-rounded nav-icon">group</span>
+                    <span>Usuarios</span>
+                </a>
+                <a href="#" class="nav-link admin-only" data-section="channels" style="display:none;">
+                    <span class="material-symbols-rounded nav-icon">podcasts</span>
+                    <span>Canales</span>
+                </a>
+                <a href="#" class="nav-link admin-only" data-section="user-channels" style="display:none;">
+                    <span class="material-symbols-rounded nav-icon">group_add</span>
+                    <span>Asignar Canales</span>
+                </a>
+                <a href="#" class="nav-link admin-only" data-section="device-channels" style="display:none;">
+                    <span class="material-symbols-rounded nav-icon">tv</span>
+                    <span>Canales Dispositivos</span>
+                </a>
+                <a href="#" class="nav-link admin-only" data-section="dashboard" style="display:none;">
+                    <span class="material-symbols-rounded nav-icon">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+            </nav>
+            <div class="sidebar__footer">
                 <button id="btnNotifBell" class="btn btn--icon btn--ghost-nav auth-only notif-bell"
                     style="display:none;" title="Notificaciones">
                     <span class="material-symbols-rounded">notifications</span>
                     <span id="notifBadge" class="notif-badge" style="display:none;">0</span>
                 </button>
-                <div id="userWelcomeGroup" class="navbar__user-group" style="display:none;">
-                    <div class="navbar__avatar" id="userAvatar">NA</div>
-                    <span id="userWelcome" class="navbar__user-name"></span>
+                <div id="userWelcomeGroup" class="sidebar__user-group" style="display:none;">
+                    <div class="sidebar__avatar" id="userAvatar">NA</div>
+                    <span id="userWelcome" class="sidebar__user-name"></span>
                 </div>
-                <button id="btnLogin" class="btn btn--outline">Iniciar Sesión</button>
-                <button id="btnRegister" class="btn btn--primary btn--sm">Registrarse</button>
-                <button id="btnLogout" class="btn btn--ghost-nav" style="display:none;">
-                    <span class="material-symbols-rounded">logout</span>
-                    <span>Cerrar Sesión</span>
-                </button>
+                <div class="sidebar__auth-actions">
+                    <button id="btnLogin" class="btn btn--outline">Iniciar Sesión</button>
+                    <button id="btnRegister" class="btn btn--primary btn--sm">Registrarse</button>
+                    <button id="btnLogout" class="btn btn--ghost-nav" style="display:none;">
+                        <span class="material-symbols-rounded">logout</span>
+                        <span>Cerrar Sesión</span>
+                    </button>
+                </div>
             </div>
-            <button class="navbar__toggle" id="navToggle">
-                <span class="material-symbols-rounded">menu</span>
-            </button>
-        </header>
+        </aside>
 
-        <!-- Toast notifications -->
-        <div id="toastContainer" class="toast-container"></div>
-
-        <!-- Main content -->
-        <main class="main">
-
-            <!-- ========== HOME SECTION ========== -->
-            <section id="sectionHome" class="section active">
-                <div class="section__header">
-                    <h2 class="section__title">Estado de la API</h2>
-                    <p class="section__subtitle">Monitorea la conexión con el backend en tiempo real</p>
+        <div class="app__content">
+            <!-- Topbar / Mobile Navbar -->
+            <header class="topbar">
+                <div class="topbar__left">
+                    <button class="topbar__toggle" id="navToggle" aria-label="Abrir menú">
+                        <span class="material-symbols-rounded">menu</span>
+                    </button>
+                    <div class="topbar__brand">
+                        <span class="topbar__logo-dot"></span>
+                        <span class="topbar__title">Difexa</span>
+                        <span class="topbar__badge">API v1.0</span>
+                    </div>
                 </div>
+            </header>
 
-                <div class="loading" id="homeLoading">
-                    <div class="spinner"></div>
-                    <p>Conectando con la API...</p>
-                </div>
+            <!-- Toast notifications -->
+            <div id="toastContainer" class="toast-container"></div>
 
-                <div id="homeContent" style="display:none;">
-                    <div class="stats-grid">
-                        <!-- Card 1: Estado -->
-                        <div class="stat-card">
-                            <div class="stat-card__top">
-                                <div class="stat-card__icon-bg stat-card__icon-bg--success">
-                                    <span class="material-symbols-rounded">check_circle</span>
+            <!-- Main content -->
+            <main class="main">
+
+                <!-- ========== HOME SECTION ========== -->
+                <section id="sectionHome" class="section active">
+                    <div class="section__header">
+                        <h2 class="section__title">Estado de la API</h2>
+                        <p class="section__subtitle">Monitorea la conexión con el backend en tiempo real</p>
+                    </div>
+
+                    <div class="loading" id="homeLoading">
+                        <div class="spinner"></div>
+                        <p>Conectando con la API...</p>
+                    </div>
+
+                    <div id="homeContent" style="display:none;">
+                        <div class="stats-grid">
+                            <!-- Card 1: Estado -->
+                            <div class="stat-card">
+                                <div class="stat-card__top">
+                                    <div class="stat-card__icon-bg stat-card__icon-bg--success">
+                                        <span class="material-symbols-rounded">check_circle</span>
+                                    </div>
+                                    <div class="stat-card__trend stat-card__trend--success">
+                                        <span class="material-symbols-rounded">wifi</span>
+                                        <span>Online</span>
+                                    </div>
                                 </div>
-                                <div class="stat-card__trend stat-card__trend--success">
-                                    <span class="material-symbols-rounded">wifi</span>
-                                    <span>Online</span>
-                                </div>
+                                <span class="stat-card__value" id="apiStatus">Conectado</span>
+                                <span class="stat-card__label">ESTADO</span>
                             </div>
-                            <span class="stat-card__value" id="apiStatus">Conectado</span>
-                            <span class="stat-card__label">ESTADO</span>
+                            <!-- Card 2: Mensaje -->
+                            <div class="stat-card">
+                                <div class="stat-card__top">
+                                    <div class="stat-card__icon-bg stat-card__icon-bg--info">
+                                        <span class="material-symbols-rounded">chat_bubble</span>
+                                    </div>
+                                    <div class="stat-card__trend stat-card__trend--success">
+                                        <span class="material-symbols-rounded">check</span>
+                                        <span>OK</span>
+                                    </div>
+                                </div>
+                                <span class="stat-card__value" id="apiMessage">-</span>
+                                <span class="stat-card__label">MENSAJE</span>
+                            </div>
+                            <!-- Card 3: Versión -->
+                            <div class="stat-card">
+                                <div class="stat-card__top">
+                                    <div class="stat-card__icon-bg stat-card__icon-bg--warning">
+                                        <span class="material-symbols-rounded">update</span>
+                                    </div>
+                                    <div class="stat-card__trend stat-card__trend--success">
+                                        <span class="material-symbols-rounded">verified</span>
+                                        <span>Stable</span>
+                                    </div>
+                                </div>
+                                <span class="stat-card__value" id="apiVersion">-</span>
+                                <span class="stat-card__label">VERSIÓN</span>
+                            </div>
+                            <!-- Card 4: Timestamp -->
+                            <div class="stat-card">
+                                <div class="stat-card__top">
+                                    <div class="stat-card__icon-bg stat-card__icon-bg--primary">
+                                        <span class="material-symbols-rounded">schedule</span>
+                                    </div>
+                                    <div class="stat-card__trend stat-card__trend--primary">
+                                        <span class="material-symbols-rounded">today</span>
+                                        <span id="apiDate">-</span>
+                                    </div>
+                                </div>
+                                <span class="stat-card__value" id="apiTimestamp">-</span>
+                                <span class="stat-card__label">TIMESTAMP</span>
+                            </div>
                         </div>
-                        <!-- Card 2: Mensaje -->
-                        <div class="stat-card">
-                            <div class="stat-card__top">
-                                <div class="stat-card__icon-bg stat-card__icon-bg--info">
-                                    <span class="material-symbols-rounded">chat_bubble</span>
-                                </div>
-                                <div class="stat-card__trend stat-card__trend--success">
-                                    <span class="material-symbols-rounded">check</span>
-                                    <span>OK</span>
+
+                        <!-- Health Check -->
+                        <div class="card card--health">
+                            <div class="card__header">
+                                <h3 class="card__title">Health Check</h3>
+                                <button class="btn btn--primary" id="btnPing">
+                                    <span class="material-symbols-rounded">play_arrow</span>
+                                    Ping
+                                </button>
+                            </div>
+                            <div id="pingResult" class="code-block">
+                                <pre>Haz clic en "Ping" para verificar el estado de la API</pre>
+                                <div class="code-block__meta" id="pingMeta" style="display:none;">
+                                    <span class="material-symbols-rounded">timer</span>
+                                    <span id="pingResponseTime">Tiempo de respuesta: -</span>
                                 </div>
                             </div>
-                            <span class="stat-card__value" id="apiMessage">-</span>
-                            <span class="stat-card__label">MENSAJE</span>
                         </div>
-                        <!-- Card 3: Versión -->
-                        <div class="stat-card">
-                            <div class="stat-card__top">
-                                <div class="stat-card__icon-bg stat-card__icon-bg--warning">
-                                    <span class="material-symbols-rounded">update</span>
-                                </div>
-                                <div class="stat-card__trend stat-card__trend--success">
-                                    <span class="material-symbols-rounded">verified</span>
-                                    <span>Stable</span>
+
+                        <!-- Quick actions for guests -->
+                        <div id="guestActions" class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">Comenzar</h3>
+                            </div>
+                            <div class="card__body">
+                                <p class="text-muted mb-1">Inicia sesión o crea una cuenta para acceder a todas las
+                                    funcionalidades.</p>
+                                <div class="btn-group">
+                                    <button class="btn btn--primary" id="btnGuestLogin">Iniciar Sesión</button>
+                                    <button class="btn btn--outline" id="btnGuestRegister">Crear Cuenta</button>
                                 </div>
                             </div>
-                            <span class="stat-card__value" id="apiVersion">-</span>
-                            <span class="stat-card__label">VERSIÓN</span>
-                        </div>
-                        <!-- Card 4: Timestamp -->
-                        <div class="stat-card">
-                            <div class="stat-card__top">
-                                <div class="stat-card__icon-bg stat-card__icon-bg--primary">
-                                    <span class="material-symbols-rounded">schedule</span>
-                                </div>
-                                <div class="stat-card__trend stat-card__trend--primary">
-                                    <span class="material-symbols-rounded">today</span>
-                                    <span id="apiDate">-</span>
-                                </div>
-                            </div>
-                            <span class="stat-card__value" id="apiTimestamp">-</span>
-                            <span class="stat-card__label">TIMESTAMP</span>
                         </div>
                     </div>
 
-                    <!-- Health Check -->
-                    <div class="card card--health">
+                    <div id="homeError" class="error-state" style="display:none;">
+                        <div class="error-state__icon">
+                            <span class="material-symbols-rounded">warning</span>
+                        </div>
+                        <h3>Error al conectar con la API</h3>
+                        <p id="homeErrorMessage">No se pudo conectar con el servidor.</p>
+                        <button class="btn btn--primary" id="btnRetry">Reintentar</button>
+                    </div>
+                </section>
+
+                <!-- ========== DEVICE CLIENT SECTION ========== -->
+                <section id="sectionDevice" class="section">
+                    <div class="section__header">
+                        <h2 class="section__title">Dispositivo Cliente</h2>
+                        <p class="section__subtitle">Autentica el dispositivo con UID y reproduce publicaciones
+                            publicadas
+                        </p>
+                    </div>
+
+                    <div class="device-grid">
+                        <div class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">Acceso por UID</h3>
+                                <div class="btn-group">
+                                    <button class="btn btn--outline btn--sm" id="btnDeviceRefresh" disabled>
+                                        <span class="material-symbols-rounded">refresh</span>
+                                        Actualizar
+                                    </button>
+                                    <button class="btn btn--danger btn--sm" id="btnDeviceLogout" style="display:none;">
+                                        <span class="material-symbols-rounded">logout</span>
+                                        Desconectar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card__body">
+                                <div class="device-status">
+                                    <span class="device-status__label">Estado</span>
+                                    <span id="deviceStatus" class="device-status__value">Desconectado</span>
+                                    <span class="device-status__uid">UID: <strong id="deviceUidValue">-</strong></span>
+                                </div>
+
+                                <div class="alert alert--error" id="deviceLoginError" style="display:none;"></div>
+
+                                <form id="deviceLoginForm" class="device-form">
+                                    <div class="form-group">
+                                        <label class="form-label" for="deviceUidInput">UID del dispositivo</label>
+                                        <input type="text" id="deviceUidInput" class="form-input" placeholder="DC400"
+                                            maxlength="50" required>
+                                    </div>
+                                    <button class="btn btn--primary btn--block" id="btnDeviceLogin" type="submit">
+                                        Conectar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">Publicaciones publicadas</h3>
+                                <span class="chip" id="devicePostsCount">0</span>
+                            </div>
+                            <div class="card__body">
+                                <div id="devicePostsLoading" class="loading" style="display:none;">
+                                    <div class="spinner spinner--sm"></div>
+                                    <p>Cargando publicaciones...</p>
+                                </div>
+                                <div id="devicePostsEmpty" class="empty-state" style="display:none;">
+                                    <span class="material-symbols-rounded"
+                                        style="font-size:2rem;color:var(--on-surface-variant);">playlist_remove</span>
+                                    <p>No hay publicaciones publicadas disponibles</p>
+                                </div>
+                                <div id="devicePostsList" class="device-posts" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card device-player-card" id="devicePlayerCard">
                         <div class="card__header">
-                            <h3 class="card__title">Health Check</h3>
-                            <button class="btn btn--primary" id="btnPing">
-                                <span class="material-symbols-rounded">play_arrow</span>
-                                Ping
+                            <div>
+                                <h3 class="card__title">Reproductor</h3>
+                                <span id="devicePlayerStatus" class="text-muted">Selecciona una publicacion para
+                                    reproducir.</span>
+                            </div>
+                            <div class="device-controls">
+                                <button class="btn btn--outline btn--sm" id="btnDeviceFullscreen">
+                                    <span class="material-symbols-rounded">fullscreen</span>
+                                    Pantalla completa
+                                </button>
+                                <button class="btn btn--danger btn--sm" id="btnDeviceStop">
+                                    <span class="material-symbols-rounded">stop_circle</span>
+                                    Detener
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card__body">
+                            <div id="devicePlayerEmpty" class="device-player-empty">
+                                <span class="material-symbols-rounded">play_circle</span>
+                            </div>
+                            <div id="devicePlayerContent" class="device-player-content"></div>
+                            <div class="device-playlist" id="devicePlaylist">
+                                <div class="device-playlist__header">
+                                    <h4>Lista de reproduccion</h4>
+                                    <span class="chip" id="devicePlaylistCount">0</span>
+                                </div>
+                                <div id="devicePlaylistEmpty" class="text-muted">No hay publicaciones en la lista.</div>
+                                <div id="devicePlaylistItems" class="device-playlist__items"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== PROFILE SECTION ========== -->
+                <section id="sectionProfile" class="section">
+                    <div class="section__header">
+                        <h2 class="section__title">Mi Perfil</h2>
+                        <p class="section__subtitle">Información de tu cuenta y sesión</p>
+                    </div>
+
+                    <div class="profile-grid">
+                        <div class="card profile-card">
+                            <div class="card__header">
+                                <h3 class="card__title">Información Personal</h3>
+                                <button class="btn btn--sm btn--outline" id="btnRefreshProfile">🔄 Actualizar</button>
+                            </div>
+                            <div class="card__body">
+                                <div class="profile-avatar" id="profileAvatar">?</div>
+                                <div class="profile-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">ID</span>
+                                        <span class="detail-value" id="profileId">-</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Nombre</span>
+                                        <span class="detail-value" id="profileName">-</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Email</span>
+                                        <span class="detail-value" id="profileEmail">-</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Email Verificado</span>
+                                        <span class="detail-value" id="profileVerified">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">Roles y Permisos</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="detail-row">
+                                    <span class="detail-label">Roles</span>
+                                    <div class="tags" id="profileRoles">
+                                        <span class="tag tag--muted">Sin roles</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row" style="margin-top: 1rem;">
+                                    <span class="detail-label">Permisos</span>
+                                    <div class="tags" id="profilePermissions">
+                                        <span class="tag tag--muted">Sin permisos</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">Sesión Activa</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="detail-row">
+                                    <span class="detail-label">Token</span>
+                                    <span class="detail-value token-display" id="profileToken">-</span>
+                                </div>
+                                <div class="btn-group" style="margin-top: 1rem;">
+                                    <button class="btn btn--danger btn--sm" id="btnProfileLogout">Cerrar Sesión</button>
+                                    <button class="btn btn--outline btn--sm" id="btnResendVerification">Reenviar
+                                        Verificación</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== FILES SECTION ========== -->
+                <section id="sectionFiles" class="section">
+                    <div class="section__header">
+                        <h2 class="section__title">Gestión de Archivos</h2>
+                        <p class="section__subtitle">Sube, lista, descarga y elimina archivos del servidor</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">📤 Subir Archivos</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="upload-zone" id="uploadZone">
+                                <div class="upload-zone__icon">📁</div>
+                                <p class="upload-zone__text">Arrastra archivos aquí o haz clic para seleccionar</p>
+                                <p class="upload-zone__hint">Máximo 10 archivos, 10MB por archivo</p>
+                                <input type="file" id="fileInput" multiple style="display:none;">
+                            </div>
+
+                            <div id="selectedFiles" class="selected-files" style="display:none;">
+                                <div class="selected-files__header">
+                                    <span id="selectedCount">0 archivos seleccionados</span>
+                                    <button class="btn btn--ghost btn--sm" id="btnClearFiles">✕ Limpiar</button>
+                                </div>
+                                <div id="filePreviewList" class="file-preview-list"></div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 1rem;">
+                                <label class="form-label" for="uploadDescription">Descripción (opcional)</label>
+                                <input type="text" id="uploadDescription" class="form-input"
+                                    placeholder="Descripción de los archivos..." maxlength="500">
+                            </div>
+
+                            <button class="btn btn--primary btn--block" id="btnUpload" disabled>
+                                <span id="uploadBtnText">Subir Archivos</span>
+                            </button>
+
+                            <div id="uploadProgress" class="progress-bar" style="display:none;">
+                                <div class="progress-bar__fill" id="uploadProgressFill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">📋 Archivos en el Servidor</h3>
+                            <button class="btn btn--sm btn--outline" id="btnRefreshFiles">🔄 Actualizar</button>
+                        </div>
+                        <div class="card__body">
+                            <div id="filesLoading" class="loading" style="display:none;">
+                                <div class="spinner spinner--sm"></div>
+                                <p>Cargando archivos...</p>
+                            </div>
+                            <div id="filesEmpty" class="empty-state">
+                                <p>📂 No hay archivos en el servidor</p>
+                            </div>
+                            <div id="filesTable" style="display:none;">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Tamaño</th>
+                                                <th>Última modificación</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="filesTableBody"></tbody>
+                                    </table>
+                                </div>
+                                <div class="files-summary">
+                                    <span id="filesTotalCount">0 archivos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== ADMIN USERS SECTION ========== -->
+                <section id="sectionAdmin-users" class="section">
+                    <div class="section__header">
+                        <h2 class="section__title">Gestión de Usuarios</h2>
+                        <p class="section__subtitle">Administra usuarios, aprueba registros, asigna roles y revisa
+                            historial.</p>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="au-filters-card">
+                        <div class="au-filters-header">
+                            <div class="au-filters-title">
+                                <span class="material-symbols-rounded au-filters-icon">search</span>
+                                <span class="au-filters-title-text">Filtros</span>
+                            </div>
+                            <button class="au-filters-toggle" id="btnFiltersToggle" aria-label="Expandir filtros">
+                                <span class="material-symbols-rounded">keyboard_arrow_down</span>
+                            </button>
+                            <div class="au-filters-btns">
+                                <button class="btn btn--primary" id="btnApplyFilters">
+                                    <span class="material-symbols-rounded">search</span>
+                                    <span>Buscar</span>
+                                </button>
+                                <button class="btn btn--outline" id="btnClearFilters">
+                                    <span class="material-symbols-rounded">filter_list</span>
+                                    <span>Limpiar</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="au-filters-body" id="filtersBody">
+                            <div class="au-filter-row">
+                                <div class="au-filter-field">
+                                    <label for="filterName" class="au-filter-label">Nombre</label>
+                                    <input type="text" id="filterName" class="au-filter-input"
+                                        placeholder="Buscar por nombre...">
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="filterEmail" class="au-filter-label">Email</label>
+                                    <input type="text" id="filterEmail" class="au-filter-input"
+                                        placeholder="Buscar por email...">
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="filterDni" class="au-filter-label">DNI</label>
+                                    <input type="text" id="filterDni" class="au-filter-input" placeholder="12345678A">
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="filterStatus" class="au-filter-label">Estado</label>
+                                    <select id="filterStatus" class="au-filter-input">
+                                        <option value="">Todos</option>
+                                        <option value="registered">Registrado</option>
+                                        <option value="verified">Verificado</option>
+                                        <option value="approved">Aprobado</option>
+                                        <option value="disabled">Deshabilitado</option>
+                                        <option value="deleted">Eliminado</option>
+                                    </select>
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="filterRole" class="au-filter-label">Rol</label>
+                                    <select id="filterRole" class="au-filter-input">
+                                        <option value="">Todos</option>
+                                        <option value="publicador">Publicador</option>
+                                        <option value="moderador">Moderador</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="filterPerPage" class="au-filter-label">Por página</label>
+                                    <select id="filterPerPage" class="au-filter-input">
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="au-filter-row">
+                                <div class="au-filter-field">
+                                    <label for="filterRegisteredFrom" class="au-filter-label">Registro desde</label>
+                                    <input type="date" id="filterRegisteredFrom" class="au-filter-input">
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="filterRegisteredTo" class="au-filter-label">Registro hasta</label>
+                                    <input type="date" id="filterRegisteredTo" class="au-filter-input">
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="filterLastAccessFrom" class="au-filter-label">Último acceso
+                                        desde</label>
+                                    <input type="date" id="filterLastAccessFrom" class="au-filter-input">
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="filterLastAccessTo" class="au-filter-label">Último acceso hasta</label>
+                                    <input type="date" id="filterLastAccessTo" class="au-filter-input">
+                                </div>
+                            </div>
+                            <div class="au-filters-btns au-filters-btns--mobile">
+                                <button class="btn btn--primary btn--block"
+                                    onclick="document.getElementById('btnApplyFilters').click()">
+                                    <span class="material-symbols-rounded">search</span>
+                                    <span>Buscar</span>
+                                </button>
+                                <button class="btn btn--outline btn--block"
+                                    onclick="document.getElementById('btnClearFilters').click()">
+                                    <span class="material-symbols-rounded">filter_list</span>
+                                    <span>Limpiar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla / Cards de usuarios -->
+                    <div class="au-table-card">
+                        <div class="au-table-header">
+                            <div class="au-table-title">
+                                <span class="material-symbols-rounded au-table-icon">group</span>
+                                <span class="au-table-title-text">Usuarios</span>
+                            </div>
+                            <button class="btn btn--outline" id="btnRefreshUsers">
+                                <span class="material-symbols-rounded">refresh</span>
+                                <span class="au-btn-label">Actualizar</span>
                             </button>
                         </div>
-                        <div id="pingResult" class="code-block">
-                            <pre>Haz clic en "Ping" para verificar el estado de la API</pre>
-                            <div class="code-block__meta" id="pingMeta" style="display:none;">
-                                <span class="material-symbols-rounded">timer</span>
-                                <span id="pingResponseTime">Tiempo de respuesta: -</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick actions for guests -->
-                    <div id="guestActions" class="card">
-                        <div class="card__header">
-                            <h3 class="card__title">Comenzar</h3>
-                        </div>
-                        <div class="card__body">
-                            <p class="text-muted mb-1">Inicia sesión o crea una cuenta para acceder a todas las
-                                funcionalidades.</p>
-                            <div class="btn-group">
-                                <button class="btn btn--primary" id="btnGuestLogin">Iniciar Sesión</button>
-                                <button class="btn btn--outline" id="btnGuestRegister">Crear Cuenta</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="homeError" class="error-state" style="display:none;">
-                    <div class="error-state__icon">
-                        <span class="material-symbols-rounded">warning</span>
-                    </div>
-                    <h3>Error al conectar con la API</h3>
-                    <p id="homeErrorMessage">No se pudo conectar con el servidor.</p>
-                    <button class="btn btn--primary" id="btnRetry">Reintentar</button>
-                </div>
-            </section>
-
-            <!-- ========== PROFILE SECTION ========== -->
-            <section id="sectionProfile" class="section">
-                <div class="section__header">
-                    <h2 class="section__title">Mi Perfil</h2>
-                    <p class="section__subtitle">Información de tu cuenta y sesión</p>
-                </div>
-
-                <div class="profile-grid">
-                    <div class="card profile-card">
-                        <div class="card__header">
-                            <h3 class="card__title">Información Personal</h3>
-                            <button class="btn btn--sm btn--outline" id="btnRefreshProfile">🔄 Actualizar</button>
-                        </div>
-                        <div class="card__body">
-                            <div class="profile-avatar" id="profileAvatar">?</div>
-                            <div class="profile-details">
-                                <div class="detail-row">
-                                    <span class="detail-label">ID</span>
-                                    <span class="detail-value" id="profileId">-</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Nombre</span>
-                                    <span class="detail-value" id="profileName">-</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Email</span>
-                                    <span class="detail-value" id="profileEmail">-</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Email Verificado</span>
-                                    <span class="detail-value" id="profileVerified">-</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card__header">
-                            <h3 class="card__title">Roles y Permisos</h3>
-                        </div>
-                        <div class="card__body">
-                            <div class="detail-row">
-                                <span class="detail-label">Roles</span>
-                                <div class="tags" id="profileRoles">
-                                    <span class="tag tag--muted">Sin roles</span>
-                                </div>
-                            </div>
-                            <div class="detail-row" style="margin-top: 1rem;">
-                                <span class="detail-label">Permisos</span>
-                                <div class="tags" id="profilePermissions">
-                                    <span class="tag tag--muted">Sin permisos</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card__header">
-                            <h3 class="card__title">Sesión Activa</h3>
-                        </div>
-                        <div class="card__body">
-                            <div class="detail-row">
-                                <span class="detail-label">Token</span>
-                                <span class="detail-value token-display" id="profileToken">-</span>
-                            </div>
-                            <div class="btn-group" style="margin-top: 1rem;">
-                                <button class="btn btn--danger btn--sm" id="btnProfileLogout">Cerrar Sesión</button>
-                                <button class="btn btn--outline btn--sm" id="btnResendVerification">Reenviar
-                                    Verificación</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========== FILES SECTION ========== -->
-            <section id="sectionFiles" class="section">
-                <div class="section__header">
-                    <h2 class="section__title">Gestión de Archivos</h2>
-                    <p class="section__subtitle">Sube, lista, descarga y elimina archivos del servidor</p>
-                </div>
-
-                <div class="card">
-                    <div class="card__header">
-                        <h3 class="card__title">📤 Subir Archivos</h3>
-                    </div>
-                    <div class="card__body">
-                        <div class="upload-zone" id="uploadZone">
-                            <div class="upload-zone__icon">📁</div>
-                            <p class="upload-zone__text">Arrastra archivos aquí o haz clic para seleccionar</p>
-                            <p class="upload-zone__hint">Máximo 10 archivos, 10MB por archivo</p>
-                            <input type="file" id="fileInput" multiple style="display:none;">
-                        </div>
-
-                        <div id="selectedFiles" class="selected-files" style="display:none;">
-                            <div class="selected-files__header">
-                                <span id="selectedCount">0 archivos seleccionados</span>
-                                <button class="btn btn--ghost btn--sm" id="btnClearFiles">✕ Limpiar</button>
-                            </div>
-                            <div id="filePreviewList" class="file-preview-list"></div>
-                        </div>
-
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label class="form-label" for="uploadDescription">Descripción (opcional)</label>
-                            <input type="text" id="uploadDescription" class="form-input"
-                                placeholder="Descripción de los archivos..." maxlength="500">
-                        </div>
-
-                        <button class="btn btn--primary btn--block" id="btnUpload" disabled>
-                            <span id="uploadBtnText">Subir Archivos</span>
-                        </button>
-
-                        <div id="uploadProgress" class="progress-bar" style="display:none;">
-                            <div class="progress-bar__fill" id="uploadProgressFill"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card__header">
-                        <h3 class="card__title">📋 Archivos en el Servidor</h3>
-                        <button class="btn btn--sm btn--outline" id="btnRefreshFiles">🔄 Actualizar</button>
-                    </div>
-                    <div class="card__body">
-                        <div id="filesLoading" class="loading" style="display:none;">
+                        <div id="usersLoading" class="loading" style="display:none;">
                             <div class="spinner spinner--sm"></div>
-                            <p>Cargando archivos...</p>
+                            <p>Cargando usuarios...</p>
                         </div>
-                        <div id="filesEmpty" class="empty-state">
-                            <p>📂 No hay archivos en el servidor</p>
+                        <div id="usersEmpty" class="empty-state" style="display:none;">
+                            <span class="material-symbols-rounded"
+                                style="font-size:2.5rem;color:var(--on-surface-variant);">group</span>
+                            <p>No se encontraron usuarios con los filtros aplicados</p>
                         </div>
-                        <div id="filesTable" style="display:none;">
+                        <div id="usersTableWrapper" style="display:none;">
+                            <!-- Desktop table -->
+                            <div class="au-desktop-table">
+                                <div class="au-col-headers">
+                                    <span class="au-col au-col--id">ID</span>
+                                    <span class="au-col au-col--name au-col--sortable" data-sort="name"
+                                        onclick="toggleAdminSort('name')">
+                                        NOMBRE
+                                        <span class="material-symbols-rounded au-sort-icon"
+                                            id="sortIcon-name">unfold_more</span>
+                                    </span>
+                                    <span class="au-col au-col--email au-col--sortable" data-sort="email"
+                                        onclick="toggleAdminSort('email')">
+                                        EMAIL
+                                        <span class="material-symbols-rounded au-sort-icon"
+                                            id="sortIcon-email">unfold_more</span>
+                                    </span>
+                                    <span class="au-col au-col--status au-col--sortable" data-sort="status"
+                                        onclick="toggleAdminSort('status')">
+                                        ESTADO
+                                        <span class="material-symbols-rounded au-sort-icon"
+                                            id="sortIcon-status">unfold_more</span>
+                                    </span>
+                                    <span class="au-col au-col--role">ROLES</span>
+                                    <span class="au-col au-col--date au-col--sortable" data-sort="created_at"
+                                        onclick="toggleAdminSort('created_at')">
+                                        REGISTRO
+                                        <span class="material-symbols-rounded au-sort-icon"
+                                            id="sortIcon-created_at">unfold_more</span>
+                                    </span>
+                                    <span class="au-col au-col--date au-col--sortable" data-sort="last_access_at"
+                                        onclick="toggleAdminSort('last_access_at')">
+                                        ÚLT. ACCESO
+                                        <span class="material-symbols-rounded au-sort-icon"
+                                            id="sortIcon-last_access_at">unfold_more</span>
+                                    </span>
+                                    <span class="au-col au-col--actions">ACCIONES</span>
+                                </div>
+                                <div id="usersTableBody"></div>
+                            </div>
+                            <!-- Mobile cards -->
+                            <div class="au-mobile-cards" id="usersMobileCards"></div>
+                            <div class="pagination-bar" id="usersPagination"></div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ========== CHANNELS SECTION ========== -->
+                <section id="sectionChannels" class="section">
+                    <div class="section__header">
+                        <div
+                            style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                            <div>
+                                <h2 class="section__title">Gestión de Canales</h2>
+                                <p class="section__subtitle">Crea canales temáticos, asocia medios de publicación y
+                                    configura el contexto para IA.</p>
+                            </div>
+                            <button class="btn btn--primary" id="btnCreateChannel">
+                                <span class="material-symbols-rounded">add</span>
+                                <span>Nuevo Canal</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabla / Cards de canales -->
+                    <div class="au-table-card">
+                        <div class="au-table-header">
+                            <div class="au-table-title">
+                                <span class="material-symbols-rounded au-table-icon">podcasts</span>
+                                <span class="au-table-title-text">Canales</span>
+                            </div>
+                            <button class="btn btn--outline" id="btnRefreshChannels">
+                                <span class="material-symbols-rounded">refresh</span>
+                                <span class="au-btn-label">Actualizar</span>
+                            </button>
+                        </div>
+                        <div id="channelsLoading" class="loading" style="display:none;">
+                            <div class="spinner spinner--sm"></div>
+                            <p>Cargando canales...</p>
+                        </div>
+                        <div id="channelsEmpty" class="empty-state" style="display:none;">
+                            <span class="material-symbols-rounded"
+                                style="font-size:2.5rem;color:var(--on-surface-variant);">podcasts</span>
+                            <p>No hay canales creados aún</p>
+                            <button class="btn btn--primary btn--sm" onclick="openCreateChannelModal()"
+                                style="margin-top:0.5rem;">
+                                <span class="material-symbols-rounded">add</span> Crear primer canal
+                            </button>
+                        </div>
+                        <div id="channelsTableWrapper" style="display:none;">
+                            <!-- Desktop table -->
+                            <div class="au-desktop-table">
+                                <div class="au-col-headers">
+                                    <span class="au-col au-col--id">ID</span>
+                                    <span class="au-col ch-col--name">NOMBRE</span>
+                                    <span class="au-col ch-col--type">TIPO</span>
+                                    <span class="au-col ch-col--desc">DESCRIPCIÓN</span>
+                                    <span class="au-col ch-col--medias">MEDIOS</span>
+                                    <span class="au-col au-col--actions">ACCIONES</span>
+                                </div>
+                                <div id="channelsTableBody"></div>
+                            </div>
+                            <!-- Mobile cards -->
+                            <div class="au-mobile-cards" id="channelsMobileCards"></div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ========== USER-CHANNELS SECTION ========== -->
+                <section id="sectionUser-channels" class="section">
+                    <div class="section__header">
+                        <div
+                            style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                            <div>
+                                <h2 class="section__title">Asignación de Canales a Publicadores</h2>
+                                <p class="section__subtitle">Gestiona qué canales puede administrar cada publicador. Los
+                                    cambios se aplican inmediatamente.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla / Cards de publicadores -->
+                    <div class="au-table-card">
+                        <div class="au-table-header">
+                            <div class="au-table-title">
+                                <span class="material-symbols-rounded au-table-icon">group_add</span>
+                                <span class="au-table-title-text">Publicadores</span>
+                            </div>
+                            <button class="btn btn--outline" id="btnRefreshUc">
+                                <span class="material-symbols-rounded">refresh</span>
+                                <span class="au-btn-label">Actualizar</span>
+                            </button>
+                        </div>
+                        <div id="ucLoading" class="loading" style="display:none;">
+                            <div class="spinner spinner--sm"></div>
+                            <p>Cargando publicadores...</p>
+                        </div>
+                        <div id="ucEmpty" class="empty-state" style="display:none;">
+                            <span class="material-symbols-rounded"
+                                style="font-size:2.5rem;color:var(--on-surface-variant);">group_off</span>
+                            <p>No hay usuarios con rol publicador</p>
+                        </div>
+                        <div id="ucTableWrapper" style="display:none;">
+                            <!-- Desktop table -->
+                            <div class="au-desktop-table">
+                                <div class="au-col-headers">
+                                    <span class="au-col au-col--id">ID</span>
+                                    <span class="au-col uc-col--name">PUBLICADOR</span>
+                                    <span class="au-col uc-col--channels">CANALES ASIGNADOS</span>
+                                    <span class="au-col uc-col--count">TOTAL</span>
+                                    <span class="au-col au-col--actions">ACCIONES</span>
+                                </div>
+                                <div id="ucTableBody"></div>
+                            </div>
+                            <!-- Mobile cards -->
+                            <div class="au-mobile-cards" id="ucMobileCards"></div>
+                            <div class="pagination-bar" id="ucPagination"></div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ========== DEVICE-CHANNELS SECTION ========== -->
+                <section id="sectionDevice-channels" class="section">
+                    <div class="section__header">
+                        <div
+                            style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                            <div>
+                                <h2 class="section__title">Asignación de Canales a Dispositivos</h2>
+                                <p class="section__subtitle">Gestiona qué canales consume cada dispositivo en pantalla.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="au-table-card">
+                        <div class="au-table-header">
+                            <div class="au-table-title">
+                                <span class="material-symbols-rounded au-table-icon">tv</span>
+                                <span class="au-table-title-text">Dispositivos</span>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn--primary" id="btnCreateDevice">
+                                    <span class="material-symbols-rounded">add</span>
+                                    <span>Crear dispositivo</span>
+                                </button>
+                                <button class="btn btn--outline" id="btnRefreshDc">
+                                    <span class="material-symbols-rounded">refresh</span>
+                                    <span class="au-btn-label">Actualizar</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="dcLoading" class="loading" style="display:none;">
+                            <div class="spinner spinner--sm"></div>
+                            <p>Cargando dispositivos...</p>
+                        </div>
+                        <div id="dcEmpty" class="empty-state" style="display:none;">
+                            <span class="material-symbols-rounded"
+                                style="font-size:2.5rem;color:var(--on-surface-variant);">tv_off</span>
+                            <p>No hay dispositivos asignados</p>
+                        </div>
+                        <div id="dcTableWrapper" style="display:none;">
+                            <div class="au-desktop-table">
+                                <div class="au-col-headers">
+                                    <span class="au-col au-col--id">ID</span>
+                                    <span class="au-col dc-col--device">DISPOSITIVO</span>
+                                    <span class="au-col dc-col--channels">CANALES ASIGNADOS</span>
+                                    <span class="au-col dc-col--count">TOTAL</span>
+                                    <span class="au-col au-col--actions">ACCIONES</span>
+                                </div>
+                                <div id="dcTableBody"></div>
+                            </div>
+                            <div class="au-mobile-cards" id="dcMobileCards"></div>
+                            <div class="pagination-bar" id="dcPagination"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== POSTS SECTION ========== -->
+                <section id="sectionPosts" class="section">
+                    <div class="section__header">
+                        <div
+                            style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                            <div>
+                                <h2 class="section__title">Mis Publicaciones</h2>
+                                <p class="section__subtitle">Crea y gestiona tus publicaciones en los canales
+                                    autorizados.
+                                </p>
+                            </div>
+                            <button class="btn btn--primary" id="btnCreatePost">
+                                <span class="material-symbols-rounded">add</span>
+                                <span>Nueva Publicación</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filtros de búsqueda (H11b) -->
+                    <div class="au-filters-card" id="postsFiltersCard">
+                        <div class="au-filters-header">
+                            <div class="au-filters-title">
+                                <span class="material-symbols-rounded au-filters-icon">search</span>
+                                <span class="au-filters-title-text">Filtros</span>
+                            </div>
+                            <button class="au-filters-toggle" id="btnPostsFiltersToggle" aria-label="Expandir filtros">
+                                <span class="material-symbols-rounded">keyboard_arrow_down</span>
+                            </button>
+                            <div class="au-filters-btns">
+                                <button class="btn btn--primary" id="btnApplyPostFilters">
+                                    <span class="material-symbols-rounded">search</span>
+                                    <span>Buscar</span>
+                                </button>
+                                <button class="btn btn--outline" id="btnClearPostFilters">
+                                    <span class="material-symbols-rounded">filter_list</span>
+                                    <span>Limpiar</span>
+                                </button>
+                                <button class="btn btn--outline" id="btnSavePostFilter" title="Guardar filtro actual">
+                                    <span class="material-symbols-rounded">bookmark_add</span>
+                                    <span>Guardar filtro</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="au-filters-body" id="postsFiltersBody">
+                            <div class="au-filter-row">
+                                <div class="au-filter-field">
+                                    <label for="postFilterSearch" class="au-filter-label">Buscar</label>
+                                    <input type="text" id="postFilterSearch" class="au-filter-input"
+                                        placeholder="Título o contenido...">
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="postFilterStatus" class="au-filter-label">Estado</label>
+                                    <select id="postFilterStatus" class="au-filter-input">
+                                        <option value="">Todos</option>
+                                        <option value="draft">Borrador</option>
+                                        <option value="pending_review">Pendiente de revisión</option>
+                                        <option value="approved_by_moderator">Aprobada</option>
+                                        <option value="scheduled">Programada</option>
+                                        <option value="published">Publicada</option>
+                                        <option value="archived">Archivada</option>
+                                    </select>
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="postFilterType" class="au-filter-label">Tipo</label>
+                                    <select id="postFilterType" class="au-filter-input">
+                                        <option value="">Todos</option>
+                                        <option value="text">Texto</option>
+                                        <option value="image">Imagen</option>
+                                        <option value="video">Video</option>
+                                        <option value="audio">Audio</option>
+                                        <option value="multimedia">Multimedia</option>
+                                    </select>
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="postFilterPerPage" class="au-filter-label">Por página</label>
+                                    <select id="postFilterPerPage" class="au-filter-input">
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="au-filter-row">
+                                <div class="au-filter-field">
+                                    <label for="postFilterDateFrom" class="au-filter-label">Desde</label>
+                                    <input type="date" id="postFilterDateFrom" class="au-filter-input">
+                                </div>
+                                <div class="au-filter-field">
+                                    <label for="postFilterDateTo" class="au-filter-label">Hasta</label>
+                                    <input type="date" id="postFilterDateTo" class="au-filter-input">
+                                </div>
+                            </div>
+                            <div class="au-filters-btns au-filters-btns--mobile">
+                                <button class="btn btn--primary btn--block"
+                                    onclick="document.getElementById('btnApplyPostFilters').click()">
+                                    <span class="material-symbols-rounded">search</span>
+                                    <span>Buscar</span>
+                                </button>
+                                <button class="btn btn--outline btn--block"
+                                    onclick="document.getElementById('btnClearPostFilters').click()">
+                                    <span class="material-symbols-rounded">filter_list</span>
+                                    <span>Limpiar</span>
+                                </button>
+                                <button class="btn btn--outline btn--block"
+                                    onclick="document.getElementById('btnSavePostFilter').click()">
+                                    <span class="material-symbols-rounded">bookmark_add</span>
+                                    <span>Guardar filtro</span>
+                                </button>
+                            </div>
+                            <select id="postSavedFilters" class="au-filter-input" style="max-width:200px;display:none;">
+                                <option value="">— Filtros guardados —</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Stats rápidas -->
+                    <div class="stats-inline" id="postsStats" style="display:none;">
+                        <div class="stat-inline stat-inline--info">
+                            <span class="material-symbols-rounded stat-inline__icon">article</span>
+                            <span class="stat-inline__value" id="postsTotalCount">0</span>
+                            <span class="stat-inline__label">TOTAL</span>
+                        </div>
+                        <div class="stat-inline stat-inline--warning">
+                            <span class="material-symbols-rounded stat-inline__icon">edit_note</span>
+                            <span class="stat-inline__value" id="postsDraftCount">0</span>
+                            <span class="stat-inline__label">BORRADORES</span>
+                        </div>
+                        <div class="stat-inline stat-inline--orange">
+                            <span class="material-symbols-rounded stat-inline__icon">hourglass_top</span>
+                            <span class="stat-inline__value" id="postsPendingCount">0</span>
+                            <span class="stat-inline__label">EN REVISIÓN</span>
+                        </div>
+                        <div class="stat-inline stat-inline--success">
+                            <span class="material-symbols-rounded stat-inline__icon">public</span>
+                            <span class="stat-inline__value" id="postsPublishedCount">0</span>
+                            <span class="stat-inline__label">PUBLICADAS</span>
+                        </div>
+                        <div class="stat-inline stat-inline--primary">
+                            <span class="material-symbols-rounded stat-inline__icon">schedule</span>
+                            <span class="stat-inline__value" id="postsScheduledCount">0</span>
+                            <span class="stat-inline__label">PROGRAMADAS</span>
+                        </div>
+                    </div>
+
+                    <!-- Tabla / Cards de publicaciones -->
+                    <div class="au-table-card">
+                        <div class="au-table-header">
+                            <div class="au-table-title">
+                                <span class="material-symbols-rounded au-table-icon">article</span>
+                                <span class="au-table-title-text">Publicaciones</span>
+                            </div>
+                            <button class="btn btn--outline" id="btnRefreshPosts">
+                                <span class="material-symbols-rounded">refresh</span>
+                                <span class="au-btn-label">Actualizar</span>
+                            </button>
+                        </div>
+                        <div id="postsLoading" class="loading" style="display:none;">
+                            <div class="spinner spinner--sm"></div>
+                            <p>Cargando publicaciones...</p>
+                        </div>
+                        <div id="postsEmpty" class="empty-state" style="display:none;">
+                            <span class="material-symbols-rounded"
+                                style="font-size:2.5rem;color:var(--on-surface-variant);">article</span>
+                            <p>No tienes publicaciones aún</p>
+                            <button class="btn btn--primary btn--sm" onclick="openPostFormModal()"
+                                style="margin-top:0.5rem;">
+                                <span class="material-symbols-rounded">add</span> Crear primera publicación
+                            </button>
+                        </div>
+                        <div id="postsTableWrapper" style="display:none;">
+                            <!-- Desktop table -->
+                            <div class="au-desktop-table">
+                                <div class="au-col-headers">
+                                    <span class="au-col au-col--id">ID</span>
+                                    <span class="au-col post-col--title">TÍTULO</span>
+                                    <span class="au-col post-col--type">TIPO</span>
+                                    <span class="au-col post-col--status">ESTADO</span>
+                                    <span class="au-col post-col--channels">CANALES</span>
+                                    <span class="au-col post-col--date">FECHA</span>
+                                    <span class="au-col au-col--actions">ACCIONES</span>
+                                </div>
+                                <div id="postsTableBody"></div>
+                            </div>
+                            <!-- Mobile cards -->
+                            <div class="au-mobile-cards" id="postsMobileCards"></div>
+                            <div class="pagination-bar" id="postsPagination"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== MODERATION SECTION ========== -->
+                <section id="sectionModeration" class="section">
+                    <div class="section__header">
+                        <div
+                            style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
+                            <div>
+                                <h2 class="section__title">Moderación de Publicaciones</h2>
+                                <p class="section__subtitle">Revisa, aprueba o rechaza las publicaciones pendientes.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="au-table-card">
+                        <div class="au-table-header">
+                            <div class="au-table-title">
+                                <span class="material-symbols-rounded au-table-icon">gavel</span>
+                                <span class="au-table-title-text">Pendientes de revisión</span>
+                            </div>
+                            <button class="btn btn--outline" id="btnRefreshModeration">
+                                <span class="material-symbols-rounded">refresh</span>
+                                <span class="au-btn-label">Actualizar</span>
+                            </button>
+                        </div>
+                        <div id="moderationLoading" class="loading" style="display:none;">
+                            <div class="spinner spinner--sm"></div>
+                            <p>Cargando publicaciones pendientes...</p>
+                        </div>
+                        <div id="moderationEmpty" class="empty-state" style="display:none;">
+                            <span class="material-symbols-rounded"
+                                style="font-size:2.5rem;color:var(--on-surface-variant);">check_circle</span>
+                            <p>No hay publicaciones pendientes de revisión</p>
+                        </div>
+                        <div id="moderationTableWrapper" style="display:none;">
+                            <div class="au-desktop-table">
+                                <div class="au-col-headers">
+                                    <span class="au-col au-col--id">ID</span>
+                                    <span class="au-col post-col--title">TÍTULO</span>
+                                    <span class="au-col post-col--type">TIPO</span>
+                                    <span class="au-col post-col--channels">AUTOR</span>
+                                    <span class="au-col post-col--date">FECHA</span>
+                                    <span class="au-col au-col--actions">ACCIONES</span>
+                                </div>
+                                <div id="moderationTableBody"></div>
+                            </div>
+                            <div class="au-mobile-cards" id="moderationMobileCards"></div>
+                            <div class="pagination-bar" id="moderationPagination"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== NOTIFICATIONS SECTION ========== -->
+                <section id="sectionNotifications" class="section">
+                    <div class="section__header">
+                        <h2 class="section__title">
+                            <span class="material-symbols-rounded">notifications</span>
+                            Centro de Notificaciones
+                        </h2>
+                        <p class="section__subtitle">Revisa los eventos importantes de tu cuenta</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">Notificaciones recientes</h3>
+                            <div class="btn-group">
+                                <button class="btn btn--sm btn--outline" id="btnMarkAllRead">
+                                    <span class="material-symbols-rounded">done_all</span> Marcar todas leídas
+                                </button>
+                                <button class="btn btn--sm btn--outline" id="btnRefreshNotif">
+                                    <span class="material-symbols-rounded">refresh</span> Actualizar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card__body">
+                            <div id="notifList" class="notif-list">
+                                <p class="notif-loading">Cargando notificaciones...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== DASHBOARD SECTION ========== -->
+                <section id="sectionDashboard" class="section">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2 class="section__title">Dashboard Central</h2>
+                            <p class="section__subtitle">Monitoreo general de tótems, canales y actividad reciente</p>
+                        </div>
+                        <div class="dashboard-actions">
+                            <button class="btn btn--sm btn--outline" id="btnRefreshDash">
+                                <span class="material-symbols-rounded">refresh</span>
+                                Actualizar
+                            </button>
+                            <span class="dashboard-sync" id="dashLastSync">Actualizado: -</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-grid">
+                        <article class="kpi-card kpi-card--primary">
+                            <div class="kpi-card__icon">
+                                <span class="material-symbols-rounded">edit_note</span>
+                            </div>
+                            <div class="kpi-card__content">
+                                <span class="kpi-card__value" id="dashTotalPosts">-</span>
+                                <span class="kpi-card__label">Total Publicaciones</span>
+                            </div>
+                            <div class="kpi-card__status">Estable</div>
+                        </article>
+                        <article class="kpi-card kpi-card--success">
+                            <div class="kpi-card__icon">
+                                <span class="material-symbols-rounded">wifi</span>
+                            </div>
+                            <div class="kpi-card__content">
+                                <span class="kpi-card__value" id="dashDevicesOnline">-</span>
+                                <span class="kpi-card__label">Dispositivos Online</span>
+                            </div>
+                            <div class="kpi-card__status">Activo</div>
+                        </article>
+                        <article class="kpi-card kpi-card--info">
+                            <div class="kpi-card__icon">
+                                <span class="material-symbols-rounded">podcasts</span>
+                            </div>
+                            <div class="kpi-card__content">
+                                <span class="kpi-card__value" id="dashChannels">-</span>
+                                <span class="kpi-card__label">Canales</span>
+                            </div>
+                            <div class="kpi-card__status">En rotación</div>
+                        </article>
+                        <article class="kpi-card kpi-card--danger">
+                            <div class="kpi-card__icon">
+                                <span class="material-symbols-rounded">report</span>
+                            </div>
+                            <div class="kpi-card__content">
+                                <span class="kpi-card__value" id="dashAlerts">-</span>
+                                <span class="kpi-card__label">Alertas</span>
+                            </div>
+                            <div class="kpi-card__status">Revisar</div>
+                        </article>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="card card--chart">
+                            <div class="card__header">
+                                <h3 class="card__title">Tendencia semanal</h3>
+                                <span class="chip">7 días</span>
+                            </div>
+                            <div class="card__body">
+                                <div class="chart-area">
+                                    <div class="chart-area__grid"></div>
+                                    <div class="chart-area__fill"></div>
+                                    <div class="chart-area__line"></div>
+                                </div>
+                                <div class="chart-legend">
+                                    <span class="legend-dot legend-dot--primary"></span>
+                                    <span>Actividad total</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card card--chart">
+                            <div class="card__header">
+                                <h3 class="card__title">Rendimiento por tipo</h3>
+                                <span class="chip">Última semana</span>
+                            </div>
+                            <div class="card__body">
+                                <div class="chart-bars">
+                                    <div class="chart-bars__item" style="--value:0.9;">
+                                        <span class="chart-bars__bar"></span>
+                                        <span class="chart-bars__label">Imagen</span>
+                                    </div>
+                                    <div class="chart-bars__item" style="--value:0.72;">
+                                        <span class="chart-bars__bar"></span>
+                                        <span class="chart-bars__label">Video</span>
+                                    </div>
+                                    <div class="chart-bars__item" style="--value:0.55;">
+                                        <span class="chart-bars__bar"></span>
+                                        <span class="chart-bars__label">Texto</span>
+                                    </div>
+                                    <div class="chart-bars__item" style="--value:0.35;">
+                                        <span class="chart-bars__bar"></span>
+                                        <span class="chart-bars__label">Promos</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">Actividad reciente</h3>
+                            <span class="text-muted">Últimos pulsos de dispositivos</span>
+                        </div>
+                        <div class="card__body">
+                            <div id="dashLoading" class="loading" style="display:none;">
+                                <div class="spinner spinner--sm"></div>
+                            </div>
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table table--logs">
                                     <thead>
                                         <tr>
-                                            <th>Nombre</th>
-                                            <th>Tamaño</th>
-                                            <th>Última modificación</th>
-                                            <th>Acciones</th>
+                                            <th>ID Tótem</th>
+                                            <th>Estado</th>
+                                            <th>Canal Activo</th>
+                                            <th>Último Pulso</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="filesTableBody"></tbody>
+                                    <tbody id="dashLogsBody">
+                                        <tr>
+                                            <td colspan="4">Cargando registros...</td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
-                            <div class="files-summary">
-                                <span id="filesTotalCount">0 archivos</span>
-                            </div>
                         </div>
                     </div>
+                </section>
+
+            </main>
+
+            <footer class="footer">
+                <p>&copy; 2026 Difexa — Microservicios API. Todos los derechos reservados.</p>
+                <div class="footer__links">
+                    <a href="/docs" class="footer__link">
+                        <span class="material-symbols-rounded">description</span>
+                        Documentación
+                    </a>
+                    <a href="/" class="footer__link">
+                        <span class="material-symbols-rounded">terminal</span>
+                        API Client
+                    </a>
                 </div>
-            </section>
+            </footer>
+        </div>
 
-            <!-- ========== ADMIN USERS SECTION ========== -->
-            <section id="sectionAdmin-users" class="section">
-                <div class="section__header">
-                    <h2 class="section__title">Gestión de Usuarios</h2>
-                    <p class="section__subtitle">Administra usuarios, aprueba registros, asigna roles y revisa
-                        historial.</p>
-                </div>
-
-                <!-- Filtros -->
-                <div class="au-filters-card">
-                    <div class="au-filters-header">
-                        <div class="au-filters-title">
-                            <span class="material-symbols-rounded au-filters-icon">search</span>
-                            <span class="au-filters-title-text">Filtros</span>
-                        </div>
-                        <button class="au-filters-toggle" id="btnFiltersToggle" aria-label="Expandir filtros">
-                            <span class="material-symbols-rounded">keyboard_arrow_down</span>
-                        </button>
-                        <div class="au-filters-btns">
-                            <button class="btn btn--primary" id="btnApplyFilters">
-                                <span class="material-symbols-rounded">search</span>
-                                <span>Buscar</span>
-                            </button>
-                            <button class="btn btn--outline" id="btnClearFilters">
-                                <span class="material-symbols-rounded">filter_list</span>
-                                <span>Limpiar</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="au-filters-body" id="filtersBody">
-                        <div class="au-filter-row">
-                            <div class="au-filter-field">
-                                <label for="filterName" class="au-filter-label">Nombre</label>
-                                <input type="text" id="filterName" class="au-filter-input"
-                                    placeholder="Buscar por nombre...">
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="filterEmail" class="au-filter-label">Email</label>
-                                <input type="text" id="filterEmail" class="au-filter-input"
-                                    placeholder="Buscar por email...">
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="filterDni" class="au-filter-label">DNI</label>
-                                <input type="text" id="filterDni" class="au-filter-input" placeholder="12345678A">
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="filterStatus" class="au-filter-label">Estado</label>
-                                <select id="filterStatus" class="au-filter-input">
-                                    <option value="">Todos</option>
-                                    <option value="registered">Registrado</option>
-                                    <option value="verified">Verificado</option>
-                                    <option value="approved">Aprobado</option>
-                                    <option value="disabled">Deshabilitado</option>
-                                    <option value="deleted">Eliminado</option>
-                                </select>
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="filterRole" class="au-filter-label">Rol</label>
-                                <select id="filterRole" class="au-filter-input">
-                                    <option value="">Todos</option>
-                                    <option value="publicador">Publicador</option>
-                                    <option value="moderador">Moderador</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="filterPerPage" class="au-filter-label">Por página</label>
-                                <select id="filterPerPage" class="au-filter-input">
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="au-filter-row">
-                            <div class="au-filter-field">
-                                <label for="filterRegisteredFrom" class="au-filter-label">Registro desde</label>
-                                <input type="date" id="filterRegisteredFrom" class="au-filter-input">
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="filterRegisteredTo" class="au-filter-label">Registro hasta</label>
-                                <input type="date" id="filterRegisteredTo" class="au-filter-input">
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="filterLastAccessFrom" class="au-filter-label">Último acceso desde</label>
-                                <input type="date" id="filterLastAccessFrom" class="au-filter-input">
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="filterLastAccessTo" class="au-filter-label">Último acceso hasta</label>
-                                <input type="date" id="filterLastAccessTo" class="au-filter-input">
-                            </div>
-                        </div>
-                        <div class="au-filters-btns au-filters-btns--mobile">
-                            <button class="btn btn--primary btn--block"
-                                onclick="document.getElementById('btnApplyFilters').click()">
-                                <span class="material-symbols-rounded">search</span>
-                                <span>Buscar</span>
-                            </button>
-                            <button class="btn btn--outline btn--block"
-                                onclick="document.getElementById('btnClearFilters').click()">
-                                <span class="material-symbols-rounded">filter_list</span>
-                                <span>Limpiar</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabla / Cards de usuarios -->
-                <div class="au-table-card">
-                    <div class="au-table-header">
-                        <div class="au-table-title">
-                            <span class="material-symbols-rounded au-table-icon">group</span>
-                            <span class="au-table-title-text">Usuarios</span>
-                        </div>
-                        <button class="btn btn--outline" id="btnRefreshUsers">
-                            <span class="material-symbols-rounded">refresh</span>
-                            <span class="au-btn-label">Actualizar</span>
-                        </button>
-                    </div>
-                    <div id="usersLoading" class="loading" style="display:none;">
-                        <div class="spinner spinner--sm"></div>
-                        <p>Cargando usuarios...</p>
-                    </div>
-                    <div id="usersEmpty" class="empty-state" style="display:none;">
-                        <span class="material-symbols-rounded"
-                            style="font-size:2.5rem;color:var(--on-surface-variant);">group</span>
-                        <p>No se encontraron usuarios con los filtros aplicados</p>
-                    </div>
-                    <div id="usersTableWrapper" style="display:none;">
-                        <!-- Desktop table -->
-                        <div class="au-desktop-table">
-                            <div class="au-col-headers">
-                                <span class="au-col au-col--id">ID</span>
-                                <span class="au-col au-col--name au-col--sortable" data-sort="name"
-                                    onclick="toggleAdminSort('name')">
-                                    NOMBRE
-                                    <span class="material-symbols-rounded au-sort-icon"
-                                        id="sortIcon-name">unfold_more</span>
-                                </span>
-                                <span class="au-col au-col--email au-col--sortable" data-sort="email"
-                                    onclick="toggleAdminSort('email')">
-                                    EMAIL
-                                    <span class="material-symbols-rounded au-sort-icon"
-                                        id="sortIcon-email">unfold_more</span>
-                                </span>
-                                <span class="au-col au-col--status au-col--sortable" data-sort="status"
-                                    onclick="toggleAdminSort('status')">
-                                    ESTADO
-                                    <span class="material-symbols-rounded au-sort-icon"
-                                        id="sortIcon-status">unfold_more</span>
-                                </span>
-                                <span class="au-col au-col--role">ROLES</span>
-                                <span class="au-col au-col--date au-col--sortable" data-sort="created_at"
-                                    onclick="toggleAdminSort('created_at')">
-                                    REGISTRO
-                                    <span class="material-symbols-rounded au-sort-icon"
-                                        id="sortIcon-created_at">unfold_more</span>
-                                </span>
-                                <span class="au-col au-col--date au-col--sortable" data-sort="last_access_at"
-                                    onclick="toggleAdminSort('last_access_at')">
-                                    ÚLT. ACCESO
-                                    <span class="material-symbols-rounded au-sort-icon"
-                                        id="sortIcon-last_access_at">unfold_more</span>
-                                </span>
-                                <span class="au-col au-col--actions">ACCIONES</span>
-                            </div>
-                            <div id="usersTableBody"></div>
-                        </div>
-                        <!-- Mobile cards -->
-                        <div class="au-mobile-cards" id="usersMobileCards"></div>
-                        <div class="pagination-bar" id="usersPagination"></div>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- ========== CHANNELS SECTION ========== -->
-            <section id="sectionChannels" class="section">
-                <div class="section__header">
-                    <div
-                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
-                        <div>
-                            <h2 class="section__title">Gestión de Canales</h2>
-                            <p class="section__subtitle">Crea canales temáticos, asocia medios de publicación y
-                                configura el contexto para IA.</p>
-                        </div>
-                        <button class="btn btn--primary" id="btnCreateChannel">
-                            <span class="material-symbols-rounded">add</span>
-                            <span>Nuevo Canal</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Tabla / Cards de canales -->
-                <div class="au-table-card">
-                    <div class="au-table-header">
-                        <div class="au-table-title">
-                            <span class="material-symbols-rounded au-table-icon">podcasts</span>
-                            <span class="au-table-title-text">Canales</span>
-                        </div>
-                        <button class="btn btn--outline" id="btnRefreshChannels">
-                            <span class="material-symbols-rounded">refresh</span>
-                            <span class="au-btn-label">Actualizar</span>
-                        </button>
-                    </div>
-                    <div id="channelsLoading" class="loading" style="display:none;">
-                        <div class="spinner spinner--sm"></div>
-                        <p>Cargando canales...</p>
-                    </div>
-                    <div id="channelsEmpty" class="empty-state" style="display:none;">
-                        <span class="material-symbols-rounded"
-                            style="font-size:2.5rem;color:var(--on-surface-variant);">podcasts</span>
-                        <p>No hay canales creados aún</p>
-                        <button class="btn btn--primary btn--sm" onclick="openCreateChannelModal()"
-                            style="margin-top:0.5rem;">
-                            <span class="material-symbols-rounded">add</span> Crear primer canal
-                        </button>
-                    </div>
-                    <div id="channelsTableWrapper" style="display:none;">
-                        <!-- Desktop table -->
-                        <div class="au-desktop-table">
-                            <div class="au-col-headers">
-                                <span class="au-col au-col--id">ID</span>
-                                <span class="au-col ch-col--name">NOMBRE</span>
-                                <span class="au-col ch-col--type">TIPO</span>
-                                <span class="au-col ch-col--desc">DESCRIPCIÓN</span>
-                                <span class="au-col ch-col--medias">MEDIOS</span>
-                                <span class="au-col au-col--actions">ACCIONES</span>
-                            </div>
-                            <div id="channelsTableBody"></div>
-                        </div>
-                        <!-- Mobile cards -->
-                        <div class="au-mobile-cards" id="channelsMobileCards"></div>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- ========== USER-CHANNELS SECTION ========== -->
-            <section id="sectionUser-channels" class="section">
-                <div class="section__header">
-                    <div
-                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
-                        <div>
-                            <h2 class="section__title">Asignación de Canales a Publicadores</h2>
-                            <p class="section__subtitle">Gestiona qué canales puede administrar cada publicador. Los
-                                cambios se aplican inmediatamente.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabla / Cards de publicadores -->
-                <div class="au-table-card">
-                    <div class="au-table-header">
-                        <div class="au-table-title">
-                            <span class="material-symbols-rounded au-table-icon">group_add</span>
-                            <span class="au-table-title-text">Publicadores</span>
-                        </div>
-                        <button class="btn btn--outline" id="btnRefreshUc">
-                            <span class="material-symbols-rounded">refresh</span>
-                            <span class="au-btn-label">Actualizar</span>
-                        </button>
-                    </div>
-                    <div id="ucLoading" class="loading" style="display:none;">
-                        <div class="spinner spinner--sm"></div>
-                        <p>Cargando publicadores...</p>
-                    </div>
-                    <div id="ucEmpty" class="empty-state" style="display:none;">
-                        <span class="material-symbols-rounded"
-                            style="font-size:2.5rem;color:var(--on-surface-variant);">group_off</span>
-                        <p>No hay usuarios con rol publicador</p>
-                    </div>
-                    <div id="ucTableWrapper" style="display:none;">
-                        <!-- Desktop table -->
-                        <div class="au-desktop-table">
-                            <div class="au-col-headers">
-                                <span class="au-col au-col--id">ID</span>
-                                <span class="au-col uc-col--name">PUBLICADOR</span>
-                                <span class="au-col uc-col--channels">CANALES ASIGNADOS</span>
-                                <span class="au-col uc-col--count">TOTAL</span>
-                                <span class="au-col au-col--actions">ACCIONES</span>
-                            </div>
-                            <div id="ucTableBody"></div>
-                        </div>
-                        <!-- Mobile cards -->
-                        <div class="au-mobile-cards" id="ucMobileCards"></div>
-                        <div class="pagination-bar" id="ucPagination"></div>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- ========== POSTS SECTION ========== -->
-            <section id="sectionPosts" class="section">
-                <div class="section__header">
-                    <div
-                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
-                        <div>
-                            <h2 class="section__title">Mis Publicaciones</h2>
-                            <p class="section__subtitle">Crea y gestiona tus publicaciones en los canales autorizados.
-                            </p>
-                        </div>
-                        <button class="btn btn--primary" id="btnCreatePost">
-                            <span class="material-symbols-rounded">add</span>
-                            <span>Nueva Publicación</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Filtros de búsqueda (H11b) -->
-                <div class="au-filters-card" id="postsFiltersCard">
-                    <div class="au-filters-header">
-                        <div class="au-filters-title">
-                            <span class="material-symbols-rounded au-filters-icon">search</span>
-                            <span class="au-filters-title-text">Filtros</span>
-                        </div>
-                        <button class="au-filters-toggle" id="btnPostsFiltersToggle" aria-label="Expandir filtros">
-                            <span class="material-symbols-rounded">keyboard_arrow_down</span>
-                        </button>
-                        <div class="au-filters-btns">
-                            <button class="btn btn--primary" id="btnApplyPostFilters">
-                                <span class="material-symbols-rounded">search</span>
-                                <span>Buscar</span>
-                            </button>
-                            <button class="btn btn--outline" id="btnClearPostFilters">
-                                <span class="material-symbols-rounded">filter_list</span>
-                                <span>Limpiar</span>
-                            </button>
-                            <button class="btn btn--outline" id="btnSavePostFilter" title="Guardar filtro actual">
-                                <span class="material-symbols-rounded">bookmark_add</span>
-                                <span>Guardar filtro</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="au-filters-body" id="postsFiltersBody">
-                        <div class="au-filter-row">
-                            <div class="au-filter-field">
-                                <label for="postFilterSearch" class="au-filter-label">Buscar</label>
-                                <input type="text" id="postFilterSearch" class="au-filter-input"
-                                    placeholder="Título o contenido...">
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="postFilterStatus" class="au-filter-label">Estado</label>
-                                <select id="postFilterStatus" class="au-filter-input">
-                                    <option value="">Todos</option>
-                                    <option value="draft">Borrador</option>
-                                    <option value="pending_review">Pendiente de revisión</option>
-                                    <option value="approved_by_moderator">Aprobada</option>
-                                    <option value="scheduled">Programada</option>
-                                    <option value="published">Publicada</option>
-                                    <option value="archived">Archivada</option>
-                                </select>
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="postFilterType" class="au-filter-label">Tipo</label>
-                                <select id="postFilterType" class="au-filter-input">
-                                    <option value="">Todos</option>
-                                    <option value="text">Texto</option>
-                                    <option value="image">Imagen</option>
-                                    <option value="video">Video</option>
-                                    <option value="audio">Audio</option>
-                                    <option value="multimedia">Multimedia</option>
-                                </select>
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="postFilterPerPage" class="au-filter-label">Por página</label>
-                                <select id="postFilterPerPage" class="au-filter-input">
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="au-filter-row">
-                            <div class="au-filter-field">
-                                <label for="postFilterDateFrom" class="au-filter-label">Desde</label>
-                                <input type="date" id="postFilterDateFrom" class="au-filter-input">
-                            </div>
-                            <div class="au-filter-field">
-                                <label for="postFilterDateTo" class="au-filter-label">Hasta</label>
-                                <input type="date" id="postFilterDateTo" class="au-filter-input">
-                            </div>
-                        </div>
-                        <div class="au-filters-btns au-filters-btns--mobile">
-                            <button class="btn btn--primary btn--block"
-                                onclick="document.getElementById('btnApplyPostFilters').click()">
-                                <span class="material-symbols-rounded">search</span>
-                                <span>Buscar</span>
-                            </button>
-                            <button class="btn btn--outline btn--block"
-                                onclick="document.getElementById('btnClearPostFilters').click()">
-                                <span class="material-symbols-rounded">filter_list</span>
-                                <span>Limpiar</span>
-                            </button>
-                            <button class="btn btn--outline btn--block"
-                                onclick="document.getElementById('btnSavePostFilter').click()">
-                                <span class="material-symbols-rounded">bookmark_add</span>
-                                <span>Guardar filtro</span>
-                            </button>
-                        </div>
-                        <select id="postSavedFilters" class="au-filter-input" style="max-width:200px;display:none;">
-                            <option value="">— Filtros guardados —</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Stats rápidas -->
-                <div class="stats-inline" id="postsStats" style="display:none;">
-                    <div class="stat-inline stat-inline--info">
-                        <span class="material-symbols-rounded stat-inline__icon">article</span>
-                        <span class="stat-inline__value" id="postsTotalCount">0</span>
-                        <span class="stat-inline__label">TOTAL</span>
-                    </div>
-                    <div class="stat-inline stat-inline--warning">
-                        <span class="material-symbols-rounded stat-inline__icon">edit_note</span>
-                        <span class="stat-inline__value" id="postsDraftCount">0</span>
-                        <span class="stat-inline__label">BORRADORES</span>
-                    </div>
-                    <div class="stat-inline stat-inline--orange">
-                        <span class="material-symbols-rounded stat-inline__icon">hourglass_top</span>
-                        <span class="stat-inline__value" id="postsPendingCount">0</span>
-                        <span class="stat-inline__label">EN REVISIÓN</span>
-                    </div>
-                    <div class="stat-inline stat-inline--success">
-                        <span class="material-symbols-rounded stat-inline__icon">public</span>
-                        <span class="stat-inline__value" id="postsPublishedCount">0</span>
-                        <span class="stat-inline__label">PUBLICADAS</span>
-                    </div>
-                    <div class="stat-inline stat-inline--primary">
-                        <span class="material-symbols-rounded stat-inline__icon">schedule</span>
-                        <span class="stat-inline__value" id="postsScheduledCount">0</span>
-                        <span class="stat-inline__label">PROGRAMADAS</span>
-                    </div>
-                </div>
-
-                <!-- Tabla / Cards de publicaciones -->
-                <div class="au-table-card">
-                    <div class="au-table-header">
-                        <div class="au-table-title">
-                            <span class="material-symbols-rounded au-table-icon">article</span>
-                            <span class="au-table-title-text">Publicaciones</span>
-                        </div>
-                        <button class="btn btn--outline" id="btnRefreshPosts">
-                            <span class="material-symbols-rounded">refresh</span>
-                            <span class="au-btn-label">Actualizar</span>
-                        </button>
-                    </div>
-                    <div id="postsLoading" class="loading" style="display:none;">
-                        <div class="spinner spinner--sm"></div>
-                        <p>Cargando publicaciones...</p>
-                    </div>
-                    <div id="postsEmpty" class="empty-state" style="display:none;">
-                        <span class="material-symbols-rounded"
-                            style="font-size:2.5rem;color:var(--on-surface-variant);">article</span>
-                        <p>No tienes publicaciones aún</p>
-                        <button class="btn btn--primary btn--sm" onclick="openPostFormModal()"
-                            style="margin-top:0.5rem;">
-                            <span class="material-symbols-rounded">add</span> Crear primera publicación
-                        </button>
-                    </div>
-                    <div id="postsTableWrapper" style="display:none;">
-                        <!-- Desktop table -->
-                        <div class="au-desktop-table">
-                            <div class="au-col-headers">
-                                <span class="au-col au-col--id">ID</span>
-                                <span class="au-col post-col--title">TÍTULO</span>
-                                <span class="au-col post-col--type">TIPO</span>
-                                <span class="au-col post-col--status">ESTADO</span>
-                                <span class="au-col post-col--channels">CANALES</span>
-                                <span class="au-col post-col--date">FECHA</span>
-                                <span class="au-col au-col--actions">ACCIONES</span>
-                            </div>
-                            <div id="postsTableBody"></div>
-                        </div>
-                        <!-- Mobile cards -->
-                        <div class="au-mobile-cards" id="postsMobileCards"></div>
-                        <div class="pagination-bar" id="postsPagination"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========== MODERATION SECTION ========== -->
-            <section id="sectionModeration" class="section">
-                <div class="section__header">
-                    <div
-                        style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:1rem;">
-                        <div>
-                            <h2 class="section__title">Moderación de Publicaciones</h2>
-                            <p class="section__subtitle">Revisa, aprueba o rechaza las publicaciones pendientes.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="au-table-card">
-                    <div class="au-table-header">
-                        <div class="au-table-title">
-                            <span class="material-symbols-rounded au-table-icon">gavel</span>
-                            <span class="au-table-title-text">Pendientes de revisión</span>
-                        </div>
-                        <button class="btn btn--outline" id="btnRefreshModeration">
-                            <span class="material-symbols-rounded">refresh</span>
-                            <span class="au-btn-label">Actualizar</span>
-                        </button>
-                    </div>
-                    <div id="moderationLoading" class="loading" style="display:none;">
-                        <div class="spinner spinner--sm"></div>
-                        <p>Cargando publicaciones pendientes...</p>
-                    </div>
-                    <div id="moderationEmpty" class="empty-state" style="display:none;">
-                        <span class="material-symbols-rounded"
-                            style="font-size:2.5rem;color:var(--on-surface-variant);">check_circle</span>
-                        <p>No hay publicaciones pendientes de revisión</p>
-                    </div>
-                    <div id="moderationTableWrapper" style="display:none;">
-                        <div class="au-desktop-table">
-                            <div class="au-col-headers">
-                                <span class="au-col au-col--id">ID</span>
-                                <span class="au-col post-col--title">TÍTULO</span>
-                                <span class="au-col post-col--type">TIPO</span>
-                                <span class="au-col post-col--channels">AUTOR</span>
-                                <span class="au-col post-col--date">FECHA</span>
-                                <span class="au-col au-col--actions">ACCIONES</span>
-                            </div>
-                            <div id="moderationTableBody"></div>
-                        </div>
-                        <div class="au-mobile-cards" id="moderationMobileCards"></div>
-                        <div class="pagination-bar" id="moderationPagination"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========== NOTIFICATIONS SECTION ========== -->
-            <section id="sectionNotifications" class="section">
-                <div class="section__header">
-                    <h2 class="section__title">
-                        <span class="material-symbols-rounded">notifications</span>
-                        Centro de Notificaciones
-                    </h2>
-                    <p class="section__subtitle">Revisa los eventos importantes de tu cuenta</p>
-                </div>
-
-                <div class="card">
-                    <div class="card__header">
-                        <h3 class="card__title">Notificaciones recientes</h3>
-                        <div class="btn-group">
-                            <button class="btn btn--sm btn--outline" id="btnMarkAllRead">
-                                <span class="material-symbols-rounded">done_all</span> Marcar todas leídas
-                            </button>
-                            <button class="btn btn--sm btn--outline" id="btnRefreshNotif">
-                                <span class="material-symbols-rounded">refresh</span> Actualizar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card__body">
-                        <div id="notifList" class="notif-list">
-                            <p class="notif-loading">Cargando notificaciones...</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========== DASHBOARD SECTION ========== -->
-            <section id="sectionDashboard" class="section">
-                <div class="section__header">
-                    <h2 class="section__title">Panel de Administración</h2>
-                    <p class="section__subtitle">Vista general del sistema (requiere rol admin)</p>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card stat-card--primary">
-                        <div class="stat-card__icon">👥</div>
-                        <div class="stat-card__info">
-                            <span class="stat-card__value" id="dashUsers">-</span>
-                            <span class="stat-card__label">Usuarios</span>
-                        </div>
-                    </div>
-                    <div class="stat-card stat-card--success">
-                        <div class="stat-card__icon">📝</div>
-                        <div class="stat-card__info">
-                            <span class="stat-card__value" id="dashPosts">-</span>
-                            <span class="stat-card__label">Posts</span>
-                        </div>
-                    </div>
-                    <div class="stat-card stat-card--warning">
-                        <div class="stat-card__icon">💬</div>
-                        <div class="stat-card__info">
-                            <span class="stat-card__value" id="dashComments">-</span>
-                            <span class="stat-card__label">Comentarios</span>
-                        </div>
-                    </div>
-                    <div class="stat-card stat-card--info">
-                        <div class="stat-card__icon">📊</div>
-                        <div class="stat-card__info">
-                            <span class="stat-card__value" id="dashActive">-</span>
-                            <span class="stat-card__label">Activos hoy</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card__header">
-                        <h3 class="card__title">Respuesta del Dashboard API</h3>
-                        <button class="btn btn--sm btn--outline" id="btnRefreshDash">🔄 Actualizar</button>
-                    </div>
-                    <div class="card__body">
-                        <div id="dashLoading" class="loading" style="display:none;">
-                            <div class="spinner spinner--sm"></div>
-                        </div>
-                        <div id="dashResponse" class="code-block">
-                            <pre>Haz clic en "Actualizar" para cargar los datos del dashboard</pre>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-
-        <footer class="footer">
-            <p>&copy; 2026 Difexa — Microservicios API. Todos los derechos reservados.</p>
-            <div class="footer__links">
-                <a href="/docs" class="footer__link">
-                    <span class="material-symbols-rounded">description</span>
-                    Documentación
-                </a>
-                <a href="/" class="footer__link">
-                    <span class="material-symbols-rounded">terminal</span>
-                    API Client
-                </a>
-            </div>
-        </footer>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
     </div>
 
     <!-- ========== MODAL: LOGIN ========== -->
@@ -1319,6 +1588,83 @@
         </div>
     </div>
 
+    <!-- ========== MODAL: DEVICE-CHANNEL ASSIGN ========== -->
+    <div id="dcAssignModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="dcAssignTitle">Asignar Canales al Dispositivo</h2>
+                <button class="modal__close" data-close-modal="dcAssignModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los canales que deseas asignar. Los
+                    cambios se aplican inmediatamente.</p>
+                <div id="dcAssignLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando canales...</p>
+                </div>
+                <div id="dcAssignContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;">
+                    <button class="btn btn--primary" id="btnDcAssignSubmit">Guardar Asignación</button>
+                    <button class="btn btn--outline" data-close-modal="dcAssignModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: DEVICE-CHANNEL REVOKE ========== -->
+    <div id="dcRevokeModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--lg">
+            <div class="modal__header">
+                <h2 class="modal__title" id="dcRevokeTitle">Revocar Canales</h2>
+                <button class="modal__close" data-close-modal="dcRevokeModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Selecciona los canales que deseas revocar.</p>
+                <div id="dcRevokeLoading" class="loading" style="display:none;">
+                    <div class="spinner spinner--sm"></div>
+                    <p>Cargando canales asignados...</p>
+                </div>
+                <div id="dcRevokeEmpty" class="empty-state" style="display:none;">
+                    <span class="material-symbols-rounded"
+                        style="font-size:2rem;color:var(--on-surface-variant);">link_off</span>
+                    <p>Este dispositivo no tiene canales asignados.</p>
+                </div>
+                <div id="dcRevokeContent" style="display:none;"></div>
+                <div class="btn-group" style="margin-top:1.5rem;" id="dcRevokeActions">
+                    <button class="btn btn--danger" id="btnDcRevokeSubmit">Revocar Seleccionados</button>
+                    <button class="btn btn--outline" data-close-modal="dcRevokeModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: CREATE DEVICE ========== -->
+    <div id="deviceCreateModal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--sm">
+            <div class="modal__header">
+                <h2 class="modal__title">Crear Dispositivo</h2>
+                <button class="modal__close" data-close-modal="deviceCreateModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="text-muted" style="margin-bottom:1rem;">Se generara un UID automaticamente.</p>
+                <div class="alert alert--error" id="deviceCreateError" style="display:none;"></div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="deviceCreateIsActive" class="checkbox-input" checked>
+                        <span>Dispositivo activo</span>
+                    </label>
+                </div>
+                <div class="btn-group" style="margin-top:1rem;">
+                    <button class="btn btn--primary" id="btnDeviceCreateConfirm">Crear</button>
+                    <button class="btn btn--outline" data-close-modal="deviceCreateModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== MODAL: POST FORM (Create) ========== -->
     <div id="postFormModal" class="modal">
         <div class="modal__overlay"></div>
@@ -1528,9 +1874,11 @@
     <script src="./frontend/js/admin-users.js"></script>
     <script src="./frontend/js/channels.js"></script>
     <script src="./frontend/js/user-channels.js"></script>
+    <script src="./frontend/js/device-channels.js"></script>
     <script src="./frontend/js/posts.js"></script>
     <script src="./frontend/js/moderation.js"></script>
     <script src="./frontend/js/notifications.js"></script>
+    <script src="./frontend/js/device.js"></script>
     <script src="./frontend/js/app.js"></script>
 </body>
 

@@ -64,7 +64,7 @@ async function loadDashboard() {
     if (!state.isAuthenticated) return;
 
     const loading = document.getElementById('dashLoading');
-    const responseEl = document.getElementById('dashResponse');
+    const lastSync = document.getElementById('dashLastSync');
 
     loading.style.display = 'flex';
 
@@ -72,18 +72,65 @@ async function loadDashboard() {
         const res = await api.get('/admin/dashboard', true);
         const stats = res.data?.stats;
 
-        if (stats) {
-            document.getElementById('dashUsers').textContent = stats.users ?? '-';
-            document.getElementById('dashPosts').textContent = stats.posts ?? '-';
-            document.getElementById('dashComments').textContent = stats.comments ?? '-';
-            document.getElementById('dashActive').textContent = stats.active ?? '-';
-        }
+        const totalPosts = stats?.total_posts ?? stats?.posts ?? '-';
+        const devicesOnline = stats?.devices_online ?? stats?.active ?? '-';
+        const channels = stats?.channels ?? stats?.total_channels ?? '-';
+        const alerts = stats?.alerts ?? stats?.comments ?? '-';
 
-        responseEl.querySelector('pre').textContent = JSON.stringify(res, null, 2);
+        document.getElementById('dashTotalPosts').textContent = totalPosts;
+        document.getElementById('dashDevicesOnline').textContent = devicesOnline;
+        document.getElementById('dashChannels').textContent = channels;
+        document.getElementById('dashAlerts').textContent = alerts;
+
+        renderDashboardLogs(res.data?.recent || res.data?.logs || []);
+        if (lastSync) lastSync.textContent = `Actualizado: ${formatDate(new Date())}`;
         loading.style.display = 'none';
     } catch (err) {
         loading.style.display = 'none';
-        responseEl.querySelector('pre').textContent = `❌ Error: ${err.message}`;
+        renderDashboardLogs([]);
+        if (lastSync) lastSync.textContent = 'Actualizado: -';
         showToast('Error al cargar dashboard: ' + err.message, 'error');
     }
+}
+
+function renderDashboardLogs(logs) {
+    const tbody = document.getElementById('dashLogsBody');
+    if (!tbody) return;
+
+    const fallback = [
+        { id: 'DT-102', status: 'online', channel: 'Ofertas', pulse: 'hace 2 min' },
+        { id: 'DT-318', status: 'online', channel: 'Eventos', pulse: 'hace 6 min' },
+        { id: 'DT-409', status: 'offline', channel: 'Noticias', pulse: 'hace 12 min' },
+        { id: 'DT-552', status: 'alerta', channel: 'Promos', pulse: 'hace 20 min' }
+    ];
+
+    const rows = Array.isArray(logs) && logs.length > 0 ? logs : fallback;
+
+    tbody.innerHTML = rows.map((log) => {
+        const id = escapeHtml(String(log.id ?? log.device_id ?? '—'));
+        const statusRaw = String(log.status ?? log.state ?? log.online ?? 'offline').toLowerCase();
+        const channel = escapeHtml(String(log.channel ?? log.active_channel ?? '—'));
+        const pulse = escapeHtml(String(log.pulse ?? log.last_seen ?? log.last_pulse ?? '—'));
+
+        const statusLabel = statusRaw === 'online' || statusRaw === 'activo' || statusRaw === 'true'
+            ? 'online'
+            : statusRaw === 'offline' || statusRaw === 'inactivo' || statusRaw === 'false'
+                ? 'offline'
+                : 'alerta';
+
+        const statusClass = statusLabel === 'online'
+            ? 'status-pill--success'
+            : statusLabel === 'offline'
+                ? 'status-pill--error'
+                : 'status-pill--warning';
+
+        return `
+            <tr>
+                <td>${id}</td>
+                <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
+                <td>${channel}</td>
+                <td>${pulse}</td>
+            </tr>
+        `;
+    }).join('');
 }

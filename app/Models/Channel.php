@@ -76,4 +76,13 @@ class Channel extends Model
     {
         return $this->belongsToMany(Media::class, 'channel_medias', 'channel_id', 'media_id');
     }
+
+    /**
+     * Relacion N:M con Devices.
+     * Un canal puede distribuirse a muchos dispositivos.
+     */
+    public function devices(): BelongsToMany
+    {
+        return $this->belongsToMany(Device::class, 'device_channels', 'channel_id', 'device_id');
+    }
 }
