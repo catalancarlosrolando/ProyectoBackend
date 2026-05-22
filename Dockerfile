@@ -18,8 +18,11 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && rm composer-setup.php \
     && composer install --no-dev --optimize-autoloader --no-interaction
 
-RUN chmod -R 775 storage bootstrap/cache
+# Aseguramos permisos para Laravel y también para nuestro script de despliegue
+RUN chmod -R 775 storage bootstrap/cache database \
+    && chmod +x deploy.sh
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public/"]
+# Cambiamos el CMD para que ejecute el script bash
+CMD ["./deploy.sh"]
