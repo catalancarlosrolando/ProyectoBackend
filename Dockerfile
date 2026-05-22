@@ -10,13 +10,13 @@ RUN apt-get update \
         pdo pdo_mysql pdo_sqlite mbstring xml bcmath curl zip gd intl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY composer.json composer.lock ./
+COPY . .
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && rm composer-setup.php \
     && composer install --no-dev --optimize-autoloader --no-interaction
-
-COPY . .
 
 RUN chmod -R 775 storage bootstrap/cache
 
