@@ -52,6 +52,46 @@ function setDisplayError(message) {
     error.textContent = message || '';
 }
 
+function renderDisplayInactive(message) {
+    clearDisplayPlaybackTimers();
+    if (displayState.pollTimer) {
+        clearInterval(displayState.pollTimer);
+        displayState.pollTimer = null;
+    }
+
+    displayState.posts = [];
+    displayState.mediaCache.clear();
+    displayState.lastFeedSignature = 'inactive';
+
+    const wrapper = document.getElementById('displayMedia');
+    const empty = document.getElementById('displayEmpty');
+    const playlist = document.getElementById('displayPlaylist');
+    const channels = document.getElementById('displayChannels');
+
+    setDisplayStatus('Dispositivo inactivo', 'error');
+    setDisplayError(message || 'Lo sentimos, este dispositivo está inactivo. Contacta con el administrador para reactivarlo.');
+    updateDisplayNow(null);
+
+    if (playlist) playlist.innerHTML = '<span class="text-muted">Sin publicaciones disponibles</span>';
+    if (channels) channels.textContent = 'Sin canales asignados';
+
+    if (wrapper) {
+        wrapper.innerHTML = `
+            <div class="display-fallback" style="min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;">
+                <span class="material-symbols-rounded" style="font-size:4.5rem;color:#ffb84d;margin-bottom:16px;">tv_off</span>
+                <h2 style="margin:0 0 10px;font-size:2rem;">Este dispositivo está inactivo</h2>
+                <p style="margin:0;max-width:32rem;color:var(--display-muted,#9fb2cc);line-height:1.7;">
+                    Lo sentimos, este dispositivo está inactivo. Conéctate con el administrador para reactivarlo y volver a recibir publicaciones.
+                </p>
+            </div>
+        `;
+    }
+
+    if (empty) {
+        empty.style.display = 'none';
+    }
+}
+
 function setDisplaySyncTimestamp() {
     const sync = document.getElementById('displaySync');
     if (!sync) return;
@@ -295,6 +335,10 @@ async function pollDisplayFeed() {
         setDisplaySyncTimestamp();
         updateFeed(posts);
     } catch (err) {
+        if ((err.message || '').toLowerCase().includes('dispositivo no autorizado')) {
+            renderDisplayInactive('Lo sentimos, este dispositivo está inactivo. Conéctate con el administrador para reactivarlo y volver a recibir publicaciones.');
+            return;
+        }
         setDisplayStatus('Sin conexion', 'error');
         setDisplayError(err.message || 'Error al sincronizar');
     }

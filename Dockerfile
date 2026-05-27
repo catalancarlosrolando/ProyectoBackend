@@ -10,6 +10,11 @@ RUN apt-get update \
         pdo pdo_mysql pdo_sqlite mbstring xml bcmath curl zip gd intl \
     && rm -rf /var/lib/apt/lists/*
 
+# Modificar los límites de subida directamente en la configuración de PHP
+RUN echo "upload_max_filesize = 10M" > /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size = 64M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 COPY . .
 
 ENV COMPOSER_ALLOW_SUPERUSER=1

@@ -58,4 +58,20 @@ class DeviceAdminController extends Controller
             'message' => 'Dispositivo eliminado correctamente.',
         ]);
     }
+
+    /**
+     * PATCH /api/admin/devices/{device}
+     */
+    public function update(Device $device, StoreDeviceRequest $request): JsonResponse
+    {
+        $device->update([
+            'is_active' => $request->input('is_active', $device->is_active),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $device->only('id', 'uid', 'is_active', 'last_seen_at'),
+            'message' => 'Dispositivo actualizado correctamente.',
+        ]);
+    }
 }

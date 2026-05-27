@@ -94,6 +94,9 @@ function renderDeviceChannelsTable(devices) {
     tbody.innerHTML = devices.map(device => {
         const channelTags = renderDeviceChannelTags(device.channels || []);
         const count = (device.channels || []).length;
+        const toggleLabel = device.is_active ? 'Desactivar dispositivo' : 'Activar dispositivo';
+        const toggleIcon = device.is_active ? 'power_off' : 'power';
+        const toggleClass = device.is_active ? 'au-actions-menu__item--danger' : 'au-actions-menu__item--success';
         return `
         <div class="au-row">
             <span class="au-cell au-cell--id">${device.id}</span>
@@ -115,6 +118,9 @@ function renderDeviceChannelsTable(devices) {
                         <span class="material-symbols-rounded" style="font-size:20px">more_vert</span>
                     </button>
                     <div class="au-actions-menu">
+                        <button class="au-actions-menu__item ${toggleClass}" onclick="toggleDeviceActive(${device.id}, ${device.is_active ? 'false' : 'true'})">
+                            <span class="material-symbols-rounded">${toggleIcon}</span> ${toggleLabel}
+                        </button>
                         <button class="au-actions-menu__item au-actions-menu__item--success" onclick="openAssignDeviceChannelsModal(${device.id})">
                             <span class="material-symbols-rounded">add_link</span> Asignar canales
                         </button>
@@ -131,6 +137,9 @@ function renderDeviceChannelsTable(devices) {
     mobile.innerHTML = devices.map(device => {
         const channelTags = renderDeviceChannelTags(device.channels || []);
         const count = (device.channels || []).length;
+        const toggleLabel = device.is_active ? 'Desactivar dispositivo' : 'Activar dispositivo';
+        const toggleIcon = device.is_active ? 'power_off' : 'power';
+        const toggleClass = device.is_active ? 'au-actions-menu__item--danger' : 'au-actions-menu__item--success';
         return `
         <div class="au-user-card">
             <div class="au-user-card__top">
@@ -158,6 +167,9 @@ function renderDeviceChannelsTable(devices) {
                         <span class="material-symbols-rounded" style="font-size:20px">more_vert</span>
                     </button>
                     <div class="au-actions-menu">
+                        <button class="au-actions-menu__item ${toggleClass}" onclick="toggleDeviceActive(${device.id}, ${device.is_active ? 'false' : 'true'})">
+                            <span class="material-symbols-rounded">${toggleIcon}</span> ${toggleLabel}
+                        </button>
                         <button class="au-actions-menu__item au-actions-menu__item--success" onclick="openAssignDeviceChannelsModal(${device.id})">
                             <span class="material-symbols-rounded">add_link</span> Asignar canales
                         </button>
@@ -169,6 +181,26 @@ function renderDeviceChannelsTable(devices) {
             </div>
         </div>`;
     }).join('');
+}
+
+async function toggleDeviceActive(deviceId, nextStatus) {
+    const actionText = nextStatus ? 'activar' : 'desactivar';
+    showConfirm(
+        `${nextStatus ? 'Activar' : 'Desactivar'} dispositivo`,
+        `¿Deseas ${actionText} este dispositivo?`,
+        async () => {
+            try {
+                await api.patch(`/admin/devices/${deviceId}`, { is_active: !!nextStatus }, true);
+                showToast(`Dispositivo ${nextStatus ? 'activado' : 'desactivado'} correctamente.`, 'success');
+                if (typeof closeAllActionMenus === 'function') {
+                    closeAllActionMenus();
+                }
+                loadDeviceChannels(state.deviceChannels.currentPage || 1);
+            } catch (err) {
+                showToast('Error al actualizar dispositivo: ' + err.message, 'error');
+            }
+        }
+    );
 }
 
 function renderDcPagination(pagination) {

@@ -142,6 +142,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [DeviceAdminController::class, 'index']);
         Route::post('/', [DeviceAdminController::class, 'store']);
         Route::delete('/{device}', [DeviceAdminController::class, 'destroy']);
+        Route::patch('/{device}', [DeviceAdminController::class, 'update']);
     });
 
     // ── Gestión de publicaciones (Publicador) ──

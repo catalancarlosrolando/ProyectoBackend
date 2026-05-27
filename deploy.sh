@@ -17,6 +17,10 @@ touch "$DB_PATH"
 echo "Corriendo migraciones y seeds..."
 php artisan migrate --force --seed
 
+# Generar el enlace simbólico para las imágenes en producción
+echo "Creando enlace simbólico para el storage..."
+php artisan storage:link
+
 status=$?
 if [ $status -ne 0 ]; then
   echo "Error durante la migración o el seed. Código de salida: $status"

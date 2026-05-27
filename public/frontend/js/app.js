@@ -154,8 +154,10 @@ async function initApp() {
     // Confirm modal
     document.getElementById('btnConfirmYes').addEventListener('click', () => {
         if (state.confirmCallback) {
-            state.confirmCallback();
+            const callback = state.confirmCallback;
             state.confirmCallback = null;
+            closeModal('confirmModal');
+            callback();
         }
     });
 
