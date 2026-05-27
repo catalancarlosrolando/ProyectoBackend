@@ -16,7 +16,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && rm composer-setup.php \
-    && composer install --no-dev --optimize-autoloader --no-interaction
+    && composer install --optimize-autoloader --no-interaction
 
 # Aseguramos permisos para Laravel y también para nuestro script de despliegue
 RUN chmod -R 775 storage bootstrap/cache database \
