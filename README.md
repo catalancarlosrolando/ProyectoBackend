@@ -1,360 +1,299 @@
-# Microservicios API - Base para Proyectos Backend
+# ProyectoBackend
 
-## Descripción
+Este documento describe exclusivamente la parte de backend del proyecto desarrollada en PHP con Laravel. La interfaz frontend en JavaScript vanilla no está incluida en esta documentación.
 
-Este proyecto tiene como objetivo ser la **base fundamental para múltiples proyectos de backend de microservicios**. Ha sido diseñado específicamente como una plataforma **didáctica y profesional** para que estudiantes puedan utilizarla como punto de partida para sus proyectos personales y académicos.
+## Descripción general
 
-La API está construida con **Laravel 12** y PHP 8.2+, siguiendo las mejores prácticas de desarrollo backend moderno. Incluye todas las funcionalidades esenciales que necesita un proyecto profesional, desde autenticación hasta manejo de archivos y notificaciones por email.
+ProyectoBackend es una API REST para la gestión de contenido editorial, canales, medios, usuarios, dispositivos y moderación de publicaciones. Está pensado para soportar un flujo de publicación digital con autenticación, control de permisos por roles, administración de canales y entrega de contenido a dispositivos clientes.
 
-## Características y Funcionalidades
+La aplicación usa Laravel 12, PHP 8.2, Sanctum para autenticación por tokens, Spatie Permission para roles y permisos, y SQLite como base de datos por defecto para el entorno local.
 
-### Sistema de Autenticación Completo
-- **Registro de usuarios** con validación de datos
-- **Autenticación Bearer Token** usando Laravel Sanctum
-- **Verificación por email** con enlaces firmados
-- **Reset de contraseñas** con tokens seguros
-- **Logout seguro** con revocación de tokens
+## Stack tecnológico
 
-### Sistema de Notificaciones
-- **Emails personalizados** con tema corporativo
-- **Verificación de cuenta** por email
-- **Recuperación de contraseña** por email
-- **Configuración para Mailtrap** (ideal para desarrollo)
+- PHP 8.2
+- Laravel 12
+- Laravel Sanctum
+- Spatie Laravel Permission
+- SQLite (entorno local)
+- Pest para pruebas
+- SQL y Eloquent ORM
+- API REST con respuestas JSON
 
-### Sistema de Archivos
-- **Upload de archivos** con validación de tipos y tamaños
-- **Descarga de archivos** con control de acceso
-- **Gestión de archivos** (listado, eliminación)
-- **Almacenamiento local** configurado
+## Objetivos del backend
 
-### Herramientas de Desarrollo
-- **Pruebas automatizadas** con PestPHP
-- **Cliente API genérico** para probar endpoints
-- **Documentación interactiva** incluida
-- **Logs detallados** para debugging
+- Gestionar usuarios y sesiones autenticadas.
+- Controlar acceso por roles y permisos.
+- Administrar canales temáticos y medios asociados.
+- Permitir la creación y gestión de publicaciones con flujo de estado.
+- Facilitar la revisión y aprobación de contenido por parte de moderadores.
+- Entregar contenido a dispositivos autorizados.
+- Mantener historial de cambios y notificaciones internas.
+- Soportar carga de archivos y gestión de recursos multimedia.
 
-### Características Técnicas
-- **API RESTful** con respuestas JSON consistentes
-- **Validación robusta** en todas las entradas
-- **Manejo de errores** centralizado
-- **Middleware de autenticación** configurado
-- **Base de datos SQLite** (fácil setup)
+## Funcionalidades principales
 
-## Requisitos del Sistema
+### 1. Autenticación y usuarios
 
-Antes de instalar el proyecto, asegúrate de tener instalado en tu computadora:
+El backend incluye un sistema de autenticación basado en tokens de Sanctum.
 
-### Herramientas Necesarias
+Incluye:
 
-1. **PHP 8.2 o superior**
-   - Descarga desde: https://www.php.net/downloads
-   - Verifica la instalación: `php --version`
+- Registro de usuarios
+- Login con email y contraseña
+- Logout
+- Verificación de email
+- Reenvío de correos de verificación
+- Recuperación y restablecimiento de contraseña
+- Consulta del usuario autenticado
+- Roles y permisos por usuario
 
-2. **Composer (Gestor de dependencias de PHP)**
-   - Descarga desde: https://getcomposer.org/download/
-   - Verifica la instalación: `composer --version`
+Además, cada usuario puede tener permisos asociados a tareas como:
 
-3. **Git**
-   - Descarga desde: https://git-scm.com/downloads
-   - Verifica la instalación: `git --version`
+- gestionar-usuarios
+- gestionar-canales
+- editar-contenido
+- acceder-panel-admin
 
-4. **Un editor de código** (recomendado: VS Code)
+### 2. Roles y permisos
 
-## Instalación en Windows - Guía Detallada
+El proyecto implementa un sistema de autorización basado en roles y permisos con Spatie Permission.
 
-### Paso 1: Instalar PHP en Windows
+Roles típicos del sistema:
 
-1. **Descargar PHP**:
-   - Ve a https://windows.php.net/download/
-   - Descarga la versión "Non Thread Safe" de PHP 8.2 o superior
-   - Extrae el archivo ZIP en `C:\php`
+- invitado
+- publicador
+- moderador
+- admin
 
-2. **Configurar PHP**:
-   - Agrega `C:\php` a la variable de entorno PATH de Windows
-   - Copia `php.ini-development` y renómbralo a `php.ini`
-   - Edita `php.ini` y descomenta las siguientes extensiones:
-     ```ini
-     extension=openssl
-     extension=pdo_sqlite
-     extension=sqlite3
-     extension=curl
-     extension=mbstring
-     extension=fileinfo
-     ```
+Esto permite proteger rutas y endpoints por permisos específicos, por ejemplo:
 
-3. **Verificar instalación**:
-   ```powershell
-   php --version
-   ```
+- usuarios administradores gestionan usuarios y canales
+- publicadores gestionan publicaciones dentro de canales autorizados
+- moderadores revisan y validan contenido
+- administradores acceden a paneles y control global
 
-### Paso 2: Instalar Composer en Windows
+### 3. Gestión de canales y medios
 
-1. **Descargar Composer**:
-   - Ve a https://getcomposer.org/download/
-   - Descarga e instala `Composer-Setup.exe`
-   - El instalador configurará automáticamente PHP y las variables de entorno
+El backend administra contenidos organizados por canales temáticos y tipos de medios.
 
-2. **Verificar instalación**:
-   ```powershell
-   composer --version
-   ```
+Funciones disponibles:
 
-### Paso 3: Instalar Git en Windows
+- listado de tipos de canales
+- listado y creación de canales
+- edición y eliminación de canales
+- asociación de medios a canales
+- consulta de medios disponibles por canal
+- administración de medios y tipos de multimedia
 
-1. **Descargar Git**:
-   - Ve a https://git-scm.com/download/win
-   - Descarga e instala la versión más reciente
-   - Durante la instalación, selecciona "Use Git from the Windows Command Prompt"
+La lógica valida que:
 
-2. **Verificar instalación**:
-   ```powershell
-   git --version
-   ```
+- el publicador esté autorizado para un canal
+- los medios seleccionados pertenezcan al canal indicado
 
-### Paso 4: Configurar PowerShell
+### 4. Gestión de publicaciones
 
-1. **Abrir PowerShell como Administrador**
-2. **Habilitar la ejecución de scripts** (si es necesario):
-   ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-   ```
+La entidad principal del backend es Post, con un flujo completo de publicación y revisión.
 
-## Instalación Local - Guía Paso a Paso
+Operaciones disponibles:
 
-### Paso 1: Clonar el Repositorio
-```powershell
-git clone https://github.com/eormeno-idei/microservicios-api.git
-cd microservicios-api
-```
+- listado con búsqueda y filtros
+- creación de publicaciones en borrador
+- detalle de publicación
+- edición de publicaciones
+- eliminación de publicaciones
+- envío a revisión
+- reversión a borrador
+- archivado y desarchivado
+- historial de cambios por versión
+- comparación y restauración de versiones previas
+- exportación del historial
 
-### Paso 2: Instalar Dependencias
-```powershell
+Estados de publicación contemplados:
+
+- draft
+- submitted
+- published
+- archived
+- rejected
+
+El sistema además valida permisos y canales asociados antes de transformar el contenido a estados más avanzados.
+
+### 5. Moderación de contenido
+
+El backend incluye un módulo dedicado a la revisión editorial.
+
+Funciones:
+
+- listado de publicaciones pendientes de moderación
+- detalle completo de la publicación para revisión
+- aprobación de publicaciones
+- rechazo con comentarios obligatorios
+- detención de publicaciones ya publicadas
+- registro de comentarios del moderador
+
+Esto permite un control claro del ciclo editorial y la trazabilidad del proceso.
+
+### 6. Asignación de canales a usuarios y dispositivos
+
+El sistema permite relacionar usuarios con canales específicos y dispositivos con canales autorizados.
+
+Módulos implementados:
+
+- asignación de canales a publicadores
+- revocación de acceso a canales
+- consulta de canales del usuario
+- asignación de canales a dispositivos
+- recuperación de dispositivos con canales asociados
+
+Este mecanismo es clave para limitar qué contenido puede publicar o consumir cada actor del sistema.
+
+### 7. Gestión de dispositivos
+
+El proyecto soporta dispositivos como clientes del sistema de contenido.
+
+Incluye:
+
+- alta de dispositivos por administración
+- activación/desactivación de dispositivos
+- listado de dispositivos
+- eliminación y actualización
+- publicación de contenido para dispositivos autorizados
+- entrega de feed de publicaciones asociadas a canales del dispositivo
+
+La API de dispositivos permite consultar publicaciones publicadas en los canales asignados al dispositivo, validando si este está activo y autorizado.
+
+### 8. Archivos y recursos multimedia
+
+El backend incluye endpoints para manejar archivos de prueba y recursos asociados al sistema.
+
+Funciones:
+
+- carga de archivos
+- listado de archivos
+- descarga de archivos
+- eliminación de archivos
+
+Esto permite manejar contenido adicional adjunto a publicaciones o recursos del sistema de forma centralizada.
+
+### 9. Notificaciones
+
+El backend incorpora un módulo de notificaciones para usuarios autenticados.
+
+Funcionalidades:
+
+- listado de notificaciones
+- conteo de no leídas
+- marcado individual como leído
+- marcado de todas como leídas
+- eliminación de notificaciones
+
+Las notificaciones se usan para informar cambios de estado, asignaciones de canales, moderación y otros eventos relevantes del negocio.
+
+### 10. Historial y auditoría
+
+El sistema registra cambios relevantes sobre las publicaciones y otros registros de dominio.
+
+Incluye:
+
+- historial de versiones
+- comparación de versiones
+- restauración a una versión anterior
+- trazabilidad de modificaciones por usuario y fecha
+
+Esto fortalece la auditoría y permite corregir o recuperar contenido fácilmente.
+
+## Endpoints principales del backend
+
+La API se estructura bajo el prefijo /api y contiene rutas como:
+
+- /api/ping
+- /api/landing
+- /api/register
+- /api/login
+- /api/logout
+- /api/user
+- /api/password/forgot
+- /api/password/reset
+- /api/email/verify/{id}/{hash}
+- /api/email/resend
+- /api/posts
+- /api/posts/{post}
+- /api/posts/{post}/submit
+- /api/posts/{post}/history
+- /api/moderation/posts
+- /api/admin/users
+- /api/admin/channels
+- /api/admin/user-channels
+- /api/admin/device-channels
+- /api/admin/devices
+- /api/notifications
+- /api/device/posts
+- /api/test-files
+
+## Estructura de la aplicación Laravel
+
+Principales carpetas del backend:
+
+- app/Http/Controllers/Api: controladores REST del API
+- app/Models: modelos Eloquent del dominio
+- app/Http/Requests: validaciones de entrada por request
+- app/Enums: enums del dominio
+- app/Notifications: notificaciones del sistema
+- app/Services: servicios de lógica de negocio
+- routes/api.php: definición de endpoints
+- database/migrations: definiciones de esquema
+- database/seeders: carga inicial de datos
+- tests/: pruebas automatizadas con Pest
+
+## Seguridad y validación
+
+El backend aplica medidas de seguridad y validación consistentes con Laravel:
+
+- validación de entradas por request
+- protección de rutas con middleware de autenticación
+- control de acceso por permisos con Spatie
+- protección por token Sanctum
+- validación de permisos específicos para cada operación
+- uso de transacciones para operaciones críticas
+- manejo de errores JSON estandarizado
+
+## Instalación y ejecución
+
+Requisitos:
+
+- PHP 8.2+
+- Composer
+- SQLite o base de datos compatible
+
+Pasos básicos:
+
+```bash
 composer install
-```
-
-### Paso 3: Configurar Variables de Entorno
-```powershell
-# Copia el archivo de ejemplo (Windows)
-copy .env.example .env
-
-# Genera la clave de aplicación
+cp .env.example .env
 php artisan key:generate
-```
-
-## Paso 4: Configuración del Usuario Administrador
-
-Este paso es fundamental para que al poblar con `seed` la BBDD no de ningun error.
-
-En el archivo `.env` hay que añadir lo siguiente:
-
-```env
-ADMIN_NAME="Administrador"
-ADMIN_EMAIL="admin@tuproyecto.com"
-ADMIN_PASSWORD="tu_password_seguro"
-```
-
-### Paso 5: Configurar Base de Datos
-```powershell
-# Crear la base de datos SQLite
 php artisan migrate
-
-# Opcional: Poblar con datos de prueba
 php artisan db:seed
-```
-
-### Paso 6: Ejecutar el Servidor
-```powershell
 php artisan serve
 ```
 
-Listo! Tu API estará disponible en: http://127.0.0.1:8000
+La API estará disponible en:
 
-### Comandos Adicionales para Windows
-
-#### Limpiar caché y configuración
-```powershell
-php artisan config:clear
-php artisan cache:clear
-php artisan route:clear
+```bash
+http://localhost:8000/api
 ```
 
-#### Verificar el estado del proyecto
-```powershell
-php artisan about
-```
+## Pruebas
 
-#### Crear enlace simbólico para storage (si es necesario)
-```powershell
-php artisan storage:link
-```
+El proyecto incluye pruebas con Pest en la carpeta tests.
 
-## Configuración de Mailtrap (Recomendado para Estudiantes)
+Para ejecutarlas:
 
-Para probar las funcionalidades de email (verificación, reset de contraseña), te recomendamos usar **Mailtrap**:
-
-### Paso 1: Crear Cuenta en Mailtrap
-1. Ve a https://mailtrap.io/
-2. Crea una cuenta gratuita
-3. Inicia sesión en tu dashboard
-
-### Paso 2: Obtener Credenciales
-1. Ve a **Email Testing** > **Inboxes**
-2. Crea un nuevo inbox o selecciona uno existente
-3. Ve a la pestaña **SMTP Settings**
-4. Selecciona **Laravel 9+** en el dropdown
-5. Copia las credenciales mostradas
-
-### Paso 3: Configurar en .env
-Abre tu archivo `.env` y actualiza estas variables:
-
-```env
-MAIL_MAILER=smtp
-MAIL_HOST=sandbox.smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USERNAME=tu_usuario_mailtrap
-MAIL_PASSWORD=tu_password_mailtrap
-MAIL_FROM_ADDRESS="noreply@tuproyecto.com"
-MAIL_FROM_NAME="Tu Proyecto"
-```
-
-> **Nota**: Reemplaza `tu_usuario_mailtrap` y `tu_password_mailtrap` con las credenciales reales de Mailtrap.
-
-## Probando la API
-
-### Cliente Web Incluido
-El proyecto incluye un cliente web para probar todos los endpoints:
-
-1. Ve a: http://127.0.0.1:8000
-2. Usa el cliente interactivo para probar las funcionalidades
-
-### Endpoints Principales
-- **POST** `/api/register` - Registrar usuario
-- **POST** `/api/login` - Iniciar sesión
-- **POST** `/api/logout` - Cerrar sesión
-- **GET** `/api/user` - Obtener usuario autenticado
-- **POST** `/api/password/forgot` - Solicitar reset de contraseña
-- **POST** `/api/password/reset` - Resetear contraseña
-- **GET** `/api/email/verify/{id}/{hash}` - Verificar email
-- **POST** `/api/files/upload` - Subir archivo
-- **GET** `/api/files` - Listar archivos
-
-### Ejecutar Pruebas
-```powershell
-# Ejecutar todas las pruebas
+```bash
 php artisan test
-
-# Ejecutar pruebas específicas
-php artisan test --filter AuthTest
-
-# Ejecutar pruebas con cobertura (requiere Xdebug)
-php artisan test --coverage
 ```
 
-## Documentación Adicional
+## Resumen
 
-El proyecto incluye documentación detallada:
+La parte backend del proyecto implementa una API REST sólida para gestionar usuarios, roles, contenido editorial, dispositivos, canales, publicaciones, moderación, notificaciones y auditoría. Está diseñada para apoyar un flujo completo de administración digital y publicación de contenido con control de permisos y trazabilidad.
 
-- `API_COMPLETE_DOCUMENTATION.md` - Documentación completa de la API
-- `IMPLEMENTATION_COMPLETE_SUMMARY.md` - Resumen de implementaciones
-- `EMAIL_CUSTOMIZATION_GUIDE.md` - Guía de personalización de emails
-- `FILE_UPLOAD_EXAMPLES.md` - Ejemplos de subida de archivos
-- `TECHNICAL_COMPONENTS_README.md` - Componentes técnicos
-
-## Para Estudiantes
-
-Este proyecto está diseñado específicamente para:
-
-- **Aprender desarrollo backend** con tecnologías modernas
-- **Entender arquitecturas de microservicios**
-- **Practicar APIs RESTful**
-- **Implementar autenticación y autorización**
-- **Trabajar con bases de datos y migraciones**
-- **Manejar testing automatizado**
-
-### Sugerencias para Proyectos Personales
-1. **Modifica las entidades** según tu dominio de negocio
-2. **Agrega nuevos endpoints** para tus funcionalidades
-3. **Personaliza los emails** con tu marca
-4. **Implementa nuevas validaciones**
-5. **Extiende el sistema de archivos**
-
-## Solución de Problemas
-
-### Problemas Comunes en Windows
-
-#### Error: "php: command not found"
-```powershell
-# Verifica que PHP esté en el PATH
-echo $env:PATH
-# Agrega PHP al PATH si no está presente
-$env:PATH += ";C:\php"
-```
-
-#### Error: "composer: command not found"
-```powershell
-# Reinstala Composer desde https://getcomposer.org/download/
-# O verifica que esté en el PATH
-composer --version
-```
-
-#### Error: "Extension not found"
-```powershell
-# Verifica que las extensiones estén habilitadas en php.ini
-php -m | Select-String "openssl|pdo_sqlite|sqlite3"
-```
-
-#### Error: "Permission denied" en Windows
-```powershell
-# Ejecuta PowerShell como Administrador
-# Verifica permisos de carpetas storage y bootstrap/cache
-icacls storage /grant Everyone:(OI)(CI)F
-icacls bootstrap\cache /grant Everyone:(OI)(CI)F
-```
-
-### Errores Generales
-
-#### Error: "Class not found"
-```bash
-composer dump-autoload
-```
-
-#### Error: "Key not found"
-```bash
-php artisan key:generate
-```
-
-#### Error: "Database not found"
-```bash
-php artisan migrate:fresh
-```
-
-#### Error: "Port already in use"
-```powershell
-# Cambiar puerto del servidor
-php artisan serve --port=8001
-```
-
-#### Error: "SQLite database locked"
-```powershell
-# Cierra todas las conexiones y reinicia
-php artisan migrate:fresh --seed
-```
-
-## Soporte
-
-Si tienes preguntas o encuentras problemas:
-
-1. Revisa la documentación en el repositorio
-2. Consulta los logs en `storage/logs/`
-3. Verifica tu configuración en `.env`
-4. Ejecuta las pruebas para verificar el funcionamiento
-
-## Licencia
-
-Este proyecto está bajo la licencia MIT. Puedes usarlo libremente para tus proyectos personales y académicos.
-
----
-
-**¡Feliz codificación!**
-
-> Proyecto diseñado para estudiantes por estudiantes. Úsalo como base para crear proyectos increíbles.
+Esta documentación cubre el backend en PHP/Laravel; no incluye la interfaz frontend desarrollada en JavaScript vanilla.

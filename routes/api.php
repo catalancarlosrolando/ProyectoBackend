@@ -114,6 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{channel}/medias', [ChannelMediaController::class, 'store']);
         Route::delete('/{channel}/medias', [ChannelMediaController::class, 'destroy']);
 
+        // ── CRUD de canales ──
         Route::apiResource('/', ChannelController::class)->parameters(['' => 'channel']);
 
         // ── Si no quiero usar apiResource

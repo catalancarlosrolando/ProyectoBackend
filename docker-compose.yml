@@ -1,0 +1,26 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: microservicios-api
+    ports:
+      - "8080:8080"
+    volumes:
+      # Montamos el código para hot-reload en dev
+      - .:/app
+      # Anónimo para que vendor del contenedor no sea pisado por el host
+      - /app/vendor
+      # Volume nombrado para persistir la DB SQLite
+      - db_data:/app/database
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - PORT=8080
+      # Por defecto NO reseteamos ni seedeamos
+      - RESET_DB=false
+      - SEED=false
+    restart: unless-stopped
+
+volumes:
+  db_data:

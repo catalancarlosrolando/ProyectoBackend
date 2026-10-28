@@ -1,34 +1,36 @@
 #!/bin/bash
-# deploy.sh
+# deploy.sh — arranque del contenedor
+
+set -e
 
 DB_PATH="/app/database/database.sqlite"
+PORT="${PORT:-8080}"
 
-# Si existe, lo borramos para limpiar en cada deploy
-if [ -f "$DB_PATH" ]; then
-  echo "Eliminando base de datos antigua..."
-  rm "$DB_PATH"
+# Si la variable RESET_DB=true, borramos la DB (solo para entornos efímeros)
+if [ "${RESET_DB:-false}" = "true" ]; then
+  echo ">> RESET_DB=true: eliminando base de datos antigua..."
+  rm -f "$DB_PATH"
 fi
 
-# Creamos un archivo sqlite completamente nuevo y vacío
-echo "Creando base de datos limpia..."
-touch "$DB_PATH"
-
-# Ejecutamos las migraciones y los seeders
-echo "Corriendo migraciones y seeds..."
-php artisan migrate --force --seed
-
-# Generar el enlace simbólico para las imágenes en producción
-echo "Creando enlace simbólico para el storage..."
-php artisan storage:link
-
-status=$?
-if [ $status -ne 0 ]; then
-  echo "Error durante la migración o el seed. Código de salida: $status"
-  exit $status
+# Creamos el archivo SQLite si no existe
+if [ ! -f "$DB_PATH" ]; then
+  echo ">> Creando base de datos SQLite vacía..."
+  mkdir -p "$(dirname "$DB_PATH")"
+  touch "$DB_PATH"
 fi
 
-echo "Migración y seed completados con éxito."
+# Migraciones
+echo ">> Corriendo migraciones..."
+php artisan migrate --force
 
-# IMPORTANTE: Ahora ejecutamos el servidor web para que el contenedor no se apague
-echo "Iniciando servidor PHP..."
-exec php -S 0.0.0.0:${PORT:-8080} -t public/
+# Seeders solo si la variable SEED=true o si la DB estaba vacía
+if [ "${SEED:-false}" = "true" ]; then
+  echo ">> Corriendo seeders..."
+  php artisan db:seed --force
+fi
+
+# Enlace simbólico de storage (idempotente)
+php artisan storage:link 2>/dev/null || true
+
+echo ">> Iniciando servidor PHP en puerto $PORT..."
+exec php -S 0.0.0.0:${PORT} -t public/
